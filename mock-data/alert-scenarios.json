@@ -1,0 +1,123 @@
+{
+  "name": "SKYSHIELD MVP simulated alert scenarios",
+  "description": "Mock alert sequences for validating normalization, BLE delivery assumptions, Garmin display behavior, and vibration pattern mapping.",
+  "scenarios": [
+    {
+      "scenario_id": "patrol-low-awareness",
+      "title": "Low-risk DJI signal at distance",
+      "purpose": "Verify that low-risk alerts display without creating urgent haptic behavior.",
+      "alerts": [
+        {
+          "after_ms": 0,
+          "alert": {
+            "alert_id": "scenario-low-dji-001",
+            "timestamp": "2026-05-10T12:10:00Z",
+            "source": {
+              "system": "SKYSHIELD simulator",
+              "mode": "simulated",
+              "device_id": "esp32-s3-devkit-01"
+            },
+            "threat_type": "dji",
+            "risk_level": "low",
+            "confidence": 0.61,
+            "band": "2.4GHz",
+            "distance_category": "far",
+            "vibration_pattern": "single_short",
+            "display_message": "DJI signal far",
+            "recommended_action": "Maintain awareness.",
+            "expires_in_ms": 10000,
+            "metadata": {
+              "direction_finding_available": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenario_id": "fpv-escalation",
+      "title": "FPV threat escalates from medium to high",
+      "purpose": "Verify replacement of an active alert by a higher priority alert.",
+      "alerts": [
+        {
+          "after_ms": 0,
+          "alert": {
+            "alert_id": "scenario-fpv-medium-001",
+            "timestamp": "2026-05-10T12:11:00Z",
+            "source": {
+              "system": "SKYSHIELD simulator",
+              "mode": "simulated",
+              "device_id": "esp32-s3-devkit-01"
+            },
+            "threat_type": "fpv",
+            "risk_level": "medium",
+            "confidence": 0.74,
+            "band": "5.8GHz",
+            "distance_category": "medium",
+            "vibration_pattern": "double_short",
+            "display_message": "FPV signal medium",
+            "recommended_action": "Prepare cover and scan.",
+            "expires_in_ms": 12000,
+            "metadata": {
+              "direction_finding_available": false
+            }
+          }
+        },
+        {
+          "after_ms": 5000,
+          "alert": {
+            "alert_id": "scenario-fpv-high-002",
+            "timestamp": "2026-05-10T12:11:05Z",
+            "source": {
+              "system": "SKYSHIELD simulator",
+              "mode": "simulated",
+              "device_id": "esp32-s3-devkit-01"
+            },
+            "threat_type": "fpv",
+            "risk_level": "high",
+            "confidence": 0.91,
+            "band": "5.8GHz",
+            "distance_category": "near",
+            "vibration_pattern": "triple_short",
+            "display_message": "FPV drone near",
+            "recommended_action": "Take cover and scan overhead.",
+            "expires_in_ms": 15000,
+            "metadata": {
+              "direction_finding_available": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenario_id": "unknown-critical",
+      "title": "Unknown high-confidence multi-band threat",
+      "purpose": "Verify critical alert display and repeated urgent vibration behavior.",
+      "alerts": [
+        {
+          "after_ms": 0,
+          "alert": {
+            "alert_id": "scenario-unknown-critical-001",
+            "timestamp": "2026-05-10T12:12:00Z",
+            "source": {
+              "system": "SKYSHIELD simulator",
+              "mode": "simulated",
+              "device_id": "esp32-s3-devkit-01"
+            },
+            "threat_type": "unknown",
+            "risk_level": "critical",
+            "confidence": 0.88,
+            "band": "multi",
+            "distance_category": "near",
+            "vibration_pattern": "repeat_urgent",
+            "display_message": "Unknown drone threat",
+            "recommended_action": "Immediate cover. Await confirmation.",
+            "expires_in_ms": 20000,
+            "metadata": {
+              "direction_finding_available": false
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

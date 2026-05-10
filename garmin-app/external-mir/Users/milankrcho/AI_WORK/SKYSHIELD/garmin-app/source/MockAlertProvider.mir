@@ -1,0 +1,79 @@
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 2; @symbol_classdef = [MockAlertProvider,2,6,23]; ]
+class MockAlertProvider {
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 2; ]
+    <init> {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 2; ]
+    static
+    <init> {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 3; @symbol_functiondef = [initialize,3,13,23]; ]
+    function initialize() as Void {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 6; @symbol_functiondef = [getActiveAlert,6,13,27]; ]
+    function getActiveAlert() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_6_30_21_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 7 8 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_6_30_21_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_6_30_21_4_stop" ]
+        %bands.1 = local;
+        symbol [ bands %bands.1 7 12 17 ];
+        %tmp.1 = newa 3;
+        %tmp.2 = newd 2;
+        %tmp.4 = const :band;
+        symbol [ band %tmp.4 8 15 19 const ];
+        %tmp.5 = "1.2";
+        %tmp.6 = dup %tmp.2;
+        %tmp.7 = aputv %tmp.6 %tmp.4 %tmp.5;
+        %tmp.9 = const :level;
+        symbol [ level %tmp.9 8 31 36 const ];
+        %tmp.10 = "LOW";
+        %tmp.11 = dup %tmp.7;
+        %tmp.12 = aputv %tmp.11 %tmp.9 %tmp.10;
+        %tmp.13 = dup %tmp.1;
+        %tmp.14 = aputv %tmp.13 0 %tmp.12;
+        %tmp.15 = newd 2;
+        %tmp.17 = const :band;
+        symbol [ band %tmp.17 9 15 19 const ];
+        %tmp.18 = "3.3";
+        %tmp.19 = dup %tmp.15;
+        %tmp.20 = aputv %tmp.19 %tmp.17 %tmp.18;
+        %tmp.22 = const :level;
+        symbol [ level %tmp.22 9 31 36 const ];
+        %tmp.23 = "MED";
+        %tmp.24 = dup %tmp.20;
+        %tmp.25 = aputv %tmp.24 %tmp.22 %tmp.23;
+        %tmp.26 = dup %tmp.14;
+        %tmp.27 = aputv %tmp.26 1 %tmp.25;
+        %tmp.28 = newd 2;
+        %tmp.30 = const :band;
+        symbol [ band %tmp.30 10 15 19 const ];
+        %tmp.31 = "5.8";
+        %tmp.32 = dup %tmp.28;
+        %tmp.33 = aputv %tmp.32 %tmp.30 %tmp.31;
+        %tmp.35 = const :level;
+        symbol [ level %tmp.35 10 31 36 const ];
+        %tmp.36 = "HIGH";
+        %tmp.37 = dup %tmp.33;
+        %tmp.38 = aputv %tmp.37 %tmp.35 %tmp.36;
+        %tmp.39 = dup %tmp.27;
+        %tmp.40 = aputv %tmp.39 2 %tmp.38;
+        lputv %bands.1 %tmp.40;
+        symbol [ bands %bands.1 7 12 17 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 13 8 ]
+        symbol [ AlertModel %tmp.44 13 19 29 ];
+        %tmp.44 = getv ? :AlertModel;
+        %tmp.45 = "FPV";
+        %tmp.46 = "HIGH";
+        %tmp.47 = 87;
+        %tmp.48 = "5.8 GHz";
+        %tmp.49 = "NEAR";
+        %tmp.50 = lgetv %bands.1;
+        symbol [ bands %tmp.50 19 12 17 ];
+        %tmp.41 = newc %tmp.44 (%tmp.45, %tmp.46, %tmp.47, %tmp.48, %tmp.49, %tmp.50);
+        ret %tmp.41;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_6_30_21_4_stop:
+    }
+}
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 2; ]
+<init> {
+}

@@ -1,0 +1,22 @@
+{
+  "alert_id": "sim-fpv-high-001",
+  "timestamp": "2026-05-10T12:00:00Z",
+  "source": {
+    "system": "SKYSHIELD simulator",
+    "mode": "simulated",
+    "device_id": "esp32-s3-devkit-01"
+  },
+  "threat_type": "fpv",
+  "risk_level": "high",
+  "confidence": 0.92,
+  "band": "5.8GHz",
+  "distance_category": "near",
+  "vibration_pattern": "triple_short",
+  "display_message": "FPV drone near",
+  "recommended_action": "Take cover and scan overhead.",
+  "expires_in_ms": 15000,
+  "metadata": {
+    "scenario": "fast approaching FPV signal",
+    "direction_finding_available": false
+  }
+}

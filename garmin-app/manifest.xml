@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="3">
+    <iq:application
+        id="0f3f8d6e-18f1-4f27-a5a1-1a33f6ef8c91"
+        type="watch-app"
+        name="@Strings.AppName"
+        entry="SkyShieldApp"
+        launcherIcon="@Drawables.LauncherIcon"
+        minSdkVersion="3.2.0">
+        <iq:products>
+            <iq:product id="enduro2"/>
+        </iq:products>
+        <iq:permissions/>
+    </iq:application>
+</iq:manifest>

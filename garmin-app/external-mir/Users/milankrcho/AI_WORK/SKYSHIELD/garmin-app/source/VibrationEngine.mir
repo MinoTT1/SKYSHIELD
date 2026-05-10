@@ -1,0 +1,236 @@
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 1; @symbol_importdef<0> = [Toybox,1,7,13]; @symbol_importdef<1> = [Attention,1,14,23]; ]
+import Toybox.Attention;
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 2; @symbol_importdef<0> = [Toybox,2,7,13]; @symbol_importdef<1> = [System,2,14,20]; ]
+import Toybox.System;
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 6; @symbol_classdef = [VibrationEngine,6,6,21]; ]
+class VibrationEngine {
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 6; ]
+    <init> {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 6; ]
+    static
+    <init> {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 7; @symbol_functiondef = [initialize,7,13,23]; ]
+    function initialize() as Void {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 10; @symbol_functiondef = [triggerForAlert,10,13,28]; @symbol_param<0> = [alert,10,29,34]; ]
+    function triggerForAlert(alert) {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_10_36_20_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 11 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_11_8_13_8_if_stmt:
+        %tmp.1 = lgetv %alert;
+        symbol [ alert %tmp.1 11 12 17 ];
+        %tmp.2 = null;
+        %tmp.3 = eq %tmp.1 %tmp.2;
+        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_11_8_13_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_11_8_13_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_11_27_13_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 12 12 ]
+        ret ?;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_11_27_13_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_11_8_13_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_11_8_13_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 15 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_15_8_19_8_if_stmt:
+        %tmp.4 = lgetv %alert;
+        symbol [ alert %tmp.4 15 12 17 ];
+        symbol [ riskLevel %tmp.5 15 18 27 ];
+        %tmp.5 = getv %tmp.4 :riskLevel;
+        %tmp.6 = "HIGH";
+        %tmp.7 = eq %tmp.5 %tmp.6;
+        bf %tmp.7 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_15_8_19_8_if_false;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_15_8_19_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_15_39_17_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 16 12 ]
+        %tmp.8 = self;
+        symbol [ vibrateHigh %tmp.9 16 12 23 ];
+        %tmp.9 = getv function %tmp.8 :vibrateHigh;
+        invoke %tmp.8 %tmp.9();
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_15_39_17_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_15_8_19_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_15_8_19_8_if_false:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 17 15 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_17_15_19_8_if_stmt:
+        %tmp.10 = lgetv %alert;
+        symbol [ alert %tmp.10 17 19 24 ];
+        symbol [ riskLevel %tmp.11 17 25 34 ];
+        %tmp.11 = getv %tmp.10 :riskLevel;
+        %tmp.12 = "CRITICAL";
+        %tmp.13 = eq %tmp.11 %tmp.12;
+        bf %tmp.13 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_17_15_19_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_17_15_19_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_17_50_19_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 18 12 ]
+        %tmp.14 = self;
+        symbol [ vibrateCritical %tmp.15 18 12 27 ];
+        %tmp.15 = getv function %tmp.14 :vibrateCritical;
+        invoke %tmp.14 %tmp.15();
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_17_50_19_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_17_15_19_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_17_15_19_8_if_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_15_8_19_8_if_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_10_36_20_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 22; @symbol_functiondef = [vibrateHigh,22,13,24]; ]
+    function vibrateHigh() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_27_32_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 23 8 ]
+        try @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_beginTry @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_endTry @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_catch @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_finally;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_beginTry:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_12_29_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 24 12 ]
+        symbol [ Attention %tmp.1 24 12 21 ];
+        %tmp.1 = getm $.Toybox.Attention;
+        symbol [ vibrate %tmp.2 24 22 29 ];
+        %tmp.2 = getv function %tmp.1 :vibrate;
+        %tmp.3 = newa 3;
+        symbol [ Attention %tmp.6 25 20 29 ];
+        %tmp.6 = getm $.Toybox.Attention;
+        symbol [ VibeProfile %tmp.7 25 30 41 ];
+        %tmp.7 = getv function ? %tmp.6 :VibeProfile;
+        %tmp.8 = 80;
+        %tmp.9 = 100;
+        %tmp.4 = newc %tmp.7 (%tmp.8, %tmp.9);
+        %tmp.10 = dup %tmp.3;
+        %tmp.11 = aputv %tmp.10 0 %tmp.4;
+        symbol [ Attention %tmp.14 26 20 29 ];
+        %tmp.14 = getm $.Toybox.Attention;
+        symbol [ VibeProfile %tmp.15 26 30 41 ];
+        %tmp.15 = getv function ? %tmp.14 :VibeProfile;
+        %tmp.16 = 80;
+        %tmp.17 = 0;
+        %tmp.12 = newc %tmp.15 (%tmp.16, %tmp.17);
+        %tmp.18 = dup %tmp.11;
+        %tmp.19 = aputv %tmp.18 1 %tmp.12;
+        symbol [ Attention %tmp.22 27 20 29 ];
+        %tmp.22 = getm $.Toybox.Attention;
+        symbol [ VibeProfile %tmp.23 27 30 41 ];
+        %tmp.23 = getv function ? %tmp.22 :VibeProfile;
+        %tmp.24 = 80;
+        %tmp.25 = 100;
+        %tmp.20 = newc %tmp.23 (%tmp.24, %tmp.25);
+        %tmp.26 = dup %tmp.19;
+        %tmp.27 = aputv %tmp.26 2 %tmp.20;
+        invoke %tmp.1 %tmp.2(%tmp.27);
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_12_29_8_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_endTry:
+        jsr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_finally;
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_catch:
+        %tmp.28 = exception;
+        push %tmp.28;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 29 10 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_catch" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_29_10_31_8_end" ]
+        %ex.1 = local;
+        symbol [ ex %ex.1 29 17 19 ];
+        %tmp.29 = dup %tmp.28;
+        lputv %ex.1 %tmp.29;
+        symbol [ ex %ex.1 29 17 19 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_29_21_31_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 30 12 ]
+        symbol [ System %tmp.30 30 12 18 ];
+        %tmp.30 = getm $.Toybox.System;
+        symbol [ println %tmp.31 30 19 26 ];
+        %tmp.31 = getv function %tmp.30 :println;
+        %tmp.32 = "SKYSHIELD vibration unavailable: ";
+        %tmp.33 = lgetv %ex.1;
+        symbol [ ex %tmp.33 30 65 67 ];
+        %tmp.34 = add %tmp.32 %tmp.33;
+        invoke %tmp.30 %tmp.31(%tmp.34);
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_29_21_31_8_stop:
+        jsr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_finally;
+        pop;
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_29_10_31_8_end:
+        try @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_catch @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_29_10_31_8_end @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_29_10_31_8_end @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_finally;
+        jsr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_finally;
+        throw %tmp.28;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_finally:
+        jsrret;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_23_8_31_8_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_27_32_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 34; @symbol_functiondef = [vibrateCritical,34,13,28]; ]
+    function vibrateCritical() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_34_31_44_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 35 8 ]
+        try @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_beginTry @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_endTry @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_catch @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_finally;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_beginTry:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_12_41_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 36 12 ]
+        symbol [ Attention %tmp.1 36 12 21 ];
+        %tmp.1 = getm $.Toybox.Attention;
+        symbol [ vibrate %tmp.2 36 22 29 ];
+        %tmp.2 = getv function %tmp.1 :vibrate;
+        %tmp.3 = newa 3;
+        symbol [ Attention %tmp.6 37 20 29 ];
+        %tmp.6 = getm $.Toybox.Attention;
+        symbol [ VibeProfile %tmp.7 37 30 41 ];
+        %tmp.7 = getv function ? %tmp.6 :VibeProfile;
+        %tmp.8 = 250;
+        %tmp.9 = 100;
+        %tmp.4 = newc %tmp.7 (%tmp.8, %tmp.9);
+        %tmp.10 = dup %tmp.3;
+        %tmp.11 = aputv %tmp.10 0 %tmp.4;
+        symbol [ Attention %tmp.14 38 20 29 ];
+        %tmp.14 = getm $.Toybox.Attention;
+        symbol [ VibeProfile %tmp.15 38 30 41 ];
+        %tmp.15 = getv function ? %tmp.14 :VibeProfile;
+        %tmp.16 = 120;
+        %tmp.17 = 0;
+        %tmp.12 = newc %tmp.15 (%tmp.16, %tmp.17);
+        %tmp.18 = dup %tmp.11;
+        %tmp.19 = aputv %tmp.18 1 %tmp.12;
+        symbol [ Attention %tmp.22 39 20 29 ];
+        %tmp.22 = getm $.Toybox.Attention;
+        symbol [ VibeProfile %tmp.23 39 30 41 ];
+        %tmp.23 = getv function ? %tmp.22 :VibeProfile;
+        %tmp.24 = 250;
+        %tmp.25 = 100;
+        %tmp.20 = newc %tmp.23 (%tmp.24, %tmp.25);
+        %tmp.26 = dup %tmp.19;
+        %tmp.27 = aputv %tmp.26 2 %tmp.20;
+        invoke %tmp.1 %tmp.2(%tmp.27);
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_12_41_8_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_endTry:
+        jsr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_finally;
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_catch:
+        %tmp.28 = exception;
+        push %tmp.28;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 41 10 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_catch" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_41_10_43_8_end" ]
+        %ex.1 = local;
+        symbol [ ex %ex.1 41 17 19 ];
+        %tmp.29 = dup %tmp.28;
+        lputv %ex.1 %tmp.29;
+        symbol [ ex %ex.1 41 17 19 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_41_21_43_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 42 12 ]
+        symbol [ System %tmp.30 42 12 18 ];
+        %tmp.30 = getm $.Toybox.System;
+        symbol [ println %tmp.31 42 19 26 ];
+        %tmp.31 = getv function %tmp.30 :println;
+        %tmp.32 = "SKYSHIELD vibration unavailable: ";
+        %tmp.33 = lgetv %ex.1;
+        symbol [ ex %tmp.33 42 65 67 ];
+        %tmp.34 = add %tmp.32 %tmp.33;
+        invoke %tmp.30 %tmp.31(%tmp.34);
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_41_21_43_8_stop:
+        jsr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_finally;
+        pop;
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_41_10_43_8_end:
+        try @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_catch @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_41_10_43_8_end @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_41_10_43_8_end @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_finally;
+        jsr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_finally;
+        throw %tmp.28;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_finally:
+        jsrret;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_35_8_43_8_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_34_31_44_4_stop:
+    }
+}
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc"; @line = 1; ]
+<init> {
+}

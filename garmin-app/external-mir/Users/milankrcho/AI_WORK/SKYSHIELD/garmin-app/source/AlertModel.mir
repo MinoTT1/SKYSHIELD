@@ -1,0 +1,60 @@
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 3; @symbol_classdef = [AlertModel,3,6,16]; ]
+class AlertModel {
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 3; ]
+    <init> {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 3; ]
+    static
+    <init> {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 4; @position = 8; @symbol_vardef = [threatType,4,8,18]; ]
+    var threatType;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 5; @position = 8; @symbol_vardef = [riskLevel,5,8,17]; ]
+    var riskLevel;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 6; @position = 8; @symbol_vardef = [confidencePercent,6,8,25]; ]
+    var confidencePercent;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 7; @position = 8; @symbol_vardef = [band,7,8,12]; ]
+    var band;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 8; @position = 8; @symbol_vardef = [distanceLabel,8,8,21]; ]
+    var distanceLabel;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 9; @position = 8; @symbol_vardef = [activeBands,9,8,19]; ]
+    var activeBands;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 11; @symbol_functiondef = [initialize,11,13,23]; @symbol_param<0> = [threat,11,24,30]; @symbol_param<1> = [risk,11,32,36]; @symbol_param<2> = [confidence,11,38,48]; @symbol_param<3> = [primaryBand,11,50,61]; @symbol_param<4> = [distance,11,63,71]; @symbol_param<5> = [bands,11,73,78]; ]
+    function initialize(threat, risk, confidence, primaryBand, distance, bands) as Void {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertModel_mc_11_80_18_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" 12 8 ]
+        %tmp.1 = lgetv %threat;
+        symbol [ threat %tmp.1 12 21 27 ];
+        symbol [ threatType ? 12 8 18 ];
+        putv self :threatType %tmp.1;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" 13 8 ]
+        %tmp.2 = lgetv %risk;
+        symbol [ risk %tmp.2 13 20 24 ];
+        symbol [ riskLevel ? 13 8 17 ];
+        putv self :riskLevel %tmp.2;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" 14 8 ]
+        %tmp.3 = lgetv %confidence;
+        symbol [ confidence %tmp.3 14 28 38 ];
+        symbol [ confidencePercent ? 14 8 25 ];
+        putv self :confidencePercent %tmp.3;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" 15 8 ]
+        %tmp.4 = lgetv %primaryBand;
+        symbol [ primaryBand %tmp.4 15 15 26 ];
+        symbol [ band ? 15 8 12 ];
+        putv self :band %tmp.4;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" 16 8 ]
+        %tmp.5 = lgetv %distance;
+        symbol [ distance %tmp.5 16 24 32 ];
+        symbol [ distanceLabel ? 16 8 21 ];
+        putv self :distanceLabel %tmp.5;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" 17 8 ]
+        %tmp.6 = lgetv %bands;
+        symbol [ bands %tmp.6 17 22 27 ];
+        symbol [ activeBands ? 17 8 19 ];
+        putv self :activeBands %tmp.6;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertModel_mc_11_80_18_4_stop:
+    }
+}
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc"; @line = 3; ]
+<init> {
+}

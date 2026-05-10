@@ -1,0 +1,22 @@
+{
+  "alert_id": "sim-unknown-critical-001",
+  "timestamp": "2026-05-10T12:02:00Z",
+  "source": {
+    "system": "SKYSHIELD simulator",
+    "mode": "simulated",
+    "device_id": "esp32-s3-devkit-01"
+  },
+  "threat_type": "unknown",
+  "risk_level": "critical",
+  "confidence": 0.88,
+  "band": "multi",
+  "distance_category": "near",
+  "vibration_pattern": "repeat_urgent",
+  "display_message": "Unknown drone threat",
+  "recommended_action": "Immediate cover. Await confirmation.",
+  "expires_in_ms": 20000,
+  "metadata": {
+    "scenario": "strong multi-band unknown profile",
+    "direction_finding_available": false
+  }
+}

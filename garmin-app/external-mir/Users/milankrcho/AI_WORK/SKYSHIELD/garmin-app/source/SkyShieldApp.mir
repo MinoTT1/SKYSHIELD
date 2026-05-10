@@ -1,0 +1,47 @@
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 1; @symbol_importdef<0> = [Toybox,1,7,13]; @symbol_importdef<1> = [Application,1,14,25]; ]
+import Toybox.Application;
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 2; @symbol_importdef<0> = [Toybox,2,7,13]; @symbol_importdef<1> = [WatchUi,2,14,21]; ]
+import Toybox.WatchUi;
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 4; @symbol_classdef = [SkyShieldApp,4,6,18]; @symbol_extends<0> = [Application,4,27,38]; @symbol_extends<1> = [AppBase,4,39,46]; ]
+class SkyShieldApp extends Application.AppBase {
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 4; ]
+    <init> {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 4; ]
+    static
+    <init> {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 5; @symbol_functiondef = [initialize,5,13,23]; ]
+    function initialize() as Void {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldApp_mc_5_26_7_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" 6 8 ]
+        symbol [ AppBase %tmp.2 6 8 15 ];
+        %tmp.2 = getv ? :AppBase;
+        symbol [ initialize %tmp.3 6 16 26 ];
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldApp_mc_5_26_7_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 9; @symbol_functiondef = [onStart,9,13,20]; @symbol_param<0> = [state,9,21,26]; ]
+    function onStart(state) {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 12; @symbol_functiondef = [onStop,12,13,19]; @symbol_param<0> = [state,12,20,25]; ]
+    function onStop(state) {
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 15; @symbol_functiondef = [getInitialView,15,13,27]; ]
+    function getInitialView() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldApp_mc_15_30_17_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" 16 8 ]
+        %tmp.1 = newa 1;
+        symbol [ SkyShieldView %tmp.5 16 21 34 ];
+        %tmp.5 = getv ? :SkyShieldView;
+        %tmp.2 = newc %tmp.5 ();
+        %tmp.6 = dup %tmp.1;
+        %tmp.7 = aputv %tmp.6 0 %tmp.2;
+        ret %tmp.7;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldApp_mc_15_30_17_4_stop:
+    }
+}
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc"; @line = 1; ]
+<init> {
+}
