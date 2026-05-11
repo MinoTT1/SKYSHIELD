@@ -7,6 +7,7 @@ class SkyShieldView extends WatchUi.View {
     var _alert;
     var _settings;
     var _history;
+    var _connectionState;
     var _vibrationEngine;
     var _timer;
     var _currentScreen;
@@ -20,6 +21,7 @@ class SkyShieldView extends WatchUi.View {
         _engine = new AlertEngine();
         _settings = new SettingsModel();
         _history = new AlertHistory();
+        _connectionState = new ConnectionStateService();
         _vibrationEngine = new VibrationEngine(_settings);
         _timer = null;
         _currentScreen = 0;
@@ -36,6 +38,7 @@ class SkyShieldView extends WatchUi.View {
         _screenTickCount = 0;
         _showSplash = true;
         _criticalPulseOn = true;
+        _connectionState.reset();
         _history.addAlert(_alert);
         triggerVibrationIfNeeded();
 
@@ -53,6 +56,8 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function onTimerTick() {
+        _connectionState.tick();
+
         if (_showSplash) {
             _tickCount += 1;
 
@@ -111,11 +116,14 @@ class SkyShieldView extends WatchUi.View {
         }
 
         if (_alert == null) {
+            drawConnectionState(dc, width);
             drawAlertBanner(dc, width, "LOW", "LOW");
             drawCentered(dc, width, 86, "SKYSHIELD", Graphics.FONT_SMALL);
             drawCentered(dc, width, 124, "NO ACTIVE ALERT", Graphics.FONT_TINY);
             return;
         }
+
+        drawConnectionState(dc, width);
 
         if (_currentScreen == 1) {
             drawBandsScreen(dc, width);
@@ -132,8 +140,33 @@ class SkyShieldView extends WatchUi.View {
         drawCentered(dc, width, 132, "TACTICAL RF DETECTOR", Graphics.FONT_TINY);
     }
 
+    function drawConnectionState(dc, width) {
+        var label = "[" + getConnectionStateLabel() + "]";
+        var y = 34;
+        var height = 19;
+        var margin = 58;
+
+        if (_connectionState.isSignalLost() && _connectionState.isBlinkOn()) {
+            dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_WHITE);
+            dc.fillRectangle(margin, y - 1, width - (margin * 2), height);
+            drawCentered(dc, width, y, label, Graphics.FONT_TINY);
+            return;
+        }
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, label, Graphics.FONT_TINY);
+    }
+
+    function getConnectionStateLabel() {
+        if (_connectionState.getState() == "SIGNAL_LOST") {
+            return "SIGNAL LOST";
+        }
+
+        return _connectionState.getState();
+    }
+
     function drawAlertScreen(dc, width) {
-        var y = 64;
+        var y = 82;
 
         drawAlertBanner(dc, width, getShortRiskLabel(_alert.riskLevel), _alert.riskLevel);
         dc.setColor(getRiskColor(_alert.riskLevel), Graphics.COLOR_BLACK);
@@ -158,7 +191,7 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function drawBandsScreen(dc, width) {
-        var y = 58;
+        var y = 70;
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, "BANDS", Graphics.FONT_SMALL);
@@ -174,7 +207,7 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function drawHistoryScreen(dc, width) {
-        var y = 58;
+        var y = 70;
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, "HISTORY", Graphics.FONT_SMALL);
@@ -194,7 +227,7 @@ class SkyShieldView extends WatchUi.View {
 
     function drawAlertBanner(dc, width, label, riskLevel) {
         var margin = 54;
-        var top = 30;
+        var top = 56;
         var height = 19;
 
         if (riskLevel == "CRITICAL") {

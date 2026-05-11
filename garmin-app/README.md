@@ -19,6 +19,7 @@ Current prototype responsibilities:
 - Track the last five mock alerts in memory
 - Parse canonical SKYSHIELD JSON alert packets into Garmin alert models
 - Show optional simulated direction hints on the ALERT screen
+- Simulate BLE connection lifecycle states on the HUD
 - Trigger severity-based vibration patterns
 - Use high-contrast text for the Garmin Enduro 2 MIP display
 
@@ -46,6 +47,7 @@ garmin-app/
     AlertSource.mc
     MockAlertSource.mc
     BleAlertSource.mc
+    ConnectionStateService.mc
     AlertHistory.mc
     SettingsModel.mc
     VibrationEngine.mc
@@ -85,6 +87,7 @@ The MVP is a watch-only tactical UI prototype. It includes:
 - HISTORY screen with the last five mock alerts
 - Garmin-side parser for the canonical SKYSHIELD JSON packet
 - AlertSource abstraction for swapping mock data with future BLE data
+- Simulated BLE lifecycle state display
 - Critical banner pulse
 - Severity-based vibration patterns
 - Simple in-app settings model for future settings UI
@@ -135,6 +138,23 @@ BleAlertSource -> AlertParser -> AlertModel -> AlertEngine -> SkyShieldView
 ```
 
 `BleAlertSource` is a placeholder only. It documents where the future ESP32 BLE notify payload will be received and passed into `AlertParser.parse()`.
+
+## Simulated BLE Lifecycle
+
+The HUD shows a compact monochrome connection state:
+
+- `[SCANNING]`
+- `[CONNECTING]`
+- `[CONNECTED]`
+- `[SIGNAL LOST]`
+
+Current simulated flow:
+
+```text
+SCANNING (~3s) -> CONNECTING (~2s) -> CONNECTED -> SIGNAL LOST (~2s blink) -> CONNECTING -> CONNECTED
+```
+
+`ConnectionStateService` drives this simulation with the existing lightweight timer. Future BLE callbacks can update this same state service from real scan, connect, disconnect, and reconnect events.
 
 ## Vibration Patterns
 
