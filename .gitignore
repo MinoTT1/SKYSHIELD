@@ -1,0 +1,23 @@
+# Garmin build artifacts
+*.prg
+*.debug.xml
+*.mir
+
+# Garmin generated folders
+gen/
+internal-mir/
+external-mir/
+
+# Developer keys
+developer_key
+*.der
+
+# macOS
+.DS_Store
+
+# Python
+.venv/
+__pycache__/
+
+# Logs
+*.log
