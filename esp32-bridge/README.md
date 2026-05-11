@@ -24,6 +24,10 @@ Expected long-term responsibilities:
 - Arduino framework for ESP32
 - USB serial monitor at `115200`
 
+For first hardware setup, use the step-by-step bring-up guide:
+
+- [ESP32-S3 Bring-Up Guide](../docs/esp32-bringup-guide.md)
+
 Default PlatformIO environment:
 
 ```sh
