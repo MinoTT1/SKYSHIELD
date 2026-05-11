@@ -11,6 +11,10 @@ class AlertEngine {
         return _provider.getActiveAlert();
     }
 
+    function getNextAlert() {
+        return _provider.getNextAlert();
+    }
+
     function isHighUrgency(alert) {
         if (alert == null) {
             return false;
