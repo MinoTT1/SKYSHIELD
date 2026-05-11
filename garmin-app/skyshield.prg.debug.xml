@@ -5,369 +5,465 @@
         <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/gen/no-device/source/Rez.mcgen" id="1" lineNum="7" parent="globals/Rez" pc="268435460" symbol="&lt;init&gt;"/>
         <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="2" lineNum="5" parent="globals/SkyShieldView" pc="268435480" symbol="&lt;init&gt;"/>
         <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="3" lineNum="4" parent="globals/SkyShieldApp" pc="268435492" symbol="&lt;init&gt;"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="4" lineNum="11" parent="globals/AlertModel" pc="268435504" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="4" lineNum="12" parent="globals/AlertModel" pc="268435506" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="4" lineNum="13" parent="globals/AlertModel" pc="268435515" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="4" lineNum="14" parent="globals/AlertModel" pc="268435524" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="4" lineNum="15" parent="globals/AlertModel" pc="268435533" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="4" lineNum="16" parent="globals/AlertModel" pc="268435542" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="4" lineNum="17" parent="globals/AlertModel" pc="268435551" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="5" lineNum="39" parent="globals/MockAlertProvider" pc="268435561" symbol="buildDjiMediumAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="5" lineNum="40" parent="globals/MockAlertProvider" pc="268435563" symbol="buildDjiMediumAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="6" lineNum="9" parent="globals/MockAlertProvider" pc="268435728" symbol="getActiveAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="6" lineNum="10" parent="globals/MockAlertProvider" pc="268435730" symbol="getActiveAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="7" lineNum="13" parent="globals/MockAlertProvider" pc="268435744" symbol="getNextAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="7" lineNum="14" parent="globals/MockAlertProvider" pc="268435746" symbol="getNextAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="7" lineNum="15" parent="globals/MockAlertProvider" pc="268435764" symbol="getNextAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="8" lineNum="18" parent="globals/MockAlertProvider" pc="268435778" symbol="buildAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="8" lineNum="19" parent="globals/MockAlertProvider" pc="268435780" symbol="buildAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="8" lineNum="20" parent="globals/MockAlertProvider" pc="268435788" symbol="buildAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="8" lineNum="23" parent="globals/MockAlertProvider" pc="268435798" symbol="buildAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="8" lineNum="24" parent="globals/MockAlertProvider" pc="268435806" symbol="buildAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="8" lineNum="27" parent="globals/MockAlertProvider" pc="268435816" symbol="buildAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="9" lineNum="48" parent="globals/MockAlertProvider" pc="268435823" symbol="buildUnknownCriticalAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="9" lineNum="49" parent="globals/MockAlertProvider" pc="268435825" symbol="buildUnknownCriticalAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="10" lineNum="30" parent="globals/MockAlertProvider" pc="268435990" symbol="buildFpvHighAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="10" lineNum="31" parent="globals/MockAlertProvider" pc="268435992" symbol="buildFpvHighAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="11" lineNum="5" parent="globals/MockAlertProvider" pc="268436157" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="11" lineNum="6" parent="globals/MockAlertProvider" pc="268436159" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="12" lineNum="205" parent="globals/SkyShieldView" pc="268436168" symbol="getAlertTitle"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="12" lineNum="206" parent="globals/SkyShieldView" pc="268436170" symbol="getAlertTitle"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="13" lineNum="172" parent="globals/SkyShieldView" pc="268436194" symbol="drawMediumBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="13" lineNum="173" parent="globals/SkyShieldView" pc="268436196" symbol="drawMediumBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="13" lineNum="174" parent="globals/SkyShieldView" pc="268436211" symbol="drawMediumBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="13" lineNum="176" parent="globals/SkyShieldView" pc="268436238" symbol="drawMediumBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="13" lineNum="177" parent="globals/SkyShieldView" pc="268436254" symbol="drawMediumBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="154" parent="globals/SkyShieldView" pc="268436277" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="155" parent="globals/SkyShieldView" pc="268436280" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="156" parent="globals/SkyShieldView" pc="268436284" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="157" parent="globals/SkyShieldView" pc="268436288" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="159" parent="globals/SkyShieldView" pc="268436292" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="160" parent="globals/SkyShieldView" pc="268436303" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="161" parent="globals/SkyShieldView" pc="268436324" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="164" parent="globals/SkyShieldView" pc="268436328" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="165" parent="globals/SkyShieldView" pc="268436339" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="166" parent="globals/SkyShieldView" pc="268436360" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="14" lineNum="169" parent="globals/SkyShieldView" pc="268436364" symbol="drawAlertBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="15" lineNum="180" parent="globals/SkyShieldView" pc="268436386" symbol="drawHighBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="15" lineNum="181" parent="globals/SkyShieldView" pc="268436388" symbol="drawHighBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="15" lineNum="182" parent="globals/SkyShieldView" pc="268436404" symbol="drawHighBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="15" lineNum="183" parent="globals/SkyShieldView" pc="268436428" symbol="drawHighBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="15" lineNum="185" parent="globals/SkyShieldView" pc="268436464" symbol="drawHighBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="16" lineNum="85" parent="globals/SkyShieldView" pc="268436487" symbol="triggerVibrationIfNeeded"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="16" lineNum="86" parent="globals/SkyShieldView" pc="268436489" symbol="triggerVibrationIfNeeded"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="17" lineNum="225" parent="globals/SkyShieldView" pc="268436509" symbol="getDistanceLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="17" lineNum="226" parent="globals/SkyShieldView" pc="268436511" symbol="getDistanceLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="17" lineNum="227" parent="globals/SkyShieldView" pc="268436530" symbol="getDistanceLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="17" lineNum="230" parent="globals/SkyShieldView" pc="268436539" symbol="getDistanceLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="138" parent="globals/SkyShieldView" pc="268436550" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="139" parent="globals/SkyShieldView" pc="268436553" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="141" parent="globals/SkyShieldView" pc="268436557" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="142" parent="globals/SkyShieldView" pc="268436573" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="143" parent="globals/SkyShieldView" pc="268436595" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="145" parent="globals/SkyShieldView" pc="268436602" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="147" parent="globals/SkyShieldView" pc="268436618" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="148" parent="globals/SkyShieldView" pc="268436643" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="149" parent="globals/SkyShieldView" pc="268436658" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="150" parent="globals/SkyShieldView" pc="268436698" symbol="drawBandsScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="19" lineNum="43" parent="globals/SkyShieldView" pc="268436716" symbol="onHide"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="19" lineNum="44" parent="globals/SkyShieldView" pc="268436718" symbol="onHide"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="19" lineNum="45" parent="globals/SkyShieldView" pc="268436727" symbol="onHide"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="28" parent="globals/SkyShieldView" pc="268436743" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="29" parent="globals/SkyShieldView" pc="268436745" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="30" parent="globals/SkyShieldView" pc="268436763" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="31" parent="globals/SkyShieldView" pc="268436771" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="32" parent="globals/SkyShieldView" pc="268436779" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="33" parent="globals/SkyShieldView" pc="268436787" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="34" parent="globals/SkyShieldView" pc="268436795" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="36" parent="globals/SkyShieldView" pc="268436802" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="37" parent="globals/SkyShieldView" pc="268436811" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="40" parent="globals/SkyShieldView" pc="268436843" symbol="onShow"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="120" parent="globals/SkyShieldView" pc="268436875" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="121" parent="globals/SkyShieldView" pc="268436878" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="123" parent="globals/SkyShieldView" pc="268436882" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="124" parent="globals/SkyShieldView" pc="268436923" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="125" parent="globals/SkyShieldView" pc="268436952" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="126" parent="globals/SkyShieldView" pc="268436979" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="128" parent="globals/SkyShieldView" pc="268436986" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="129" parent="globals/SkyShieldView" pc="268437002" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="130" parent="globals/SkyShieldView" pc="268437029" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="132" parent="globals/SkyShieldView" pc="268437036" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="133" parent="globals/SkyShieldView" pc="268437059" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="135" parent="globals/SkyShieldView" pc="268437066" symbol="drawAlertScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="245" parent="globals/SkyShieldView" pc="268437106" symbol="drawCentered"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="246" parent="globals/SkyShieldView" pc="268437108" symbol="drawCentered"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="49" parent="globals/SkyShieldView" pc="268437132" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="50" parent="globals/SkyShieldView" pc="268437134" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="52" parent="globals/SkyShieldView" pc="268437149" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="53" parent="globals/SkyShieldView" pc="268437157" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="54" parent="globals/SkyShieldView" pc="268437168" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="55" parent="globals/SkyShieldView" pc="268437176" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="58" parent="globals/SkyShieldView" pc="268437187" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="59" parent="globals/SkyShieldView" pc="268437198" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="62" parent="globals/SkyShieldView" pc="268437202" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="63" parent="globals/SkyShieldView" pc="268437243" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="64" parent="globals/SkyShieldView" pc="268437259" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="65" parent="globals/SkyShieldView" pc="268437287" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="68" parent="globals/SkyShieldView" pc="268437298" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="69" parent="globals/SkyShieldView" pc="268437309" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="71" parent="globals/SkyShieldView" pc="268437321" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="74" parent="globals/SkyShieldView" pc="268437329" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="75" parent="globals/SkyShieldView" pc="268437340" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="76" parent="globals/SkyShieldView" pc="268437348" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="77" parent="globals/SkyShieldView" pc="268437356" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="78" parent="globals/SkyShieldView" pc="268437364" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="79" parent="globals/SkyShieldView" pc="268437382" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="82" parent="globals/SkyShieldView" pc="268437392" symbol="onTimerTick"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="188" parent="globals/SkyShieldView" pc="268437404" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="189" parent="globals/SkyShieldView" pc="268437406" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="190" parent="globals/SkyShieldView" pc="268437414" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="191" parent="globals/SkyShieldView" pc="268437434" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="193" parent="globals/SkyShieldView" pc="268437458" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="194" parent="globals/SkyShieldView" pc="268437474" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="195" parent="globals/SkyShieldView" pc="268437496" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="198" parent="globals/SkyShieldView" pc="268437500" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="199" parent="globals/SkyShieldView" pc="268437518" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="201" parent="globals/SkyShieldView" pc="268437542" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="202" parent="globals/SkyShieldView" pc="268437561" symbol="drawCriticalBanner"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="249" parent="globals/SkyShieldView" pc="268437584" symbol="getRiskColor"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="250" parent="globals/SkyShieldView" pc="268437586" symbol="getRiskColor"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="251" parent="globals/SkyShieldView" pc="268437597" symbol="getRiskColor"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="254" parent="globals/SkyShieldView" pc="268437606" symbol="getRiskColor"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="255" parent="globals/SkyShieldView" pc="268437617" symbol="getRiskColor"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="258" parent="globals/SkyShieldView" pc="268437625" symbol="getRiskColor"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="259" parent="globals/SkyShieldView" pc="268437636" symbol="getRiskColor"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="262" parent="globals/SkyShieldView" pc="268437645" symbol="getRiskColor"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="209" parent="globals/SkyShieldView" pc="268437651" symbol="getAlertTitleFont"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="210" parent="globals/SkyShieldView" pc="268437653" symbol="getAlertTitleFont"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="16" parent="globals/SkyShieldView" pc="268437656" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="17" parent="globals/SkyShieldView" pc="268437658" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="18" parent="globals/SkyShieldView" pc="268437670" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="19" parent="globals/SkyShieldView" pc="268437695" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="20" parent="globals/SkyShieldView" pc="268437720" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="21" parent="globals/SkyShieldView" pc="268437750" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="22" parent="globals/SkyShieldView" pc="268437758" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="23" parent="globals/SkyShieldView" pc="268437766" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="24" parent="globals/SkyShieldView" pc="268437774" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="25" parent="globals/SkyShieldView" pc="268437782" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="114" parent="globals/SkyShieldView" pc="268437791" symbol="drawSplashScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="115" parent="globals/SkyShieldView" pc="268437793" symbol="drawSplashScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="116" parent="globals/SkyShieldView" pc="268437809" symbol="drawSplashScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="117" parent="globals/SkyShieldView" pc="268437831" symbol="drawSplashScreen"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="89" parent="globals/SkyShieldView" pc="268437855" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="90" parent="globals/SkyShieldView" pc="268437858" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="92" parent="globals/SkyShieldView" pc="268437867" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="93" parent="globals/SkyShieldView" pc="268437883" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="95" parent="globals/SkyShieldView" pc="268437891" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="96" parent="globals/SkyShieldView" pc="268437899" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="97" parent="globals/SkyShieldView" pc="268437912" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="100" parent="globals/SkyShieldView" pc="268437916" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="101" parent="globals/SkyShieldView" pc="268437925" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="102" parent="globals/SkyShieldView" pc="268437948" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="103" parent="globals/SkyShieldView" pc="268437970" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="104" parent="globals/SkyShieldView" pc="268437992" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="107" parent="globals/SkyShieldView" pc="268437996" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="108" parent="globals/SkyShieldView" pc="268438007" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="110" parent="globals/SkyShieldView" pc="268438023" symbol="onUpdate"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="213" parent="globals/SkyShieldView" pc="268438037" symbol="getAlertStatus"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="214" parent="globals/SkyShieldView" pc="268438039" symbol="getAlertStatus"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="215" parent="globals/SkyShieldView" pc="268438058" symbol="getAlertStatus"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="218" parent="globals/SkyShieldView" pc="268438067" symbol="getAlertStatus"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="219" parent="globals/SkyShieldView" pc="268438086" symbol="getAlertStatus"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="222" parent="globals/SkyShieldView" pc="268438095" symbol="getAlertStatus"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="233" parent="globals/SkyShieldView" pc="268438101" symbol="getShortRiskLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="234" parent="globals/SkyShieldView" pc="268438103" symbol="getShortRiskLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="235" parent="globals/SkyShieldView" pc="268438114" symbol="getShortRiskLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="238" parent="globals/SkyShieldView" pc="268438123" symbol="getShortRiskLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="239" parent="globals/SkyShieldView" pc="268438134" symbol="getShortRiskLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="242" parent="globals/SkyShieldView" pc="268438143" symbol="getShortRiskLabel"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SettingsModel.mc" id="32" lineNum="8" parent="globals/SettingsModel" pc="268438146" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SettingsModel.mc" id="32" lineNum="9" parent="globals/SettingsModel" pc="268438148" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SettingsModel.mc" id="32" lineNum="10" parent="globals/SettingsModel" pc="268438156" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SettingsModel.mc" id="32" lineNum="11" parent="globals/SettingsModel" pc="268438168" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="33" lineNum="41" parent="globals/VibrationEngine" pc="268438177" symbol="vibrateHigh"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="33" lineNum="43" parent="globals/VibrationEngine" pc="268438180" symbol="vibrateHigh"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="33" lineNum="50" parent="globals/VibrationEngine" pc="268438346" symbol="vibrateHigh"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="33" lineNum="51" parent="globals/VibrationEngine" pc="268438350" symbol="vibrateHigh"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="34" lineNum="31" parent="globals/VibrationEngine" pc="268438384" symbol="vibrateMedium"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="34" lineNum="33" parent="globals/VibrationEngine" pc="268438387" symbol="vibrateMedium"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="34" lineNum="36" parent="globals/VibrationEngine" pc="268438439" symbol="vibrateMedium"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="34" lineNum="37" parent="globals/VibrationEngine" pc="268438443" symbol="vibrateMedium"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="13" parent="globals/VibrationEngine" pc="268438477" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="14" parent="globals/VibrationEngine" pc="268438479" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="15" parent="globals/VibrationEngine" pc="268438485" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="18" parent="globals/VibrationEngine" pc="268438489" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="19" parent="globals/VibrationEngine" pc="268438512" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="22" parent="globals/VibrationEngine" pc="268438516" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="23" parent="globals/VibrationEngine" pc="268438531" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="24" parent="globals/VibrationEngine" pc="268438541" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="25" parent="globals/VibrationEngine" pc="268438556" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="26" parent="globals/VibrationEngine" pc="268438566" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="35" lineNum="27" parent="globals/VibrationEngine" pc="268438581" symbol="triggerForAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="36" lineNum="9" parent="globals/VibrationEngine" pc="268438592" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="36" lineNum="10" parent="globals/VibrationEngine" pc="268438594" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="37" lineNum="55" parent="globals/VibrationEngine" pc="268438604" symbol="vibrateCritical"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="37" lineNum="57" parent="globals/VibrationEngine" pc="268438607" symbol="vibrateCritical"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="37" lineNum="62" parent="globals/VibrationEngine" pc="268438719" symbol="vibrateCritical"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="37" lineNum="63" parent="globals/VibrationEngine" pc="268438723" symbol="vibrateCritical"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="38" lineNum="10" parent="globals/AlertEngine" pc="268438757" symbol="getActiveAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="38" lineNum="11" parent="globals/AlertEngine" pc="268438759" symbol="getActiveAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="39" lineNum="14" parent="globals/AlertEngine" pc="268438771" symbol="getNextAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="39" lineNum="15" parent="globals/AlertEngine" pc="268438773" symbol="getNextAlert"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="40" lineNum="18" parent="globals/AlertEngine" pc="268438785" symbol="isHighUrgency"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="40" lineNum="19" parent="globals/AlertEngine" pc="268438787" symbol="isHighUrgency"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="40" lineNum="20" parent="globals/AlertEngine" pc="268438793" symbol="isHighUrgency"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="40" lineNum="23" parent="globals/AlertEngine" pc="268438798" symbol="isHighUrgency"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="41" lineNum="6" parent="globals/AlertEngine" pc="268438829" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="41" lineNum="7" parent="globals/AlertEngine" pc="268438831" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="42" lineNum="9" parent="globals/SkyShieldApp" pc="268438857" symbol="onStart"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="43" lineNum="15" parent="globals/SkyShieldApp" pc="268438860" symbol="getInitialView"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="43" lineNum="16" parent="globals/SkyShieldApp" pc="268438862" symbol="getInitialView"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="44" lineNum="5" parent="globals/SkyShieldApp" pc="268438888" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="44" lineNum="6" parent="globals/SkyShieldApp" pc="268438890" symbol="initialize"/>
-        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="45" lineNum="12" parent="globals/SkyShieldApp" pc="268438903" symbol="onStop"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="4" lineNum="38" parent="globals/AlertHistory" pc="268435504" symbol="size"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="4" lineNum="39" parent="globals/AlertHistory" pc="268435506" symbol="size"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="5" lineNum="16" parent="globals/AlertHistory" pc="268435512" symbol="addAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="5" lineNum="17" parent="globals/AlertHistory" pc="268435514" symbol="addAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="5" lineNum="18" parent="globals/AlertHistory" pc="268435520" symbol="addAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="5" lineNum="21" parent="globals/AlertHistory" pc="268435524" symbol="addAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="5" lineNum="30" parent="globals/AlertHistory" pc="268435611" symbol="addAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="5" lineNum="31" parent="globals/AlertHistory" pc="268435629" symbol="addAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="5" lineNum="33" parent="globals/AlertHistory" pc="268435644" symbol="addAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="5" lineNum="34" parent="globals/AlertHistory" pc="268435655" symbol="addAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="6" lineNum="9" parent="globals/AlertHistory" pc="268435674" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="6" lineNum="10" parent="globals/AlertHistory" pc="268435676" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="6" lineNum="11" parent="globals/AlertHistory" pc="268435688" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="6" lineNum="12" parent="globals/AlertHistory" pc="268435696" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="6" lineNum="13" parent="globals/AlertHistory" pc="268435704" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="7" lineNum="42" parent="globals/AlertHistory" pc="268435714" symbol="getRecordAt"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="7" lineNum="43" parent="globals/AlertHistory" pc="268435717" symbol="getRecordAt"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="7" lineNum="44" parent="globals/AlertHistory" pc="268435728" symbol="getRecordAt"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="7" lineNum="47" parent="globals/AlertHistory" pc="268435733" symbol="getRecordAt"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="7" lineNum="49" parent="globals/AlertHistory" pc="268435746" symbol="getRecordAt"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="7" lineNum="50" parent="globals/AlertHistory" pc="268435753" symbol="getRecordAt"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertHistory.mc" id="7" lineNum="53" parent="globals/AlertHistory" pc="268435763" symbol="getRecordAt"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="8" lineNum="11" parent="globals/AlertModel" pc="268435772" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="8" lineNum="12" parent="globals/AlertModel" pc="268435774" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="8" lineNum="13" parent="globals/AlertModel" pc="268435783" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="8" lineNum="14" parent="globals/AlertModel" pc="268435792" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="8" lineNum="15" parent="globals/AlertModel" pc="268435801" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="8" lineNum="16" parent="globals/AlertModel" pc="268435810" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertModel.mc" id="8" lineNum="17" parent="globals/AlertModel" pc="268435819" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="9" lineNum="39" parent="globals/MockAlertProvider" pc="268435829" symbol="buildDjiMediumAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="9" lineNum="40" parent="globals/MockAlertProvider" pc="268435831" symbol="buildDjiMediumAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="10" lineNum="9" parent="globals/MockAlertProvider" pc="268435996" symbol="getActiveAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="10" lineNum="10" parent="globals/MockAlertProvider" pc="268435998" symbol="getActiveAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="11" lineNum="13" parent="globals/MockAlertProvider" pc="268436012" symbol="getNextAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="11" lineNum="14" parent="globals/MockAlertProvider" pc="268436014" symbol="getNextAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="11" lineNum="15" parent="globals/MockAlertProvider" pc="268436032" symbol="getNextAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="12" lineNum="18" parent="globals/MockAlertProvider" pc="268436046" symbol="buildAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="12" lineNum="19" parent="globals/MockAlertProvider" pc="268436048" symbol="buildAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="12" lineNum="20" parent="globals/MockAlertProvider" pc="268436056" symbol="buildAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="12" lineNum="23" parent="globals/MockAlertProvider" pc="268436066" symbol="buildAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="12" lineNum="24" parent="globals/MockAlertProvider" pc="268436074" symbol="buildAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="12" lineNum="27" parent="globals/MockAlertProvider" pc="268436084" symbol="buildAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="13" lineNum="48" parent="globals/MockAlertProvider" pc="268436091" symbol="buildUnknownCriticalAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="13" lineNum="49" parent="globals/MockAlertProvider" pc="268436093" symbol="buildUnknownCriticalAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="14" lineNum="30" parent="globals/MockAlertProvider" pc="268436258" symbol="buildFpvHighAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="14" lineNum="31" parent="globals/MockAlertProvider" pc="268436260" symbol="buildFpvHighAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="15" lineNum="5" parent="globals/MockAlertProvider" pc="268436425" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" id="15" lineNum="6" parent="globals/MockAlertProvider" pc="268436427" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="16" lineNum="242" parent="globals/SkyShieldView" pc="268436436" symbol="getAlertTitle"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="16" lineNum="243" parent="globals/SkyShieldView" pc="268436438" symbol="getAlertTitle"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="17" lineNum="209" parent="globals/SkyShieldView" pc="268436462" symbol="drawMediumBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="17" lineNum="210" parent="globals/SkyShieldView" pc="268436464" symbol="drawMediumBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="17" lineNum="211" parent="globals/SkyShieldView" pc="268436479" symbol="drawMediumBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="17" lineNum="213" parent="globals/SkyShieldView" pc="268436506" symbol="drawMediumBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="17" lineNum="214" parent="globals/SkyShieldView" pc="268436522" symbol="drawMediumBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="191" parent="globals/SkyShieldView" pc="268436545" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="192" parent="globals/SkyShieldView" pc="268436548" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="193" parent="globals/SkyShieldView" pc="268436552" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="194" parent="globals/SkyShieldView" pc="268436556" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="196" parent="globals/SkyShieldView" pc="268436560" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="197" parent="globals/SkyShieldView" pc="268436571" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="198" parent="globals/SkyShieldView" pc="268436592" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="201" parent="globals/SkyShieldView" pc="268436596" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="202" parent="globals/SkyShieldView" pc="268436607" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="203" parent="globals/SkyShieldView" pc="268436628" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="18" lineNum="206" parent="globals/SkyShieldView" pc="268436632" symbol="drawAlertBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="19" lineNum="217" parent="globals/SkyShieldView" pc="268436654" symbol="drawHighBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="19" lineNum="218" parent="globals/SkyShieldView" pc="268436656" symbol="drawHighBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="19" lineNum="219" parent="globals/SkyShieldView" pc="268436672" symbol="drawHighBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="19" lineNum="220" parent="globals/SkyShieldView" pc="268436696" symbol="drawHighBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="19" lineNum="222" parent="globals/SkyShieldView" pc="268436732" symbol="drawHighBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="101" parent="globals/SkyShieldView" pc="268436755" symbol="triggerVibrationIfNeeded"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="20" lineNum="102" parent="globals/SkyShieldView" pc="268436757" symbol="triggerVibrationIfNeeded"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="262" parent="globals/SkyShieldView" pc="268436777" symbol="getDistanceLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="263" parent="globals/SkyShieldView" pc="268436779" symbol="getDistanceLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="264" parent="globals/SkyShieldView" pc="268436798" symbol="getDistanceLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="21" lineNum="267" parent="globals/SkyShieldView" pc="268436807" symbol="getDistanceLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="156" parent="globals/SkyShieldView" pc="268436818" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="157" parent="globals/SkyShieldView" pc="268436821" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="159" parent="globals/SkyShieldView" pc="268436825" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="160" parent="globals/SkyShieldView" pc="268436841" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="161" parent="globals/SkyShieldView" pc="268436863" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="163" parent="globals/SkyShieldView" pc="268436870" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="165" parent="globals/SkyShieldView" pc="268436886" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="166" parent="globals/SkyShieldView" pc="268436911" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="167" parent="globals/SkyShieldView" pc="268436926" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="22" lineNum="168" parent="globals/SkyShieldView" pc="268436966" symbol="drawBandsScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="49" parent="globals/SkyShieldView" pc="268436984" symbol="onHide"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="50" parent="globals/SkyShieldView" pc="268436986" symbol="onHide"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="23" lineNum="51" parent="globals/SkyShieldView" pc="268436995" symbol="onHide"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="308" parent="globals/SkyShieldView" pc="268437011" symbol="getHistoryThreat"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="309" parent="globals/SkyShieldView" pc="268437013" symbol="getHistoryThreat"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="310" parent="globals/SkyShieldView" pc="268437024" symbol="getHistoryThreat"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="24" lineNum="313" parent="globals/SkyShieldView" pc="268437033" symbol="getHistoryThreat"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="32" parent="globals/SkyShieldView" pc="268437036" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="33" parent="globals/SkyShieldView" pc="268437038" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="34" parent="globals/SkyShieldView" pc="268437056" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="35" parent="globals/SkyShieldView" pc="268437064" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="36" parent="globals/SkyShieldView" pc="268437072" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="37" parent="globals/SkyShieldView" pc="268437080" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="38" parent="globals/SkyShieldView" pc="268437088" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="39" parent="globals/SkyShieldView" pc="268437096" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="40" parent="globals/SkyShieldView" pc="268437115" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="42" parent="globals/SkyShieldView" pc="268437122" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="43" parent="globals/SkyShieldView" pc="268437131" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="25" lineNum="46" parent="globals/SkyShieldView" pc="268437163" symbol="onShow"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="138" parent="globals/SkyShieldView" pc="268437195" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="139" parent="globals/SkyShieldView" pc="268437198" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="141" parent="globals/SkyShieldView" pc="268437202" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="142" parent="globals/SkyShieldView" pc="268437243" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="143" parent="globals/SkyShieldView" pc="268437272" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="144" parent="globals/SkyShieldView" pc="268437299" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="146" parent="globals/SkyShieldView" pc="268437306" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="147" parent="globals/SkyShieldView" pc="268437322" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="148" parent="globals/SkyShieldView" pc="268437349" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="150" parent="globals/SkyShieldView" pc="268437356" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="151" parent="globals/SkyShieldView" pc="268437379" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="26" lineNum="153" parent="globals/SkyShieldView" pc="268437386" symbol="drawAlertScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="286" parent="globals/SkyShieldView" pc="268437426" symbol="formatHistorySequence"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="287" parent="globals/SkyShieldView" pc="268437429" symbol="formatHistorySequence"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="289" parent="globals/SkyShieldView" pc="268437436" symbol="formatHistorySequence"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="290" parent="globals/SkyShieldView" pc="268437444" symbol="formatHistorySequence"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="27" lineNum="293" parent="globals/SkyShieldView" pc="268437456" symbol="formatHistorySequence"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="172" parent="globals/SkyShieldView" pc="268437459" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="173" parent="globals/SkyShieldView" pc="268437462" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="175" parent="globals/SkyShieldView" pc="268437466" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="176" parent="globals/SkyShieldView" pc="268437482" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="177" parent="globals/SkyShieldView" pc="268437504" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="179" parent="globals/SkyShieldView" pc="268437511" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="181" parent="globals/SkyShieldView" pc="268437527" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="182" parent="globals/SkyShieldView" pc="268437558" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="184" parent="globals/SkyShieldView" pc="268437575" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="185" parent="globals/SkyShieldView" pc="268437581" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="28" lineNum="186" parent="globals/SkyShieldView" pc="268437608" symbol="drawHistoryScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="316" parent="globals/SkyShieldView" pc="268437629" symbol="drawCentered"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="29" lineNum="317" parent="globals/SkyShieldView" pc="268437631" symbol="drawCentered"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="55" parent="globals/SkyShieldView" pc="268437655" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="56" parent="globals/SkyShieldView" pc="268437657" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="57" parent="globals/SkyShieldView" pc="268437665" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="59" parent="globals/SkyShieldView" pc="268437680" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="60" parent="globals/SkyShieldView" pc="268437691" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="61" parent="globals/SkyShieldView" pc="268437699" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="62" parent="globals/SkyShieldView" pc="268437707" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="65" parent="globals/SkyShieldView" pc="268437718" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="66" parent="globals/SkyShieldView" pc="268437729" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="69" parent="globals/SkyShieldView" pc="268437733" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="70" parent="globals/SkyShieldView" pc="268437748" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="72" parent="globals/SkyShieldView" pc="268437763" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="73" parent="globals/SkyShieldView" pc="268437804" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="74" parent="globals/SkyShieldView" pc="268437820" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="75" parent="globals/SkyShieldView" pc="268437848" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="78" parent="globals/SkyShieldView" pc="268437859" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="79" parent="globals/SkyShieldView" pc="268437870" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="82" parent="globals/SkyShieldView" pc="268437881" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="83" parent="globals/SkyShieldView" pc="268437892" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="84" parent="globals/SkyShieldView" pc="268437904" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="85" parent="globals/SkyShieldView" pc="268437915" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="87" parent="globals/SkyShieldView" pc="268437927" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="90" parent="globals/SkyShieldView" pc="268437935" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="91" parent="globals/SkyShieldView" pc="268437946" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="92" parent="globals/SkyShieldView" pc="268437954" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="93" parent="globals/SkyShieldView" pc="268437962" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="94" parent="globals/SkyShieldView" pc="268437980" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="95" parent="globals/SkyShieldView" pc="268437999" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="30" lineNum="98" parent="globals/SkyShieldView" pc="268438009" symbol="onTimerTick"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="225" parent="globals/SkyShieldView" pc="268438021" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="226" parent="globals/SkyShieldView" pc="268438023" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="227" parent="globals/SkyShieldView" pc="268438031" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="228" parent="globals/SkyShieldView" pc="268438051" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="230" parent="globals/SkyShieldView" pc="268438075" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="231" parent="globals/SkyShieldView" pc="268438091" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="232" parent="globals/SkyShieldView" pc="268438113" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="235" parent="globals/SkyShieldView" pc="268438117" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="236" parent="globals/SkyShieldView" pc="268438135" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="238" parent="globals/SkyShieldView" pc="268438159" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="31" lineNum="239" parent="globals/SkyShieldView" pc="268438178" symbol="drawCriticalBanner"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="32" lineNum="320" parent="globals/SkyShieldView" pc="268438201" symbol="getRiskColor"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="32" lineNum="321" parent="globals/SkyShieldView" pc="268438203" symbol="getRiskColor"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="32" lineNum="322" parent="globals/SkyShieldView" pc="268438214" symbol="getRiskColor"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="32" lineNum="325" parent="globals/SkyShieldView" pc="268438223" symbol="getRiskColor"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="32" lineNum="326" parent="globals/SkyShieldView" pc="268438234" symbol="getRiskColor"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="32" lineNum="329" parent="globals/SkyShieldView" pc="268438242" symbol="getRiskColor"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="32" lineNum="330" parent="globals/SkyShieldView" pc="268438253" symbol="getRiskColor"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="32" lineNum="333" parent="globals/SkyShieldView" pc="268438262" symbol="getRiskColor"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="33" lineNum="246" parent="globals/SkyShieldView" pc="268438268" symbol="getAlertTitleFont"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="33" lineNum="247" parent="globals/SkyShieldView" pc="268438270" symbol="getAlertTitleFont"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="18" parent="globals/SkyShieldView" pc="268438273" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="19" parent="globals/SkyShieldView" pc="268438275" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="20" parent="globals/SkyShieldView" pc="268438287" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="21" parent="globals/SkyShieldView" pc="268438312" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="22" parent="globals/SkyShieldView" pc="268438337" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="23" parent="globals/SkyShieldView" pc="268438362" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="24" parent="globals/SkyShieldView" pc="268438392" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="25" parent="globals/SkyShieldView" pc="268438400" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="26" parent="globals/SkyShieldView" pc="268438408" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="27" parent="globals/SkyShieldView" pc="268438416" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="28" parent="globals/SkyShieldView" pc="268438424" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="34" lineNum="29" parent="globals/SkyShieldView" pc="268438432" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="35" lineNum="132" parent="globals/SkyShieldView" pc="268438441" symbol="drawSplashScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="35" lineNum="133" parent="globals/SkyShieldView" pc="268438443" symbol="drawSplashScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="35" lineNum="134" parent="globals/SkyShieldView" pc="268438459" symbol="drawSplashScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="35" lineNum="135" parent="globals/SkyShieldView" pc="268438481" symbol="drawSplashScreen"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="105" parent="globals/SkyShieldView" pc="268438505" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="106" parent="globals/SkyShieldView" pc="268438508" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="108" parent="globals/SkyShieldView" pc="268438517" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="109" parent="globals/SkyShieldView" pc="268438533" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="111" parent="globals/SkyShieldView" pc="268438541" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="112" parent="globals/SkyShieldView" pc="268438549" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="113" parent="globals/SkyShieldView" pc="268438562" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="116" parent="globals/SkyShieldView" pc="268438566" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="117" parent="globals/SkyShieldView" pc="268438575" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="118" parent="globals/SkyShieldView" pc="268438598" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="119" parent="globals/SkyShieldView" pc="268438620" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="120" parent="globals/SkyShieldView" pc="268438642" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="123" parent="globals/SkyShieldView" pc="268438646" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="124" parent="globals/SkyShieldView" pc="268438657" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="125" parent="globals/SkyShieldView" pc="268438673" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="126" parent="globals/SkyShieldView" pc="268438684" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="36" lineNum="128" parent="globals/SkyShieldView" pc="268438700" symbol="onUpdate"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="37" lineNum="250" parent="globals/SkyShieldView" pc="268438714" symbol="getAlertStatus"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="37" lineNum="251" parent="globals/SkyShieldView" pc="268438716" symbol="getAlertStatus"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="37" lineNum="252" parent="globals/SkyShieldView" pc="268438735" symbol="getAlertStatus"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="37" lineNum="255" parent="globals/SkyShieldView" pc="268438744" symbol="getAlertStatus"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="37" lineNum="256" parent="globals/SkyShieldView" pc="268438763" symbol="getAlertStatus"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="37" lineNum="259" parent="globals/SkyShieldView" pc="268438772" symbol="getAlertStatus"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="38" lineNum="282" parent="globals/SkyShieldView" pc="268438778" symbol="formatHistoryRecord"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="38" lineNum="283" parent="globals/SkyShieldView" pc="268438780" symbol="formatHistoryRecord"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="39" lineNum="296" parent="globals/SkyShieldView" pc="268438849" symbol="getHistorySeverity"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="39" lineNum="297" parent="globals/SkyShieldView" pc="268438851" symbol="getHistorySeverity"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="39" lineNum="298" parent="globals/SkyShieldView" pc="268438862" symbol="getHistorySeverity"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="39" lineNum="301" parent="globals/SkyShieldView" pc="268438871" symbol="getHistorySeverity"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="39" lineNum="302" parent="globals/SkyShieldView" pc="268438882" symbol="getHistorySeverity"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="39" lineNum="305" parent="globals/SkyShieldView" pc="268438891" symbol="getHistorySeverity"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="40" lineNum="270" parent="globals/SkyShieldView" pc="268438897" symbol="getShortRiskLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="40" lineNum="271" parent="globals/SkyShieldView" pc="268438899" symbol="getShortRiskLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="40" lineNum="272" parent="globals/SkyShieldView" pc="268438910" symbol="getShortRiskLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="40" lineNum="275" parent="globals/SkyShieldView" pc="268438919" symbol="getShortRiskLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="40" lineNum="276" parent="globals/SkyShieldView" pc="268438930" symbol="getShortRiskLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" id="40" lineNum="279" parent="globals/SkyShieldView" pc="268438939" symbol="getShortRiskLabel"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SettingsModel.mc" id="41" lineNum="8" parent="globals/SettingsModel" pc="268438942" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SettingsModel.mc" id="41" lineNum="9" parent="globals/SettingsModel" pc="268438944" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SettingsModel.mc" id="41" lineNum="10" parent="globals/SettingsModel" pc="268438952" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SettingsModel.mc" id="41" lineNum="11" parent="globals/SettingsModel" pc="268438964" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="42" lineNum="41" parent="globals/VibrationEngine" pc="268438973" symbol="vibrateHigh"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="42" lineNum="43" parent="globals/VibrationEngine" pc="268438976" symbol="vibrateHigh"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="42" lineNum="50" parent="globals/VibrationEngine" pc="268439142" symbol="vibrateHigh"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="42" lineNum="51" parent="globals/VibrationEngine" pc="268439146" symbol="vibrateHigh"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="43" lineNum="31" parent="globals/VibrationEngine" pc="268439180" symbol="vibrateMedium"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="43" lineNum="33" parent="globals/VibrationEngine" pc="268439183" symbol="vibrateMedium"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="43" lineNum="36" parent="globals/VibrationEngine" pc="268439235" symbol="vibrateMedium"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="43" lineNum="37" parent="globals/VibrationEngine" pc="268439239" symbol="vibrateMedium"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="13" parent="globals/VibrationEngine" pc="268439273" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="14" parent="globals/VibrationEngine" pc="268439275" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="15" parent="globals/VibrationEngine" pc="268439281" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="18" parent="globals/VibrationEngine" pc="268439285" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="19" parent="globals/VibrationEngine" pc="268439308" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="22" parent="globals/VibrationEngine" pc="268439312" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="23" parent="globals/VibrationEngine" pc="268439327" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="24" parent="globals/VibrationEngine" pc="268439337" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="25" parent="globals/VibrationEngine" pc="268439352" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="26" parent="globals/VibrationEngine" pc="268439362" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="44" lineNum="27" parent="globals/VibrationEngine" pc="268439377" symbol="triggerForAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="45" lineNum="9" parent="globals/VibrationEngine" pc="268439388" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="45" lineNum="10" parent="globals/VibrationEngine" pc="268439390" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="46" lineNum="55" parent="globals/VibrationEngine" pc="268439400" symbol="vibrateCritical"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="46" lineNum="57" parent="globals/VibrationEngine" pc="268439403" symbol="vibrateCritical"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="46" lineNum="62" parent="globals/VibrationEngine" pc="268439515" symbol="vibrateCritical"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" id="46" lineNum="63" parent="globals/VibrationEngine" pc="268439519" symbol="vibrateCritical"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="47" lineNum="10" parent="globals/AlertEngine" pc="268439553" symbol="getActiveAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="47" lineNum="11" parent="globals/AlertEngine" pc="268439555" symbol="getActiveAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="48" lineNum="14" parent="globals/AlertEngine" pc="268439567" symbol="getNextAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="48" lineNum="15" parent="globals/AlertEngine" pc="268439569" symbol="getNextAlert"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="49" lineNum="18" parent="globals/AlertEngine" pc="268439581" symbol="isHighUrgency"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="49" lineNum="19" parent="globals/AlertEngine" pc="268439583" symbol="isHighUrgency"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="49" lineNum="20" parent="globals/AlertEngine" pc="268439589" symbol="isHighUrgency"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="49" lineNum="23" parent="globals/AlertEngine" pc="268439594" symbol="isHighUrgency"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="50" lineNum="6" parent="globals/AlertEngine" pc="268439625" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" id="50" lineNum="7" parent="globals/AlertEngine" pc="268439627" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="51" lineNum="9" parent="globals/SkyShieldApp" pc="268439653" symbol="onStart"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="52" lineNum="15" parent="globals/SkyShieldApp" pc="268439656" symbol="getInitialView"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="52" lineNum="16" parent="globals/SkyShieldApp" pc="268439658" symbol="getInitialView"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="53" lineNum="5" parent="globals/SkyShieldApp" pc="268439684" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="53" lineNum="6" parent="globals/SkyShieldApp" pc="268439686" symbol="initialize"/>
+        <entry filename="/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldApp.mc" id="54" lineNum="12" parent="globals/SkyShieldApp" pc="268439699" symbol="onStop"/>
     </pcToLineNum>
     <symbolTable>
         <entry id="8388639" module="true" symbol="Graphics"/>
-        <entry id="6" object="true" symbol="AlertModel"/>
-        <entry id="45" method="true" symbol="getDistanceLabel"/>
+        <entry id="7" object="true" symbol="AlertModel"/>
+        <entry id="76" symbol="severity"/>
+        <entry id="18" method="true" symbol="getRecordAt"/>
+        <entry id="57" method="true" symbol="getDistanceLabel"/>
         <entry id="8388632" method="true" symbol="&lt;init&gt;"/>
-        <entry id="10" object="true" symbol="SkyShieldView"/>
-        <entry id="8" object="true" symbol="SettingsModel"/>
-        <entry id="48" method="true" symbol="onTimerTick"/>
-        <entry field="true" id="31" symbol="_tickCount"/>
-        <entry id="39" method="true" symbol="drawHighBanner"/>
-        <entry field="true" id="18" symbol="_alertIndex"/>
-        <entry id="23" method="true" symbol="getActiveAlert"/>
-        <entry id="53" method="true" symbol="triggerForAlert"/>
-        <entry field="true" id="26" symbol="_criticalPulseOn"/>
-        <entry id="56" method="true" symbol="vibrateMedium"/>
+        <entry id="11" object="true" symbol="SkyShieldView"/>
+        <entry id="9" object="true" symbol="SettingsModel"/>
+        <entry id="62" method="true" symbol="onTimerTick"/>
+        <entry field="true" id="40" symbol="_tickCount"/>
+        <entry id="48" method="true" symbol="drawHighBanner"/>
+        <entry field="true" id="25" symbol="_alertIndex"/>
+        <entry id="30" method="true" symbol="getActiveAlert"/>
+        <entry field="true" id="14" symbol="_nextSequence"/>
+        <entry id="67" method="true" symbol="triggerForAlert"/>
+        <entry id="58" method="true" symbol="getHistorySeverity"/>
+        <entry field="true" id="33" symbol="_criticalPulseOn"/>
+        <entry field="true" id="16" symbol="_writeIndex"/>
+        <entry id="70" method="true" symbol="vibrateMedium"/>
+        <entry field="true" id="37" symbol="_screenTickCount"/>
         <entry field="true" id="8388611" module="true" symbol="Toybox"/>
-        <entry id="42" method="true" symbol="getAlertStatus"/>
-        <entry field="true" id="33" symbol="_vibrationEngine"/>
-        <entry field="true" id="60" symbol="AppName"/>
-        <entry id="44" method="true" symbol="getAlertTitleFont"/>
-        <entry field="true" id="16" symbol="riskLevel"/>
+        <entry field="true" id="8388782" method="true" symbol="size"/>
+        <entry id="54" method="true" symbol="getAlertStatus"/>
+        <entry id="75" symbol="sequence"/>
+        <entry field="true" id="42" symbol="_vibrationEngine"/>
+        <entry field="true" id="74" symbol="AppName"/>
+        <entry id="56" method="true" symbol="getAlertTitleFont"/>
+        <entry field="true" id="23" symbol="riskLevel"/>
         <entry id="4" module="true" symbol="globals/Rez/Strings"/>
+        <entry id="53" method="true" symbol="formatHistorySequence"/>
         <entry id="8388648" module="true" symbol="WatchUi"/>
-        <entry id="41" method="true" symbol="drawSplashScreen"/>
-        <entry field="true" id="28" symbol="_screenPhase"/>
+        <entry id="51" method="true" symbol="drawSplashScreen"/>
+        <entry field="true" id="36" symbol="_screenPhase"/>
         <entry id="2" module="true" symbol="globals/Rez"/>
-        <entry id="35" method="true" symbol="drawAlertScreen"/>
-        <entry id="36" method="true" symbol="drawBandsScreen"/>
-        <entry id="54" method="true" symbol="vibrateCritical"/>
+        <entry id="44" method="true" symbol="drawAlertScreen"/>
+        <entry id="45" method="true" symbol="drawBandsScreen"/>
+        <entry id="68" method="true" symbol="vibrateCritical"/>
         <entry id="8389124" method="true" symbol="onUpdate"/>
-        <entry id="37" method="true" symbol="drawCentered"/>
-        <entry id="47" method="true" symbol="getShortRiskLabel"/>
+        <entry id="17" method="true" symbol="addAlert"/>
+        <entry id="46" method="true" symbol="drawCentered"/>
+        <entry field="true" id="35" symbol="_history"/>
+        <entry id="61" method="true" symbol="getShortRiskLabel"/>
         <entry id="8388771" module="true" object="true" symbol="Drawables"/>
-        <entry id="58" method="true" symbol="isHighUrgency"/>
-        <entry field="true" id="50" symbol="sensitivity"/>
-        <entry field="true" id="12" symbol="activeBands"/>
-        <entry field="true" id="32" symbol="_timer"/>
-        <entry id="22" method="true" symbol="buildUnknownCriticalAlert"/>
-        <entry id="49" method="true" symbol="triggerVibrationIfNeeded"/>
-        <entry field="true" id="25" symbol="_alert"/>
-        <entry id="43" method="true" symbol="getAlertTitle"/>
+        <entry id="72" method="true" symbol="isHighUrgency"/>
+        <entry field="true" id="64" symbol="sensitivity"/>
+        <entry field="true" id="19" symbol="activeBands"/>
+        <entry field="true" id="41" symbol="_timer"/>
+        <entry id="29" method="true" symbol="buildUnknownCriticalAlert"/>
+        <entry id="52" method="true" symbol="formatHistoryRecord"/>
+        <entry id="63" method="true" symbol="triggerVibrationIfNeeded"/>
+        <entry field="true" id="15" symbol="_records"/>
+        <entry field="true" id="8388911" symbol="distance"/>
+        <entry field="true" id="32" symbol="_alert"/>
+        <entry id="55" method="true" symbol="getAlertTitle"/>
         <entry id="3" module="true" symbol="globals/Rez/Drawables"/>
-        <entry id="21" method="true" symbol="buildFpvHighAlert"/>
-        <entry field="true" id="14" symbol="confidencePercent"/>
-        <entry id="40" method="true" symbol="drawMediumBanner"/>
+        <entry id="28" method="true" symbol="buildFpvHighAlert"/>
+        <entry field="true" id="21" symbol="confidencePercent"/>
+        <entry id="59" method="true" symbol="getHistoryThreat"/>
+        <entry id="50" method="true" symbol="drawMediumBanner"/>
         <entry id="8388644" module="true" symbol="System"/>
-        <entry field="true" id="30" symbol="_showSplash"/>
+        <entry field="true" id="39" symbol="_showSplash"/>
         <entry id="8388769" module="true" object="true" symbol="Rez"/>
-        <entry id="34" method="true" symbol="drawAlertBanner"/>
-        <entry field="true" id="27" symbol="_engine"/>
+        <entry id="43" method="true" symbol="drawAlertBanner"/>
+        <entry field="true" id="34" symbol="_engine"/>
+        <entry field="true" id="8390644" symbol="threat"/>
         <entry id="8388640" module="true" symbol="Lang"/>
-        <entry field="true" id="29" symbol="_settings"/>
-        <entry id="38" method="true" symbol="drawCriticalBanner"/>
-        <entry field="true" id="59" symbol="LauncherIcon"/>
+        <entry field="true" id="38" symbol="_settings"/>
+        <entry id="47" method="true" symbol="drawCriticalBanner"/>
+        <entry field="true" id="73" symbol="LauncherIcon"/>
         <entry id="8388610" symbol="statics"/>
         <entry id="8389123" method="true" symbol="onShow"/>
-        <entry id="7" object="true" symbol="MockAlertProvider"/>
+        <entry id="8" object="true" symbol="MockAlertProvider"/>
         <entry id="8389350" module="true" symbol="globals"/>
         <entry id="8388770" module="true" object="true" symbol="Strings"/>
-        <entry id="24" method="true" symbol="getNextAlert"/>
+        <entry id="77" symbol="confidence"/>
+        <entry id="31" method="true" symbol="getNextAlert"/>
         <entry id="8388702" method="true" symbol="initialize"/>
         <entry id="8389279" method="true" symbol="onStart"/>
-        <entry id="61" symbol="level"/>
+        <entry id="78" symbol="level"/>
+        <entry field="true" id="13" symbol="_count"/>
         <entry id="8389280" method="true" symbol="getInitialView"/>
         <entry id="8389281" method="true" symbol="onStop"/>
-        <entry id="55" method="true" symbol="vibrateHigh"/>
-        <entry field="true" id="51" symbol="silentMode"/>
-        <entry id="46" method="true" symbol="getRiskColor"/>
+        <entry id="69" method="true" symbol="vibrateHigh"/>
+        <entry field="true" id="65" symbol="silentMode"/>
+        <entry id="60" method="true" symbol="getRiskColor"/>
         <entry id="8388646" module="true" object="true" symbol="Timer"/>
-        <entry field="true" id="57" symbol="_provider"/>
+        <entry field="true" id="71" symbol="_provider"/>
         <entry id="8388636" module="true" symbol="Attention"/>
-        <entry field="true" id="17" symbol="threatType"/>
-        <entry id="9" object="true" symbol="SkyShieldApp"/>
+        <entry field="true" id="24" symbol="threatType"/>
+        <entry id="10" object="true" symbol="SkyShieldApp"/>
+        <entry id="49" method="true" symbol="drawHistoryScreen"/>
         <entry id="5" object="true" symbol="AlertEngine"/>
-        <entry field="true" id="15" symbol="distanceLabel"/>
-        <entry id="20" method="true" symbol="buildDjiMediumAlert"/>
+        <entry field="true" id="22" symbol="distanceLabel"/>
+        <entry id="27" method="true" symbol="buildDjiMediumAlert"/>
         <entry id="8389125" method="true" symbol="onHide"/>
-        <entry id="11" object="true" symbol="VibrationEngine"/>
+        <entry id="12" object="true" symbol="VibrationEngine"/>
         <entry id="8388635" module="true" symbol="Application"/>
-        <entry field="true" id="52" symbol="vibrationEnabled"/>
-        <entry id="19" method="true" symbol="buildAlert"/>
-        <entry field="true" id="13" symbol="band"/>
+        <entry field="true" id="66" symbol="vibrationEnabled"/>
+        <entry id="6" object="true" symbol="AlertHistory"/>
+        <entry id="26" method="true" symbol="buildAlert"/>
+        <entry field="true" id="20" symbol="band"/>
     </symbolTable>
     <localVars>
-        <entry arg="true" endPc="268435560" name="threat" stackId="1" startPc="268435504"/>
-        <entry arg="true" endPc="268435560" name="risk" stackId="2" startPc="268435504"/>
-        <entry arg="true" endPc="268435560" name="confidence" stackId="3" startPc="268435504"/>
-        <entry arg="true" endPc="268435560" name="primaryBand" stackId="4" startPc="268435504"/>
-        <entry arg="true" endPc="268435560" name="distance" stackId="5" startPc="268435504"/>
-        <entry arg="true" endPc="268435560" name="bands" stackId="6" startPc="268435504"/>
-        <entry arg="true" endPc="268435822" name="index" stackId="1" startPc="268435778"/>
-        <entry arg="true" endPc="268436276" name="dc" stackId="1" startPc="268436194"/>
-        <entry arg="true" endPc="268436276" name="width" stackId="2" startPc="268436194"/>
-        <entry arg="true" endPc="268436276" name="label" stackId="3" startPc="268436194"/>
-        <entry arg="true" endPc="268436276" name="margin" stackId="4" startPc="268436194"/>
-        <entry arg="true" endPc="268436276" name="top" stackId="5" startPc="268436194"/>
-        <entry arg="true" endPc="268436276" name="height" stackId="6" startPc="268436194"/>
-        <entry arg="true" endPc="268436385" name="dc" stackId="1" startPc="268436277"/>
-        <entry arg="true" endPc="268436385" name="width" stackId="2" startPc="268436277"/>
-        <entry arg="true" endPc="268436385" name="label" stackId="3" startPc="268436277"/>
-        <entry arg="true" endPc="268436385" name="riskLevel" stackId="4" startPc="268436277"/>
-        <entry endPc="268436384" name="margin" stackId="5" startPc="268436280"/>
-        <entry endPc="268436384" name="top" stackId="6" startPc="268436280"/>
-        <entry endPc="268436384" name="height" stackId="7" startPc="268436280"/>
-        <entry arg="true" endPc="268436486" name="dc" stackId="1" startPc="268436386"/>
-        <entry arg="true" endPc="268436486" name="width" stackId="2" startPc="268436386"/>
-        <entry arg="true" endPc="268436486" name="label" stackId="3" startPc="268436386"/>
-        <entry arg="true" endPc="268436486" name="margin" stackId="4" startPc="268436386"/>
-        <entry arg="true" endPc="268436486" name="top" stackId="5" startPc="268436386"/>
-        <entry arg="true" endPc="268436486" name="height" stackId="6" startPc="268436386"/>
-        <entry arg="true" endPc="268436715" name="dc" stackId="1" startPc="268436550"/>
-        <entry arg="true" endPc="268436715" name="width" stackId="2" startPc="268436550"/>
-        <entry endPc="268436714" name="y" stackId="3" startPc="268436553"/>
-        <entry endPc="268436714" name="i" stackId="4" startPc="268436643"/>
-        <entry endPc="268436704" name="item" stackId="5" startPc="268436643"/>
-        <entry arg="true" endPc="268437105" name="dc" stackId="1" startPc="268436875"/>
-        <entry arg="true" endPc="268437105" name="width" stackId="2" startPc="268436875"/>
-        <entry endPc="268437104" name="y" stackId="3" startPc="268436878"/>
-        <entry arg="true" endPc="268437131" name="dc" stackId="1" startPc="268437106"/>
-        <entry arg="true" endPc="268437131" name="width" stackId="2" startPc="268437106"/>
-        <entry arg="true" endPc="268437131" name="y" stackId="3" startPc="268437106"/>
-        <entry arg="true" endPc="268437131" name="text" stackId="4" startPc="268437106"/>
-        <entry arg="true" endPc="268437131" name="font" stackId="5" startPc="268437106"/>
-        <entry arg="true" endPc="268437583" name="dc" stackId="1" startPc="268437404"/>
-        <entry arg="true" endPc="268437583" name="width" stackId="2" startPc="268437404"/>
-        <entry arg="true" endPc="268437583" name="label" stackId="3" startPc="268437404"/>
-        <entry arg="true" endPc="268437583" name="margin" stackId="4" startPc="268437404"/>
-        <entry arg="true" endPc="268437583" name="top" stackId="5" startPc="268437404"/>
-        <entry arg="true" endPc="268437583" name="height" stackId="6" startPc="268437404"/>
-        <entry arg="true" endPc="268437650" name="riskLevel" stackId="1" startPc="268437584"/>
-        <entry arg="true" endPc="268437854" name="dc" stackId="1" startPc="268437791"/>
-        <entry arg="true" endPc="268437854" name="width" stackId="2" startPc="268437791"/>
-        <entry arg="true" endPc="268438036" name="dc" stackId="1" startPc="268437855"/>
-        <entry endPc="268438035" name="width" stackId="2" startPc="268437858"/>
-        <entry arg="true" endPc="268438145" name="riskLevel" stackId="1" startPc="268438101"/>
-        <entry endPc="268438377" name="ex" stackId="1" startPc="268438346"/>
-        <entry endPc="268438470" name="ex" stackId="1" startPc="268438439"/>
-        <entry arg="true" endPc="268438591" name="alert" stackId="1" startPc="268438477"/>
-        <entry arg="true" endPc="268438603" name="settings" stackId="1" startPc="268438592"/>
-        <entry endPc="268438750" name="ex" stackId="1" startPc="268438719"/>
-        <entry arg="true" endPc="268438828" name="alert" stackId="1" startPc="268438785"/>
+        <entry arg="true" endPc="268435673" name="alert" stackId="1" startPc="268435512"/>
+        <entry arg="true" endPc="268435771" name="offset" stackId="1" startPc="268435714"/>
+        <entry endPc="268435771" name="index" stackId="2" startPc="268435717"/>
+        <entry arg="true" endPc="268435828" name="threat" stackId="1" startPc="268435772"/>
+        <entry arg="true" endPc="268435828" name="risk" stackId="2" startPc="268435772"/>
+        <entry arg="true" endPc="268435828" name="confidence" stackId="3" startPc="268435772"/>
+        <entry arg="true" endPc="268435828" name="primaryBand" stackId="4" startPc="268435772"/>
+        <entry arg="true" endPc="268435828" name="distance" stackId="5" startPc="268435772"/>
+        <entry arg="true" endPc="268435828" name="bands" stackId="6" startPc="268435772"/>
+        <entry arg="true" endPc="268436090" name="index" stackId="1" startPc="268436046"/>
+        <entry arg="true" endPc="268436544" name="dc" stackId="1" startPc="268436462"/>
+        <entry arg="true" endPc="268436544" name="width" stackId="2" startPc="268436462"/>
+        <entry arg="true" endPc="268436544" name="label" stackId="3" startPc="268436462"/>
+        <entry arg="true" endPc="268436544" name="margin" stackId="4" startPc="268436462"/>
+        <entry arg="true" endPc="268436544" name="top" stackId="5" startPc="268436462"/>
+        <entry arg="true" endPc="268436544" name="height" stackId="6" startPc="268436462"/>
+        <entry arg="true" endPc="268436653" name="dc" stackId="1" startPc="268436545"/>
+        <entry arg="true" endPc="268436653" name="width" stackId="2" startPc="268436545"/>
+        <entry arg="true" endPc="268436653" name="label" stackId="3" startPc="268436545"/>
+        <entry arg="true" endPc="268436653" name="riskLevel" stackId="4" startPc="268436545"/>
+        <entry endPc="268436652" name="margin" stackId="5" startPc="268436548"/>
+        <entry endPc="268436652" name="top" stackId="6" startPc="268436548"/>
+        <entry endPc="268436652" name="height" stackId="7" startPc="268436548"/>
+        <entry arg="true" endPc="268436754" name="dc" stackId="1" startPc="268436654"/>
+        <entry arg="true" endPc="268436754" name="width" stackId="2" startPc="268436654"/>
+        <entry arg="true" endPc="268436754" name="label" stackId="3" startPc="268436654"/>
+        <entry arg="true" endPc="268436754" name="margin" stackId="4" startPc="268436654"/>
+        <entry arg="true" endPc="268436754" name="top" stackId="5" startPc="268436654"/>
+        <entry arg="true" endPc="268436754" name="height" stackId="6" startPc="268436654"/>
+        <entry arg="true" endPc="268436983" name="dc" stackId="1" startPc="268436818"/>
+        <entry arg="true" endPc="268436983" name="width" stackId="2" startPc="268436818"/>
+        <entry endPc="268436982" name="y" stackId="3" startPc="268436821"/>
+        <entry endPc="268436982" name="i" stackId="4" startPc="268436911"/>
+        <entry endPc="268436972" name="item" stackId="5" startPc="268436911"/>
+        <entry arg="true" endPc="268437035" name="threat" stackId="1" startPc="268437011"/>
+        <entry arg="true" endPc="268437425" name="dc" stackId="1" startPc="268437195"/>
+        <entry arg="true" endPc="268437425" name="width" stackId="2" startPc="268437195"/>
+        <entry endPc="268437424" name="y" stackId="3" startPc="268437198"/>
+        <entry arg="true" endPc="268437458" name="sequence" stackId="1" startPc="268437426"/>
+        <entry endPc="268437458" name="displaySequence" stackId="2" startPc="268437429"/>
+        <entry arg="true" endPc="268437628" name="dc" stackId="1" startPc="268437459"/>
+        <entry arg="true" endPc="268437628" name="width" stackId="2" startPc="268437459"/>
+        <entry endPc="268437627" name="y" stackId="3" startPc="268437462"/>
+        <entry endPc="268437627" name="i" stackId="4" startPc="268437558"/>
+        <entry endPc="268437617" name="record" stackId="5" startPc="268437558"/>
+        <entry arg="true" endPc="268437654" name="dc" stackId="1" startPc="268437629"/>
+        <entry arg="true" endPc="268437654" name="width" stackId="2" startPc="268437629"/>
+        <entry arg="true" endPc="268437654" name="y" stackId="3" startPc="268437629"/>
+        <entry arg="true" endPc="268437654" name="text" stackId="4" startPc="268437629"/>
+        <entry arg="true" endPc="268437654" name="font" stackId="5" startPc="268437629"/>
+        <entry arg="true" endPc="268438200" name="dc" stackId="1" startPc="268438021"/>
+        <entry arg="true" endPc="268438200" name="width" stackId="2" startPc="268438021"/>
+        <entry arg="true" endPc="268438200" name="label" stackId="3" startPc="268438021"/>
+        <entry arg="true" endPc="268438200" name="margin" stackId="4" startPc="268438021"/>
+        <entry arg="true" endPc="268438200" name="top" stackId="5" startPc="268438021"/>
+        <entry arg="true" endPc="268438200" name="height" stackId="6" startPc="268438021"/>
+        <entry arg="true" endPc="268438267" name="riskLevel" stackId="1" startPc="268438201"/>
+        <entry arg="true" endPc="268438504" name="dc" stackId="1" startPc="268438441"/>
+        <entry arg="true" endPc="268438504" name="width" stackId="2" startPc="268438441"/>
+        <entry arg="true" endPc="268438713" name="dc" stackId="1" startPc="268438505"/>
+        <entry endPc="268438712" name="width" stackId="2" startPc="268438508"/>
+        <entry arg="true" endPc="268438848" name="record" stackId="1" startPc="268438778"/>
+        <entry arg="true" endPc="268438896" name="severity" stackId="1" startPc="268438849"/>
+        <entry arg="true" endPc="268438941" name="riskLevel" stackId="1" startPc="268438897"/>
+        <entry endPc="268439173" name="ex" stackId="1" startPc="268439142"/>
+        <entry endPc="268439266" name="ex" stackId="1" startPc="268439235"/>
+        <entry arg="true" endPc="268439387" name="alert" stackId="1" startPc="268439273"/>
+        <entry arg="true" endPc="268439399" name="settings" stackId="1" startPc="268439388"/>
+        <entry endPc="268439546" name="ex" stackId="1" startPc="268439515"/>
+        <entry arg="true" endPc="268439624" name="alert" stackId="1" startPc="268439581"/>
     </localVars>
     <annotations>
         <annotationEntry annotation="initialized" class="Drawables" module="globals/Rez" symbol="LauncherIcon"/>
@@ -375,18 +471,22 @@
     </annotations>
     <dataEntryOffsetMappings>
         <dataEntry label="globals" offset="49" parentId="" symbolId="globals" type="module"/>
-        <dataEntry label="globals/Rez" offset="152" parentId="globals" symbolId="Rez" type="module"/>
-        <dataEntry label="globals/AlertModel" offset="196" parentId="globals" symbolId="AlertModel" type="class"/>
-        <dataEntry label="globals/MockAlertProvider" offset="294" parentId="globals" symbolId="MockAlertProvider" type="class"/>
-        <dataEntry label="globals/SkyShieldView" offset="401" parentId="globals" symbolId="SkyShieldView" type="class"/>
-        <dataEntry label="globals/SettingsModel" offset="697" parentId="globals" symbolId="SettingsModel" type="class"/>
-        <dataEntry label="globals/VibrationEngine" offset="768" parentId="globals" symbolId="VibrationEngine" type="class"/>
-        <dataEntry label="globals/AlertEngine" offset="857" parentId="globals" symbolId="AlertEngine" type="class"/>
-        <dataEntry label="globals/SkyShieldApp" offset="937" parentId="globals" symbolId="SkyShieldApp" type="class"/>
-        <dataEntry label="globals/Rez/Drawables" offset="1008" parentId="Rez" symbolId="Drawables" type="module"/>
-        <dataEntry label="globals/Rez/Strings" offset="1043" parentId="Rez" symbolId="Strings" type="module"/>
+        <dataEntry label="globals/AlertHistory" offset="161" parentId="globals" symbolId="AlertHistory" type="class"/>
+        <dataEntry label="globals/Rez" offset="268" parentId="globals" symbolId="Rez" type="module"/>
+        <dataEntry label="globals/AlertModel" offset="312" parentId="globals" symbolId="AlertModel" type="class"/>
+        <dataEntry label="globals/MockAlertProvider" offset="410" parentId="globals" symbolId="MockAlertProvider" type="class"/>
+        <dataEntry label="globals/SkyShieldView" offset="517" parentId="globals" symbolId="SkyShieldView" type="class"/>
+        <dataEntry label="globals/SettingsModel" offset="876" parentId="globals" symbolId="SettingsModel" type="class"/>
+        <dataEntry label="globals/VibrationEngine" offset="947" parentId="globals" symbolId="VibrationEngine" type="class"/>
+        <dataEntry label="globals/AlertEngine" offset="1036" parentId="globals" symbolId="AlertEngine" type="class"/>
+        <dataEntry label="globals/SkyShieldApp" offset="1116" parentId="globals" symbolId="SkyShieldApp" type="class"/>
+        <dataEntry label="globals/Rez/Drawables" offset="1187" parentId="Rez" symbolId="Drawables" type="module"/>
+        <dataEntry label="globals/Rez/Strings" offset="1222" parentId="Rez" symbolId="Strings" type="module"/>
     </dataEntryOffsetMappings>
     <functions>
+        <functionEntry accessMode="public" name="&lt;init&gt;" parent="AlertHistory">
+            <documentation/>
+        </functionEntry>
         <functionEntry accessMode="public" endPc="268435479" name="&lt;init&gt;" parent="Rez" startPc="268435460">
             <documentation/>
         </functionEntry>
@@ -411,13 +511,27 @@
         <functionEntry accessMode="public" endPc="268435503" name="&lt;init&gt;" parent="SkyShieldApp" startPc="268435492">
             <documentation/>
         </functionEntry>
+        <functionEntry accessMode="public" endPc="268435511" name="size" parent="AlertHistory" startPc="268435504">
+            <documentation/>
+        </functionEntry>
+        <functionEntry accessMode="public" endPc="268435673" name="addAlert" parent="AlertHistory" startPc="268435512">
+            <param id="alert"/>
+            <documentation/>
+        </functionEntry>
+        <functionEntry accessMode="public" endPc="268435713" name="initialize" parent="AlertHistory" startPc="268435674">
+            <documentation/>
+        </functionEntry>
+        <functionEntry accessMode="public" endPc="268435771" name="getRecordAt" parent="AlertHistory" startPc="268435714">
+            <param id="offset"/>
+            <documentation/>
+        </functionEntry>
         <functionEntry accessMode="public" name="&lt;init&gt;" parent="Drawables">
             <documentation/>
         </functionEntry>
         <functionEntry accessMode="public" name="&lt;init&gt;" parent="Strings">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268435560" name="initialize" parent="AlertModel" startPc="268435504">
+        <functionEntry accessMode="public" endPc="268435828" name="initialize" parent="AlertModel" startPc="268435772">
             <param id="threat"/>
             <param id="risk"/>
             <param id="confidence"/>
@@ -426,32 +540,32 @@
             <param id="bands"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268435727" name="buildDjiMediumAlert" parent="MockAlertProvider" startPc="268435561">
+        <functionEntry accessMode="public" endPc="268435995" name="buildDjiMediumAlert" parent="MockAlertProvider" startPc="268435829">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268435743" name="getActiveAlert" parent="MockAlertProvider" startPc="268435728">
+        <functionEntry accessMode="public" endPc="268436011" name="getActiveAlert" parent="MockAlertProvider" startPc="268435996">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268435777" name="getNextAlert" parent="MockAlertProvider" startPc="268435744">
+        <functionEntry accessMode="public" endPc="268436045" name="getNextAlert" parent="MockAlertProvider" startPc="268436012">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268435822" name="buildAlert" parent="MockAlertProvider" startPc="268435778">
+        <functionEntry accessMode="public" endPc="268436090" name="buildAlert" parent="MockAlertProvider" startPc="268436046">
             <param id="index"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268435989" name="buildUnknownCriticalAlert" parent="MockAlertProvider" startPc="268435823">
+        <functionEntry accessMode="public" endPc="268436257" name="buildUnknownCriticalAlert" parent="MockAlertProvider" startPc="268436091">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436156" name="buildFpvHighAlert" parent="MockAlertProvider" startPc="268435990">
+        <functionEntry accessMode="public" endPc="268436424" name="buildFpvHighAlert" parent="MockAlertProvider" startPc="268436258">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436167" name="initialize" parent="MockAlertProvider" startPc="268436157">
+        <functionEntry accessMode="public" endPc="268436435" name="initialize" parent="MockAlertProvider" startPc="268436425">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436193" name="getAlertTitle" parent="SkyShieldView" startPc="268436168">
+        <functionEntry accessMode="public" endPc="268436461" name="getAlertTitle" parent="SkyShieldView" startPc="268436436">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436276" name="drawMediumBanner" parent="SkyShieldView" startPc="268436194">
+        <functionEntry accessMode="public" endPc="268436544" name="drawMediumBanner" parent="SkyShieldView" startPc="268436462">
             <param id="dc"/>
             <param id="width"/>
             <param id="label"/>
@@ -460,14 +574,14 @@
             <param id="height"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436385" name="drawAlertBanner" parent="SkyShieldView" startPc="268436277">
+        <functionEntry accessMode="public" endPc="268436653" name="drawAlertBanner" parent="SkyShieldView" startPc="268436545">
             <param id="dc"/>
             <param id="width"/>
             <param id="label"/>
             <param id="riskLevel"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436486" name="drawHighBanner" parent="SkyShieldView" startPc="268436386">
+        <functionEntry accessMode="public" endPc="268436754" name="drawHighBanner" parent="SkyShieldView" startPc="268436654">
             <param id="dc"/>
             <param id="width"/>
             <param id="label"/>
@@ -476,29 +590,42 @@
             <param id="height"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436508" name="triggerVibrationIfNeeded" parent="SkyShieldView" startPc="268436487">
+        <functionEntry accessMode="public" endPc="268436776" name="triggerVibrationIfNeeded" parent="SkyShieldView" startPc="268436755">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436549" name="getDistanceLabel" parent="SkyShieldView" startPc="268436509">
+        <functionEntry accessMode="public" endPc="268436817" name="getDistanceLabel" parent="SkyShieldView" startPc="268436777">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436715" name="drawBandsScreen" parent="SkyShieldView" startPc="268436550">
+        <functionEntry accessMode="public" endPc="268436983" name="drawBandsScreen" parent="SkyShieldView" startPc="268436818">
             <param id="dc"/>
             <param id="width"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436742" name="onHide" parent="SkyShieldView" startPc="268436716">
+        <functionEntry accessMode="public" endPc="268437010" name="onHide" parent="SkyShieldView" startPc="268436984">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268436874" name="onShow" parent="SkyShieldView" startPc="268436743">
+        <functionEntry accessMode="public" endPc="268437035" name="getHistoryThreat" parent="SkyShieldView" startPc="268437011">
+            <param id="threat"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268437105" name="drawAlertScreen" parent="SkyShieldView" startPc="268436875">
+        <functionEntry accessMode="public" endPc="268437194" name="onShow" parent="SkyShieldView" startPc="268437036">
+            <documentation/>
+        </functionEntry>
+        <functionEntry accessMode="public" endPc="268437425" name="drawAlertScreen" parent="SkyShieldView" startPc="268437195">
             <param id="dc"/>
             <param id="width"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268437131" name="drawCentered" parent="SkyShieldView" startPc="268437106">
+        <functionEntry accessMode="public" endPc="268437458" name="formatHistorySequence" parent="SkyShieldView" startPc="268437426">
+            <param id="sequence"/>
+            <documentation/>
+        </functionEntry>
+        <functionEntry accessMode="public" endPc="268437628" name="drawHistoryScreen" parent="SkyShieldView" startPc="268437459">
+            <param id="dc"/>
+            <param id="width"/>
+            <documentation/>
+        </functionEntry>
+        <functionEntry accessMode="public" endPc="268437654" name="drawCentered" parent="SkyShieldView" startPc="268437629">
             <param id="dc"/>
             <param id="width"/>
             <param id="y"/>
@@ -506,10 +633,10 @@
             <param id="font"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268437403" name="onTimerTick" parent="SkyShieldView" startPc="268437132">
+        <functionEntry accessMode="public" endPc="268438020" name="onTimerTick" parent="SkyShieldView" startPc="268437655">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268437583" name="drawCriticalBanner" parent="SkyShieldView" startPc="268437404">
+        <functionEntry accessMode="public" endPc="268438200" name="drawCriticalBanner" parent="SkyShieldView" startPc="268438021">
             <param id="dc"/>
             <param id="width"/>
             <param id="label"/>
@@ -518,76 +645,84 @@
             <param id="height"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268437650" name="getRiskColor" parent="SkyShieldView" startPc="268437584">
+        <functionEntry accessMode="public" endPc="268438267" name="getRiskColor" parent="SkyShieldView" startPc="268438201">
             <param id="riskLevel"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268437655" name="getAlertTitleFont" parent="SkyShieldView" startPc="268437651">
+        <functionEntry accessMode="public" endPc="268438272" name="getAlertTitleFont" parent="SkyShieldView" startPc="268438268">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268437790" name="initialize" parent="SkyShieldView" startPc="268437656">
+        <functionEntry accessMode="public" endPc="268438440" name="initialize" parent="SkyShieldView" startPc="268438273">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268437854" name="drawSplashScreen" parent="SkyShieldView" startPc="268437791">
+        <functionEntry accessMode="public" endPc="268438504" name="drawSplashScreen" parent="SkyShieldView" startPc="268438441">
             <param id="dc"/>
             <param id="width"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438036" name="onUpdate" parent="SkyShieldView" startPc="268437855">
+        <functionEntry accessMode="public" endPc="268438713" name="onUpdate" parent="SkyShieldView" startPc="268438505">
             <param id="dc"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438100" name="getAlertStatus" parent="SkyShieldView" startPc="268438037">
+        <functionEntry accessMode="public" endPc="268438777" name="getAlertStatus" parent="SkyShieldView" startPc="268438714">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438145" name="getShortRiskLabel" parent="SkyShieldView" startPc="268438101">
+        <functionEntry accessMode="public" endPc="268438848" name="formatHistoryRecord" parent="SkyShieldView" startPc="268438778">
+            <param id="record"/>
+            <documentation/>
+        </functionEntry>
+        <functionEntry accessMode="public" endPc="268438896" name="getHistorySeverity" parent="SkyShieldView" startPc="268438849">
+            <param id="severity"/>
+            <documentation/>
+        </functionEntry>
+        <functionEntry accessMode="public" endPc="268438941" name="getShortRiskLabel" parent="SkyShieldView" startPc="268438897">
             <param id="riskLevel"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438176" name="initialize" parent="SettingsModel" startPc="268438146">
+        <functionEntry accessMode="public" endPc="268438972" name="initialize" parent="SettingsModel" startPc="268438942">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438383" name="vibrateHigh" parent="VibrationEngine" startPc="268438177">
+        <functionEntry accessMode="public" endPc="268439179" name="vibrateHigh" parent="VibrationEngine" startPc="268438973">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438476" name="vibrateMedium" parent="VibrationEngine" startPc="268438384">
+        <functionEntry accessMode="public" endPc="268439272" name="vibrateMedium" parent="VibrationEngine" startPc="268439180">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438591" name="triggerForAlert" parent="VibrationEngine" startPc="268438477">
+        <functionEntry accessMode="public" endPc="268439387" name="triggerForAlert" parent="VibrationEngine" startPc="268439273">
             <param id="alert"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438603" name="initialize" parent="VibrationEngine" startPc="268438592">
+        <functionEntry accessMode="public" endPc="268439399" name="initialize" parent="VibrationEngine" startPc="268439388">
             <param id="settings"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438756" name="vibrateCritical" parent="VibrationEngine" startPc="268438604">
+        <functionEntry accessMode="public" endPc="268439552" name="vibrateCritical" parent="VibrationEngine" startPc="268439400">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438770" name="getActiveAlert" parent="AlertEngine" startPc="268438757">
+        <functionEntry accessMode="public" endPc="268439566" name="getActiveAlert" parent="AlertEngine" startPc="268439553">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438784" name="getNextAlert" parent="AlertEngine" startPc="268438771">
+        <functionEntry accessMode="public" endPc="268439580" name="getNextAlert" parent="AlertEngine" startPc="268439567">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438828" name="isHighUrgency" parent="AlertEngine" startPc="268438785">
+        <functionEntry accessMode="public" endPc="268439624" name="isHighUrgency" parent="AlertEngine" startPc="268439581">
             <param id="alert"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438856" name="initialize" parent="AlertEngine" startPc="268438829">
+        <functionEntry accessMode="public" endPc="268439652" name="initialize" parent="AlertEngine" startPc="268439625">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438859" name="onStart" parent="SkyShieldApp" startPc="268438857">
+        <functionEntry accessMode="public" endPc="268439655" name="onStart" parent="SkyShieldApp" startPc="268439653">
             <param id="state"/>
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438887" name="getInitialView" parent="SkyShieldApp" startPc="268438860">
+        <functionEntry accessMode="public" endPc="268439683" name="getInitialView" parent="SkyShieldApp" startPc="268439656">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438902" name="initialize" parent="SkyShieldApp" startPc="268438888">
+        <functionEntry accessMode="public" endPc="268439698" name="initialize" parent="SkyShieldApp" startPc="268439684">
             <documentation/>
         </functionEntry>
-        <functionEntry accessMode="public" endPc="268438905" name="onStop" parent="SkyShieldApp" startPc="268438903">
+        <functionEntry accessMode="public" endPc="268439701" name="onStop" parent="SkyShieldApp" startPc="268439699">
             <param id="state"/>
             <documentation/>
         </functionEntry>

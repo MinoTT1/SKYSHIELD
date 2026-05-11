@@ -14,8 +14,9 @@ Current prototype responsibilities:
 
 - Show a tactical boot splash
 - Rotate between mock FPV, DJI, and unknown threat alerts
-- Alternate between ALERT and BANDS screens
+- Alternate between ALERT, BANDS, and HISTORY screens
 - Display threat type, risk level, confidence, band, distance label, and active bands
+- Track the last five mock alerts in memory
 - Trigger severity-based vibration patterns
 - Use high-contrast text for the Garmin Enduro 2 MIP display
 
@@ -39,6 +40,7 @@ garmin-app/
     SkyShieldView.mc
     AlertModel.mc
     AlertEngine.mc
+    AlertHistory.mc
     SettingsModel.mc
     VibrationEngine.mc
     MockAlertProvider.mc
@@ -74,9 +76,33 @@ The MVP is a watch-only tactical UI prototype. It includes:
 - Rotating mock alerts every 4 seconds
 - ALERT screen for immediate action
 - BANDS screen for technical signal detail
+- HISTORY screen with the last five mock alerts
 - Critical banner pulse
 - Severity-based vibration patterns
 - Simple in-app settings model for future settings UI
+
+## Screen Cycle
+
+After the boot splash, the app automatically cycles screens:
+
+- `ALERT`: about 3 seconds
+- `BANDS`: about 1.5 seconds
+- `HISTORY`: about 1.5 seconds
+
+Mock alerts continue rotating every 4 seconds. The screen cycle and alert rotation use separate lightweight counters so the history view can appear without slowing alert rotation.
+
+## Alert History
+
+`AlertHistory` stores the last five mock alerts in a fixed-size ring buffer. Each record contains:
+
+- sequence number
+- threat type
+- severity
+- band
+- distance
+- confidence
+
+The HISTORY screen displays the newest records first using compact monochrome rows.
 
 ## Vibration Patterns
 
