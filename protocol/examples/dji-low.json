@@ -1,22 +1,15 @@
 {
-  "alert_id": "sim-dji-low-001",
-  "timestamp": "2026-05-10T12:01:00Z",
-  "source": {
-    "system": "SKYSHIELD simulator",
-    "mode": "simulated",
-    "device_id": "esp32-s3-devkit-01"
-  },
-  "threat_type": "dji",
-  "risk_level": "low",
-  "confidence": 0.64,
+  "threat": "DJI",
+  "severity": "LOW",
   "band": "2.4GHz",
-  "distance_category": "far",
-  "vibration_pattern": "single_short",
-  "display_message": "DJI signal detected",
-  "recommended_action": "Maintain awareness.",
-  "expires_in_ms": 10000,
-  "metadata": {
-    "scenario": "distant commercial drone profile",
-    "direction_finding_available": false
-  }
+  "distance": "FAR",
+  "confidence": 64,
+  "bands": {
+    "band_1_2": "NONE",
+    "band_2_4": "LOW",
+    "band_3_3": "NONE",
+    "band_5_8": "LOW"
+  },
+  "source": "ESP32_SIM",
+  "sequence": 2
 }

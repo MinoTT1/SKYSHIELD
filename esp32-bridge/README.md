@@ -45,9 +45,9 @@ SKYSHIELD ESP32 Bridge starting...
 Then every 4 seconds it rotates through compact JSON alerts over Serial:
 
 ```json
-{"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87}
-{"threat":"DJI","severity":"MEDIUM","band":"2.4GHz","distance":"MID","confidence":72}
-{"threat":"UNKNOWN","severity":"CRITICAL","band":"MULTI","distance":"NEAR","confidence":94}
+{"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87,"bands":{"band_1_2":"LOW","band_2_4":"LOW","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":1}
+{"threat":"DJI","severity":"MEDIUM","band":"2.4GHz","distance":"MID","confidence":72,"bands":{"band_1_2":"LOW","band_2_4":"MED","band_3_3":"MED","band_5_8":"LOW"},"source":"ESP32_SIM","sequence":2}
+{"threat":"UNKNOWN","severity":"CRITICAL","band":"MULTI","distance":"NEAR","confidence":94,"bands":{"band_1_2":"HIGH","band_2_4":"MED","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":3}
 ```
 
 This simulated mode is intended to validate packet shape and timing before BLE transport is added.

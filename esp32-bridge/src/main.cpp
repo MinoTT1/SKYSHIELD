@@ -7,9 +7,11 @@ MockAlertProvider mockAlerts;
 
 const uint32_t ALERT_INTERVAL_MS = 4000;
 uint32_t lastAlertMs = 0;
+uint32_t sequence = 1;
 
 void printAlert(const SkyShieldAlert& alert) {
-    Serial.println(alertToJson(alert));
+    Serial.println(alertToJson(alert, sequence));
+    sequence += 1;
 }
 }
 
