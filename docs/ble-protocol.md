@@ -4,6 +4,8 @@ The MVP assumes the ESP32-S3 acts as a BLE server and the Garmin Enduro 2 Connec
 
 The BLE link will transport canonical SKYSHIELD alert packets from the ESP32-S3 bridge to the watch. The same JSON packet is currently emitted over Serial by the ESP32 simulated bridge.
 
+For the planned service and characteristic layout, see `docs/ble-gatt-design.md`.
+
 ## Roles
 
 - ESP32-S3: BLE peripheral/server and alert bridge
