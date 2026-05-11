@@ -42,6 +42,9 @@ garmin-app/
     AlertModel.mc
     AlertParser.mc
     AlertEngine.mc
+    AlertSource.mc
+    MockAlertSource.mc
+    BleAlertSource.mc
     AlertHistory.mc
     SettingsModel.mc
     VibrationEngine.mc
@@ -80,6 +83,7 @@ The MVP is a watch-only tactical UI prototype. It includes:
 - BANDS screen for technical signal detail
 - HISTORY screen with the last five mock alerts
 - Garmin-side parser for the canonical SKYSHIELD JSON packet
+- AlertSource abstraction for swapping mock data with future BLE data
 - Critical banner pulse
 - Severity-based vibration patterns
 - Simple in-app settings model for future settings UI
@@ -111,7 +115,25 @@ The HISTORY screen displays the newest records first using compact monochrome ro
 
 `AlertParser` converts the canonical SKYSHIELD JSON payload into the Garmin `AlertModel`.
 
-Current mock alerts are stored as local JSON strings in `MockAlertProvider` and parsed through this same parser. Future BLE integration should pass the received UTF-8 BLE payload directly into `AlertParser.parse()`.
+Current mock alerts are stored as local JSON strings in `MockAlertSource` and parsed through this same parser.
+
+## AlertSource Architecture
+
+`AlertEngine` depends on an AlertSource-style object with a simple `getNextAlert()` method.
+
+Current flow:
+
+```text
+MockAlertSource -> AlertParser -> AlertModel -> AlertEngine -> SkyShieldView
+```
+
+Future BLE flow:
+
+```text
+BleAlertSource -> AlertParser -> AlertModel -> AlertEngine -> SkyShieldView
+```
+
+`BleAlertSource` is a placeholder only. It documents where the future ESP32 BLE notify payload will be received and passed into `AlertParser.parse()`.
 
 ## Vibration Patterns
 
@@ -141,7 +163,7 @@ Those responsibilities belong to the detector layer or ESP32-S3 bridge.
 
 ## Current Limitations
 
-- Mock alert JSON strings are hardcoded in `source/MockAlertProvider.mc`.
+- Mock alert JSON strings are hardcoded in `source/MockAlertSource.mc`.
 - BLE integration is intentionally not implemented.
 - Alert JSON schema validation is not implemented on the watch.
 - Vibration behavior must be validated on Garmin hardware or simulator support.
@@ -152,4 +174,4 @@ Those responsibilities belong to the detector layer or ESP32-S3 bridge.
 
 Before writing code, confirm Garmin Connect IQ support for the required BLE client behavior and haptic patterns on the Enduro 2.
 
-Next step: implement the ESP32 BLE bridge and connect it to `AlertEngine` so `AlertModel` is populated from normalized SKYSHIELD alert payloads delivered by the ESP32-S3 bridge.
+Next step: implement the ESP32 BLE bridge and replace `MockAlertSource` with `BleAlertSource` so `AlertModel` is populated from normalized SKYSHIELD alert payloads delivered by the ESP32-S3 bridge.
