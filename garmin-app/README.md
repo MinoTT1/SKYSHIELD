@@ -17,6 +17,7 @@ Current prototype responsibilities:
 - Alternate between ALERT, BANDS, and HISTORY screens
 - Display threat type, risk level, confidence, band, distance label, and active bands
 - Track the last five mock alerts in memory
+- Parse canonical SKYSHIELD JSON alert packets into Garmin alert models
 - Trigger severity-based vibration patterns
 - Use high-contrast text for the Garmin Enduro 2 MIP display
 
@@ -39,6 +40,7 @@ garmin-app/
     SkyShieldApp.mc
     SkyShieldView.mc
     AlertModel.mc
+    AlertParser.mc
     AlertEngine.mc
     AlertHistory.mc
     SettingsModel.mc
@@ -77,6 +79,7 @@ The MVP is a watch-only tactical UI prototype. It includes:
 - ALERT screen for immediate action
 - BANDS screen for technical signal detail
 - HISTORY screen with the last five mock alerts
+- Garmin-side parser for the canonical SKYSHIELD JSON packet
 - Critical banner pulse
 - Severity-based vibration patterns
 - Simple in-app settings model for future settings UI
@@ -103,6 +106,12 @@ Mock alerts continue rotating every 4 seconds. The screen cycle and alert rotati
 - confidence
 
 The HISTORY screen displays the newest records first using compact monochrome rows.
+
+## Protocol Parser
+
+`AlertParser` converts the canonical SKYSHIELD JSON payload into the Garmin `AlertModel`.
+
+Current mock alerts are stored as local JSON strings in `MockAlertProvider` and parsed through this same parser. Future BLE integration should pass the received UTF-8 BLE payload directly into `AlertParser.parse()`.
 
 ## Vibration Patterns
 
@@ -132,7 +141,7 @@ Those responsibilities belong to the detector layer or ESP32-S3 bridge.
 
 ## Current Limitations
 
-- Mock alert data is hardcoded in `source/MockAlertProvider.mc`.
+- Mock alert JSON strings are hardcoded in `source/MockAlertProvider.mc`.
 - BLE integration is intentionally not implemented.
 - Alert JSON schema validation is not implemented on the watch.
 - Vibration behavior must be validated on Garmin hardware or simulator support.

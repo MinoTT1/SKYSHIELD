@@ -9,7 +9,7 @@ class SkyShieldView extends WatchUi.View {
     var _history;
     var _vibrationEngine;
     var _timer;
-    var _screenPhase;
+    var _currentScreen;
     var _tickCount;
     var _screenTickCount;
     var _showSplash;
@@ -22,7 +22,7 @@ class SkyShieldView extends WatchUi.View {
         _history = new AlertHistory();
         _vibrationEngine = new VibrationEngine(_settings);
         _timer = null;
-        _screenPhase = 0;
+        _currentScreen = 0;
         _tickCount = 0;
         _screenTickCount = 0;
         _showSplash = true;
@@ -31,7 +31,7 @@ class SkyShieldView extends WatchUi.View {
 
     function onShow() {
         _alert = _engine.getActiveAlert();
-        _screenPhase = 0;
+        _currentScreen = 0;
         _tickCount = 0;
         _screenTickCount = 0;
         _showSplash = true;
@@ -60,6 +60,7 @@ class SkyShieldView extends WatchUi.View {
                 _tickCount = 0;
                 _screenTickCount = 0;
                 _showSplash = false;
+                _currentScreen = 0;
             }
 
             WatchUi.requestUpdate();
@@ -75,27 +76,23 @@ class SkyShieldView extends WatchUi.View {
             _criticalPulseOn = true;
         }
 
-        if (_screenTickCount >= 24) {
+        if (_screenTickCount >= 8) {
             _screenTickCount = 0;
-        }
-
-        if (_screenTickCount >= 18) {
-            _screenPhase = 2;
-        } else if (_screenTickCount >= 12) {
-            _screenPhase = 1;
-        } else {
-            _screenPhase = 0;
+            advanceScreen();
         }
 
         if (_tickCount >= 16) {
             _tickCount = 0;
-            _criticalPulseOn = true;
             _alert = _engine.getNextAlert();
             _history.addAlert(_alert);
             triggerVibrationIfNeeded();
         }
 
         WatchUi.requestUpdate();
+    }
+
+    function advanceScreen() {
+        _currentScreen = (_currentScreen + 1) % 3;
     }
 
     function triggerVibrationIfNeeded() {
@@ -120,9 +117,9 @@ class SkyShieldView extends WatchUi.View {
             return;
         }
 
-        if (_screenPhase == 1) {
+        if (_currentScreen == 1) {
             drawBandsScreen(dc, width);
-        } else if (_screenPhase == 2) {
+        } else if (_currentScreen == 2) {
             drawHistoryScreen(dc, width);
         } else {
             drawAlertScreen(dc, width);

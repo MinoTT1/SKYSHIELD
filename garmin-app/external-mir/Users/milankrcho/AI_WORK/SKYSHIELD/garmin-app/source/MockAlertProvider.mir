@@ -9,300 +9,89 @@ class MockAlertProvider {
     }
     [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 3; @position = 8; @symbol_vardef = [_alertIndex,3,8,19]; ]
     var _alertIndex;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 5; @symbol_functiondef = [initialize,5,13,23]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 4; @position = 8; @symbol_vardef = [_parser,4,8,15]; ]
+    var _parser;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 5; @position = 8; @symbol_vardef = [_mockAlerts,5,8,19]; ]
+    var _mockAlerts;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 7; @symbol_functiondef = [initialize,7,13,23]; ]
     function initialize() as Void {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_5_26_7_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 6 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_7_26_15_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 8 8 ]
         %tmp.1 = 0;
-        symbol [ _alertIndex ? 6 8 19 ];
+        symbol [ _alertIndex ? 8 8 19 ];
         putv self :_alertIndex %tmp.1;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_5_26_7_4_stop:
-    }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 9; @symbol_functiondef = [getActiveAlert,9,13,27]; ]
-    function getActiveAlert() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_9_30_11_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 9 8 ]
+        symbol [ AlertParser %tmp.5 9 22 33 ];
+        %tmp.5 = getv ? :AlertParser;
+        %tmp.2 = newc %tmp.5 ();
+        symbol [ _parser ? 9 8 15 ];
+        putv self :_parser %tmp.2;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 10 8 ]
+        %tmp.6 = newa 3;
+        %tmp.7 = "{\"threat\":\"FPV\",\"severity\":\"HIGH\",\"band\":\"5.8GHz\",\"distance\":\"NEAR\",\"confidence\":87,\"bands\":{\"band_1_2\":\"LOW\",\"band_2_4\":\"LOW\",\"band_3_3\":\"MED\",\"band_5_8\":\"HIGH\"},\"source\":\"GARMIN_MOCK\",\"sequence\":1}";
+        %tmp.8 = dup %tmp.6;
+        %tmp.9 = aputv %tmp.8 0 %tmp.7;
+        %tmp.10 = "{\"threat\":\"DJI\",\"severity\":\"MEDIUM\",\"band\":\"2.4GHz\",\"distance\":\"MID\",\"confidence\":72,\"bands\":{\"band_1_2\":\"LOW\",\"band_2_4\":\"MED\",\"band_3_3\":\"MED\",\"band_5_8\":\"LOW\"},\"source\":\"GARMIN_MOCK\",\"sequence\":2}";
+        %tmp.11 = dup %tmp.9;
+        %tmp.12 = aputv %tmp.11 1 %tmp.10;
+        %tmp.13 = "{\"threat\":\"UNKNOWN\",\"severity\":\"CRITICAL\",\"band\":\"MULTI\",\"distance\":\"NEAR\",\"confidence\":94,\"bands\":{\"band_1_2\":\"HIGH\",\"band_2_4\":\"MED\",\"band_3_3\":\"MED\",\"band_5_8\":\"HIGH\"},\"source\":\"GARMIN_MOCK\",\"sequence\":3}";
+        %tmp.14 = dup %tmp.12;
+        %tmp.15 = aputv %tmp.14 2 %tmp.13;
+        symbol [ _mockAlerts ? 10 8 19 ];
+        putv self :_mockAlerts %tmp.15;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_7_26_15_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 17; @symbol_functiondef = [getActiveAlert,17,13,27]; ]
+    function getActiveAlert() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_17_30_19_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 18 8 ]
         %tmp.1 = self;
-        symbol [ buildAlert %tmp.2 10 15 25 ];
+        symbol [ buildAlert %tmp.2 18 15 25 ];
         %tmp.2 = getv function %tmp.1 :buildAlert;
-        symbol [ _alertIndex %tmp.4 10 26 37 ];
+        symbol [ _alertIndex %tmp.4 18 26 37 ];
         %tmp.4 = getv ? :_alertIndex;
         %tmp.5 = invoke %tmp.1 %tmp.2(%tmp.4);
         ret %tmp.5;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_9_30_11_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_17_30_19_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 13; @symbol_functiondef = [getNextAlert,13,13,25]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 21; @symbol_functiondef = [getNextAlert,21,13,25]; ]
     function getNextAlert() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_13_28_16_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 14 8 ]
-        symbol [ _alertIndex %tmp.2 14 23 34 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_21_28_24_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 22 8 ]
+        symbol [ _alertIndex %tmp.2 22 23 34 ];
         %tmp.2 = getv ? :_alertIndex;
         %tmp.3 = 1;
         %tmp.4 = add %tmp.2 %tmp.3;
         %tmp.5 = 3;
         %tmp.6 = mod %tmp.4 %tmp.5;
-        symbol [ _alertIndex ? 14 8 19 ];
+        symbol [ _alertIndex ? 22 8 19 ];
         putv self :_alertIndex %tmp.6;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 15 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 23 8 ]
         %tmp.7 = self;
-        symbol [ buildAlert %tmp.8 15 15 25 ];
+        symbol [ buildAlert %tmp.8 23 15 25 ];
         %tmp.8 = getv function %tmp.7 :buildAlert;
-        symbol [ _alertIndex %tmp.10 15 26 37 ];
+        symbol [ _alertIndex %tmp.10 23 26 37 ];
         %tmp.10 = getv ? :_alertIndex;
         %tmp.11 = invoke %tmp.7 %tmp.8(%tmp.10);
         ret %tmp.11;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_13_28_16_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_21_28_24_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 18; @symbol_functiondef = [buildAlert,18,13,23]; @symbol_param<0> = [index,18,24,29]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 26; @symbol_functiondef = [buildAlert,26,13,23]; @symbol_param<0> = [index,26,24,29]; ]
     function buildAlert(index) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_18_31_28_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 19 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_19_8_21_8_if_stmt:
-        %tmp.1 = lgetv %index;
-        symbol [ index %tmp.1 19 12 17 ];
-        %tmp.2 = 1;
-        %tmp.3 = eq %tmp.1 %tmp.2;
-        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_19_8_21_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_19_8_21_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_19_24_21_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 20 12 ]
-        %tmp.4 = self;
-        symbol [ buildDjiMediumAlert %tmp.5 20 19 38 ];
-        %tmp.5 = getv function %tmp.4 :buildDjiMediumAlert;
-        %tmp.6 = invoke %tmp.4 %tmp.5();
-        ret %tmp.6;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_19_24_21_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_19_8_21_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_19_8_21_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 23 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_23_8_25_8_if_stmt:
-        %tmp.7 = lgetv %index;
-        symbol [ index %tmp.7 23 12 17 ];
-        %tmp.8 = 2;
-        %tmp.9 = eq %tmp.7 %tmp.8;
-        bf %tmp.9 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_23_8_25_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_23_8_25_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_23_24_25_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 24 12 ]
-        %tmp.10 = self;
-        symbol [ buildUnknownCriticalAlert %tmp.11 24 19 44 ];
-        %tmp.11 = getv function %tmp.10 :buildUnknownCriticalAlert;
-        %tmp.12 = invoke %tmp.10 %tmp.11();
-        ret %tmp.12;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_23_24_25_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_23_8_25_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_23_8_25_8_if_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_26_31_28_4_start:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 27 8 ]
-        %tmp.13 = self;
-        symbol [ buildFpvHighAlert %tmp.14 27 15 32 ];
-        %tmp.14 = getv function %tmp.13 :buildFpvHighAlert;
-        %tmp.15 = invoke %tmp.13 %tmp.14();
-        ret %tmp.15;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_18_31_28_4_stop:
-    }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 30; @symbol_functiondef = [buildFpvHighAlert,30,13,30]; ]
-    function buildFpvHighAlert() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_30_33_37_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 31 8 ]
-        symbol [ AlertModel %tmp.4 31 19 29 ];
-        %tmp.4 = getv ? :AlertModel;
-        %tmp.5 = "FPV";
-        %tmp.6 = "HIGH";
-        %tmp.7 = 87;
-        %tmp.8 = "5.8 GHz";
-        %tmp.9 = "NEAR";
-        %tmp.10 = newa 4;
-        %tmp.11 = newd 2;
-        %tmp.13 = const :band;
-        symbol [ band %tmp.13 32 15 19 const ];
-        %tmp.14 = "1.2";
-        %tmp.15 = dup %tmp.11;
-        %tmp.16 = aputv %tmp.15 %tmp.13 %tmp.14;
-        %tmp.18 = const :level;
-        symbol [ level %tmp.18 32 31 36 const ];
-        %tmp.19 = "LOW";
-        %tmp.20 = dup %tmp.16;
-        %tmp.21 = aputv %tmp.20 %tmp.18 %tmp.19;
-        %tmp.22 = dup %tmp.10;
-        %tmp.23 = aputv %tmp.22 0 %tmp.21;
-        %tmp.24 = newd 2;
-        %tmp.26 = const :band;
-        symbol [ band %tmp.26 33 15 19 const ];
-        %tmp.27 = "2.4";
-        %tmp.28 = dup %tmp.24;
-        %tmp.29 = aputv %tmp.28 %tmp.26 %tmp.27;
-        %tmp.31 = const :level;
-        symbol [ level %tmp.31 33 31 36 const ];
-        %tmp.32 = "LOW";
-        %tmp.33 = dup %tmp.29;
-        %tmp.34 = aputv %tmp.33 %tmp.31 %tmp.32;
-        %tmp.35 = dup %tmp.23;
-        %tmp.36 = aputv %tmp.35 1 %tmp.34;
-        %tmp.37 = newd 2;
-        %tmp.39 = const :band;
-        symbol [ band %tmp.39 34 15 19 const ];
-        %tmp.40 = "3.3";
-        %tmp.41 = dup %tmp.37;
-        %tmp.42 = aputv %tmp.41 %tmp.39 %tmp.40;
-        %tmp.44 = const :level;
-        symbol [ level %tmp.44 34 31 36 const ];
-        %tmp.45 = "MED";
-        %tmp.46 = dup %tmp.42;
-        %tmp.47 = aputv %tmp.46 %tmp.44 %tmp.45;
-        %tmp.48 = dup %tmp.36;
-        %tmp.49 = aputv %tmp.48 2 %tmp.47;
-        %tmp.50 = newd 2;
-        %tmp.52 = const :band;
-        symbol [ band %tmp.52 35 15 19 const ];
-        %tmp.53 = "5.8";
-        %tmp.54 = dup %tmp.50;
-        %tmp.55 = aputv %tmp.54 %tmp.52 %tmp.53;
-        %tmp.57 = const :level;
-        symbol [ level %tmp.57 35 31 36 const ];
-        %tmp.58 = "HIGH";
-        %tmp.59 = dup %tmp.55;
-        %tmp.60 = aputv %tmp.59 %tmp.57 %tmp.58;
-        %tmp.61 = dup %tmp.49;
-        %tmp.62 = aputv %tmp.61 3 %tmp.60;
-        %tmp.1 = newc %tmp.4 (%tmp.5, %tmp.6, %tmp.7, %tmp.8, %tmp.9, %tmp.62);
-        ret %tmp.1;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_30_33_37_4_stop:
-    }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 39; @symbol_functiondef = [buildDjiMediumAlert,39,13,32]; ]
-    function buildDjiMediumAlert() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_39_35_46_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 40 8 ]
-        symbol [ AlertModel %tmp.4 40 19 29 ];
-        %tmp.4 = getv ? :AlertModel;
-        %tmp.5 = "DJI";
-        %tmp.6 = "MEDIUM";
-        %tmp.7 = 72;
-        %tmp.8 = "2.4 GHz";
-        %tmp.9 = "MED";
-        %tmp.10 = newa 4;
-        %tmp.11 = newd 2;
-        %tmp.13 = const :band;
-        symbol [ band %tmp.13 41 15 19 const ];
-        %tmp.14 = "1.2";
-        %tmp.15 = dup %tmp.11;
-        %tmp.16 = aputv %tmp.15 %tmp.13 %tmp.14;
-        %tmp.18 = const :level;
-        symbol [ level %tmp.18 41 31 36 const ];
-        %tmp.19 = "LOW";
-        %tmp.20 = dup %tmp.16;
-        %tmp.21 = aputv %tmp.20 %tmp.18 %tmp.19;
-        %tmp.22 = dup %tmp.10;
-        %tmp.23 = aputv %tmp.22 0 %tmp.21;
-        %tmp.24 = newd 2;
-        %tmp.26 = const :band;
-        symbol [ band %tmp.26 42 15 19 const ];
-        %tmp.27 = "2.4";
-        %tmp.28 = dup %tmp.24;
-        %tmp.29 = aputv %tmp.28 %tmp.26 %tmp.27;
-        %tmp.31 = const :level;
-        symbol [ level %tmp.31 42 31 36 const ];
-        %tmp.32 = "MED";
-        %tmp.33 = dup %tmp.29;
-        %tmp.34 = aputv %tmp.33 %tmp.31 %tmp.32;
-        %tmp.35 = dup %tmp.23;
-        %tmp.36 = aputv %tmp.35 1 %tmp.34;
-        %tmp.37 = newd 2;
-        %tmp.39 = const :band;
-        symbol [ band %tmp.39 43 15 19 const ];
-        %tmp.40 = "3.3";
-        %tmp.41 = dup %tmp.37;
-        %tmp.42 = aputv %tmp.41 %tmp.39 %tmp.40;
-        %tmp.44 = const :level;
-        symbol [ level %tmp.44 43 31 36 const ];
-        %tmp.45 = "MED";
-        %tmp.46 = dup %tmp.42;
-        %tmp.47 = aputv %tmp.46 %tmp.44 %tmp.45;
-        %tmp.48 = dup %tmp.36;
-        %tmp.49 = aputv %tmp.48 2 %tmp.47;
-        %tmp.50 = newd 2;
-        %tmp.52 = const :band;
-        symbol [ band %tmp.52 44 15 19 const ];
-        %tmp.53 = "5.8";
-        %tmp.54 = dup %tmp.50;
-        %tmp.55 = aputv %tmp.54 %tmp.52 %tmp.53;
-        %tmp.57 = const :level;
-        symbol [ level %tmp.57 44 31 36 const ];
-        %tmp.58 = "LOW";
-        %tmp.59 = dup %tmp.55;
-        %tmp.60 = aputv %tmp.59 %tmp.57 %tmp.58;
-        %tmp.61 = dup %tmp.49;
-        %tmp.62 = aputv %tmp.61 3 %tmp.60;
-        %tmp.1 = newc %tmp.4 (%tmp.5, %tmp.6, %tmp.7, %tmp.8, %tmp.9, %tmp.62);
-        ret %tmp.1;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_39_35_46_4_stop:
-    }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 48; @symbol_functiondef = [buildUnknownCriticalAlert,48,13,38]; ]
-    function buildUnknownCriticalAlert() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_48_41_55_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc" 49 8 ]
-        symbol [ AlertModel %tmp.4 49 19 29 ];
-        %tmp.4 = getv ? :AlertModel;
-        %tmp.5 = "UNKNOWN";
-        %tmp.6 = "CRITICAL";
-        %tmp.7 = 94;
-        %tmp.8 = "MULTI";
-        %tmp.9 = "NEAR";
-        %tmp.10 = newa 4;
-        %tmp.11 = newd 2;
-        %tmp.13 = const :band;
-        symbol [ band %tmp.13 50 15 19 const ];
-        %tmp.14 = "1.2";
-        %tmp.15 = dup %tmp.11;
-        %tmp.16 = aputv %tmp.15 %tmp.13 %tmp.14;
-        %tmp.18 = const :level;
-        symbol [ level %tmp.18 50 31 36 const ];
-        %tmp.19 = "HIGH";
-        %tmp.20 = dup %tmp.16;
-        %tmp.21 = aputv %tmp.20 %tmp.18 %tmp.19;
-        %tmp.22 = dup %tmp.10;
-        %tmp.23 = aputv %tmp.22 0 %tmp.21;
-        %tmp.24 = newd 2;
-        %tmp.26 = const :band;
-        symbol [ band %tmp.26 51 15 19 const ];
-        %tmp.27 = "2.4";
-        %tmp.28 = dup %tmp.24;
-        %tmp.29 = aputv %tmp.28 %tmp.26 %tmp.27;
-        %tmp.31 = const :level;
-        symbol [ level %tmp.31 51 31 36 const ];
-        %tmp.32 = "MED";
-        %tmp.33 = dup %tmp.29;
-        %tmp.34 = aputv %tmp.33 %tmp.31 %tmp.32;
-        %tmp.35 = dup %tmp.23;
-        %tmp.36 = aputv %tmp.35 1 %tmp.34;
-        %tmp.37 = newd 2;
-        %tmp.39 = const :band;
-        symbol [ band %tmp.39 52 15 19 const ];
-        %tmp.40 = "3.3";
-        %tmp.41 = dup %tmp.37;
-        %tmp.42 = aputv %tmp.41 %tmp.39 %tmp.40;
-        %tmp.44 = const :level;
-        symbol [ level %tmp.44 52 31 36 const ];
-        %tmp.45 = "MED";
-        %tmp.46 = dup %tmp.42;
-        %tmp.47 = aputv %tmp.46 %tmp.44 %tmp.45;
-        %tmp.48 = dup %tmp.36;
-        %tmp.49 = aputv %tmp.48 2 %tmp.47;
-        %tmp.50 = newd 2;
-        %tmp.52 = const :band;
-        symbol [ band %tmp.52 53 15 19 const ];
-        %tmp.53 = "5.8";
-        %tmp.54 = dup %tmp.50;
-        %tmp.55 = aputv %tmp.54 %tmp.52 %tmp.53;
-        %tmp.57 = const :level;
-        symbol [ level %tmp.57 53 31 36 const ];
-        %tmp.58 = "HIGH";
-        %tmp.59 = dup %tmp.55;
-        %tmp.60 = aputv %tmp.59 %tmp.57 %tmp.58;
-        %tmp.61 = dup %tmp.49;
-        %tmp.62 = aputv %tmp.61 3 %tmp.60;
-        %tmp.1 = newc %tmp.4 (%tmp.5, %tmp.6, %tmp.7, %tmp.8, %tmp.9, %tmp.62);
-        ret %tmp.1;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_48_41_55_4_stop:
+        symbol [ _parser %tmp.2 27 15 22 ];
+        %tmp.2 = getv ? :_parser;
+        symbol [ parse %tmp.3 27 23 28 ];
+        %tmp.3 = getv function %tmp.2 :parse;
+        symbol [ _mockAlerts %tmp.5 27 29 40 ];
+        %tmp.5 = getv ? :_mockAlerts;
+        %tmp.6 = lgetv %index;
+        symbol [ index %tmp.6 27 41 46 ];
+        %tmp.7 = agetv %tmp.5 %tmp.6;
+        %tmp.8 = invoke %tmp.2 %tmp.3(%tmp.7);
+        ret %tmp.8;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_MockAlertProvider_mc_26_31_28_4_stop:
     }
 }
 [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/MockAlertProvider.mc"; @line = 2; ]
