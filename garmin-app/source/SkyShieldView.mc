@@ -142,7 +142,14 @@ class SkyShieldView extends WatchUi.View {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _alert.band, Graphics.FONT_SMALL);
-        y += 36;
+        y += 30;
+
+        var directionLabel = getDirectionLabel();
+
+        if (directionLabel != "") {
+            drawCentered(dc, width, y, directionLabel, Graphics.FONT_TINY);
+            y += 30;
+        }
 
         drawCentered(dc, width, y, getDistanceLabel(), Graphics.FONT_SMALL);
         y += 36;
@@ -262,6 +269,26 @@ class SkyShieldView extends WatchUi.View {
         }
 
         return _alert.distanceLabel;
+    }
+
+    function getDirectionLabel() {
+        if (_alert.directionLabel == "FRONT") {
+            return "^ FRONT";
+        }
+
+        if (_alert.directionLabel == "LEFT") {
+            return "< LEFT";
+        }
+
+        if (_alert.directionLabel == "RIGHT") {
+            return "> RIGHT";
+        }
+
+        if (_alert.directionLabel == "REAR") {
+            return "v REAR";
+        }
+
+        return "";
     }
 
     function getShortRiskLabel(riskLevel) {

@@ -24,6 +24,7 @@ Required fields:
 
 Optional fields:
 
+- `direction`: `FRONT`, `LEFT`, `RIGHT`, or `REAR`
 - `bands`: object with `band_1_2`, `band_2_4`, `band_3_3`, and `band_5_8`
 - `source`: source label such as `ESP32_SIM`
 - `sequence`: bridge-generated packet sequence number
@@ -38,7 +39,7 @@ Band strength values are:
 Example:
 
 ```json
-{"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87,"bands":{"band_1_2":"LOW","band_2_4":"LOW","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":1}
+{"threat":"FPV","severity":"HIGH","band":"5.8GHz","direction":"FRONT","distance":"NEAR","confidence":87,"bands":{"band_1_2":"LOW","band_2_4":"LOW","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":1}
 ```
 
 ## Current Serial Mock Mode

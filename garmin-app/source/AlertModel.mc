@@ -7,16 +7,18 @@ class AlertModel {
     var band;
     var distanceLabel;
     var activeBands;
+    var directionLabel;
     var source;
     var sequence;
 
-    function initialize(threat, risk, confidence, primaryBand, distance, bands, sourceLabel, sequenceNumber) {
+    function initialize(threat, risk, confidence, primaryBand, distance, bands, directionValue, sourceLabel, sequenceNumber) {
         threatType = threat;
         riskLevel = risk;
         confidencePercent = confidence;
         band = primaryBand;
         distanceLabel = distance;
         activeBands = bands;
+        directionLabel = directionValue;
         source = sourceLabel;
         sequence = sequenceNumber;
     }

@@ -48,6 +48,16 @@
         "NEAR"
       ]
     },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "FRONT",
+        "LEFT",
+        "RIGHT",
+        "REAR"
+      ],
+      "description": "Optional coarse bearing hint for future directional RF workflows."
+    },
     "confidence": {
       "type": "integer",
       "minimum": 0,

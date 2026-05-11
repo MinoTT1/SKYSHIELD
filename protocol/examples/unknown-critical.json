@@ -2,6 +2,7 @@
   "threat": "UNKNOWN",
   "severity": "CRITICAL",
   "band": "MULTI",
+  "direction": "RIGHT",
   "distance": "NEAR",
   "confidence": 94,
   "bands": {

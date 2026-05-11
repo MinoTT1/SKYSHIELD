@@ -18,6 +18,7 @@ Current prototype responsibilities:
 - Display threat type, risk level, confidence, band, distance label, and active bands
 - Track the last five mock alerts in memory
 - Parse canonical SKYSHIELD JSON alert packets into Garmin alert models
+- Show optional simulated direction hints on the ALERT screen
 - Trigger severity-based vibration patterns
 - Use high-contrast text for the Garmin Enduro 2 MIP display
 

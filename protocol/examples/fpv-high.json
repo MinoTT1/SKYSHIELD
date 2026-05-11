@@ -2,6 +2,7 @@
   "threat": "FPV",
   "severity": "HIGH",
   "band": "5.8GHz",
+  "direction": "FRONT",
   "distance": "NEAR",
   "confidence": 87,
   "bands": {

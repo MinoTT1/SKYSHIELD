@@ -1,0 +1,154 @@
+[
+  {
+    "offset": 0.0,
+    "packet": {
+      "threat": "FPV",
+      "severity": "HIGH",
+      "band": "5.8GHz",
+      "direction": "FRONT",
+      "distance": "NEAR",
+      "confidence": 87,
+      "bands": {
+        "band_1_2": "LOW",
+        "band_2_4": "LOW",
+        "band_3_3": "MED",
+        "band_5_8": "HIGH"
+      },
+      "source": "REPLAY_SIM",
+      "sequence": 1
+    }
+  },
+  {
+    "offset": 4.0,
+    "packet": {
+      "threat": "DJI",
+      "severity": "MEDIUM",
+      "band": "2.4GHz",
+      "direction": "LEFT",
+      "distance": "MID",
+      "confidence": 72,
+      "bands": {
+        "band_1_2": "NONE",
+        "band_2_4": "MED",
+        "band_3_3": "LOW",
+        "band_5_8": "LOW"
+      },
+      "source": "REPLAY_SIM",
+      "sequence": 2
+    }
+  },
+  {
+    "offset": 8.0,
+    "packet": {
+      "threat": "UNKNOWN",
+      "severity": "CRITICAL",
+      "band": "MULTI",
+      "direction": "RIGHT",
+      "distance": "NEAR",
+      "confidence": 94,
+      "bands": {
+        "band_1_2": "HIGH",
+        "band_2_4": "MED",
+        "band_3_3": "MED",
+        "band_5_8": "HIGH"
+      },
+      "source": "REPLAY_SIM",
+      "sequence": 3
+    }
+  },
+  {
+    "offset": 12.0,
+    "packet": {
+      "threat": "FPV",
+      "severity": "HIGH",
+      "band": "3.3GHz",
+      "direction": "REAR",
+      "distance": "MID",
+      "confidence": 81,
+      "bands": {
+        "band_1_2": "LOW",
+        "band_2_4": "NONE",
+        "band_3_3": "HIGH",
+        "band_5_8": "MED"
+      },
+      "source": "REPLAY_SIM",
+      "sequence": 4
+    }
+  },
+  {
+    "offset": 16.0,
+    "packet": {
+      "threat": "DJI",
+      "severity": "LOW",
+      "band": "2.4GHz",
+      "direction": "FRONT",
+      "distance": "FAR",
+      "confidence": 58,
+      "bands": {
+        "band_1_2": "NONE",
+        "band_2_4": "LOW",
+        "band_3_3": "NONE",
+        "band_5_8": "LOW"
+      },
+      "source": "REPLAY_SIM",
+      "sequence": 5
+    }
+  },
+  {
+    "offset": 20.0,
+    "packet": {
+      "threat": "UNKNOWN",
+      "severity": "HIGH",
+      "band": "1.2GHz",
+      "direction": "LEFT",
+      "distance": "NEAR",
+      "confidence": 76,
+      "bands": {
+        "band_1_2": "HIGH",
+        "band_2_4": "LOW",
+        "band_3_3": "NONE",
+        "band_5_8": "NONE"
+      },
+      "source": "REPLAY_SIM",
+      "sequence": 6
+    }
+  },
+  {
+    "offset": 24.0,
+    "packet": {
+      "threat": "FPV",
+      "severity": "CRITICAL",
+      "band": "5.8GHz",
+      "direction": "RIGHT",
+      "distance": "NEAR",
+      "confidence": 96,
+      "bands": {
+        "band_1_2": "MED",
+        "band_2_4": "LOW",
+        "band_3_3": "MED",
+        "band_5_8": "HIGH"
+      },
+      "source": "REPLAY_SIM",
+      "sequence": 7
+    }
+  },
+  {
+    "offset": 28.0,
+    "packet": {
+      "threat": "DJI",
+      "severity": "MEDIUM",
+      "band": "5.8GHz",
+      "direction": "REAR",
+      "distance": "MID",
+      "confidence": 69,
+      "bands": {
+        "band_1_2": "NONE",
+        "band_2_4": "MED",
+        "band_3_3": "LOW",
+        "band_5_8": "MED"
+      },
+      "source": "REPLAY_SIM",
+      "sequence": 8
+    }
+  }
+]

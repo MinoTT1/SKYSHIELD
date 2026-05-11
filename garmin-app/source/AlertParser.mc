@@ -15,10 +15,11 @@ class AlertParser {
         var distance = parseDistance(jsonString);
         var confidence = parseConfidence(jsonString);
         var bands = parseBands(jsonString);
+        var direction = parseDirection(jsonString);
         var source = parseSource(jsonString);
         var sequence = parseSequence(jsonString);
 
-        System.println("SKYSHIELD parser fields: threat=" + threat + " severity=" + severity + " band=" + band + " distance=" + distance + " confidence=" + confidence);
+        System.println("SKYSHIELD parser fields: threat=" + threat + " severity=" + severity + " band=" + band + " direction=" + direction + " distance=" + distance + " confidence=" + confidence);
 
         if (threat == null) {
             return fallbackAlert("invalid or missing threat");
@@ -53,6 +54,7 @@ class AlertParser {
             band,
             distance,
             bands,
+            direction,
             source,
             sequence
         );
@@ -68,6 +70,7 @@ class AlertParser {
             "MULTI",
             "FAR",
             defaultBands(),
+            null,
             "",
             0
         );
@@ -144,6 +147,26 @@ class AlertParser {
 
         if (hasToken(jsonString, "\"distance\":\"NEAR\"")) {
             return "NEAR";
+        }
+
+        return null;
+    }
+
+    function parseDirection(jsonString) {
+        if (hasToken(jsonString, "\"direction\":\"FRONT\"")) {
+            return "FRONT";
+        }
+
+        if (hasToken(jsonString, "\"direction\":\"LEFT\"")) {
+            return "LEFT";
+        }
+
+        if (hasToken(jsonString, "\"direction\":\"RIGHT\"")) {
+            return "RIGHT";
+        }
+
+        if (hasToken(jsonString, "\"direction\":\"REAR\"")) {
+            return "REAR";
         }
 
         return null;

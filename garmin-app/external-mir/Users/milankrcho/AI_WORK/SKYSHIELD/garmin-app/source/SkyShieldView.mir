@@ -654,9 +654,9 @@ _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_129_41_13
     }
     [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 135; @symbol_functiondef = [drawAlertScreen,135,13,28]; @symbol_param<0> = [dc,135,29,31]; @symbol_param<1> = [width,135,33,38]; ]
     function drawAlertScreen(dc, width) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_151_4_start:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_158_4_start:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 136 8 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_151_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_151_4_stop" ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_158_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_158_4_stop" ]
         %y.1 = local;
         symbol [ y %y.1 136 12 13 ];
         %tmp.1 = 64;
@@ -763,1148 +763,1270 @@ _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_15
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 145 8 ]
         %tmp.55 = lgetv %y.1;
         symbol [ y %tmp.55 145 8 9 ];
-        %tmp.56 = 36;
+        %tmp.56 = 30;
         %tmp.57 = add %tmp.55 %tmp.56;
         lputv %y.1 %tmp.57;
         symbol [ y %y.1 145 8 9 ];
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 147 8 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_158_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_158_4_stop" ]
+        %directionLabel.2 = local;
+        symbol [ directionLabel %directionLabel.2 147 12 26 ];
         %tmp.58 = self;
-        symbol [ drawCentered %tmp.59 147 8 20 ];
-        %tmp.59 = getv function %tmp.58 :drawCentered;
-        %tmp.60 = lgetv %dc;
-        symbol [ dc %tmp.60 147 21 23 ];
-        %tmp.61 = lgetv %width;
-        symbol [ width %tmp.61 147 25 30 ];
-        %tmp.62 = lgetv %y.1;
-        symbol [ y %tmp.62 147 32 33 ];
-        %tmp.63 = self;
-        symbol [ getDistanceLabel %tmp.64 147 35 51 ];
-        %tmp.64 = getv function %tmp.63 :getDistanceLabel;
-        %tmp.65 = invoke %tmp.63 %tmp.64();
-        symbol [ Graphics %tmp.66 147 55 63 ];
-        %tmp.66 = getm $.Toybox.Graphics;
-        symbol [ FONT_SMALL %tmp.67 147 64 74 ];
-        %tmp.67 = getv %tmp.66 :FONT_SMALL;
-        invoke %tmp.58 %tmp.59(%tmp.60, %tmp.61, %tmp.62, %tmp.65, %tmp.67);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 148 8 ]
+        symbol [ getDirectionLabel %tmp.59 147 29 46 ];
+        %tmp.59 = getv function %tmp.58 :getDirectionLabel;
+        %tmp.60 = invoke %tmp.58 %tmp.59();
+        lputv %directionLabel.2 %tmp.60;
+        symbol [ directionLabel %directionLabel.2 147 12 26 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 149 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_149_8_152_8_if_stmt:
+        %tmp.61 = lgetv %directionLabel.2;
+        symbol [ directionLabel %tmp.61 149 12 26 ];
+        %tmp.62 = "";
+        %tmp.63 = ne %tmp.61 %tmp.62;
+        bf %tmp.63 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_149_8_152_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_149_8_152_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_149_34_152_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 150 12 ]
+        %tmp.64 = self;
+        symbol [ drawCentered %tmp.65 150 12 24 ];
+        %tmp.65 = getv function %tmp.64 :drawCentered;
+        %tmp.66 = lgetv %dc;
+        symbol [ dc %tmp.66 150 25 27 ];
+        %tmp.67 = lgetv %width;
+        symbol [ width %tmp.67 150 29 34 ];
         %tmp.68 = lgetv %y.1;
-        symbol [ y %tmp.68 148 8 9 ];
-        %tmp.69 = 36;
-        %tmp.70 = add %tmp.68 %tmp.69;
-        lputv %y.1 %tmp.70;
-        symbol [ y %y.1 148 8 9 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 150 8 ]
-        %tmp.71 = self;
-        symbol [ drawCentered %tmp.72 150 8 20 ];
-        %tmp.72 = getv function %tmp.71 :drawCentered;
-        %tmp.73 = lgetv %dc;
-        symbol [ dc %tmp.73 150 21 23 ];
-        %tmp.74 = lgetv %width;
-        symbol [ width %tmp.74 150 25 30 ];
-        %tmp.75 = lgetv %y.1;
-        symbol [ y %tmp.75 150 32 33 ];
-        %tmp.76 = "CONF ";
-        symbol [ _alert %tmp.78 150 45 51 ];
-        %tmp.78 = getv ? :_alert;
-        symbol [ confidencePercent %tmp.79 150 52 69 ];
-        %tmp.79 = getv %tmp.78 :confidencePercent;
-        %tmp.80 = add %tmp.76 %tmp.79;
-        %tmp.81 = "%";
-        %tmp.82 = add %tmp.80 %tmp.81;
-        symbol [ Graphics %tmp.83 150 77 85 ];
-        %tmp.83 = getm $.Toybox.Graphics;
-        symbol [ FONT_SMALL %tmp.84 150 86 96 ];
-        %tmp.84 = getv %tmp.83 :FONT_SMALL;
-        invoke %tmp.71 %tmp.72(%tmp.73, %tmp.74, %tmp.75, %tmp.82, %tmp.84);
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_151_4_stop:
-    }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 153; @symbol_functiondef = [drawBandsScreen,153,13,28]; @symbol_param<0> = [dc,153,29,31]; @symbol_param<1> = [width,153,33,38]; ]
-    function drawBandsScreen(dc, width) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_153_40_167_4_start:
+        symbol [ y %tmp.68 150 36 37 ];
+        %tmp.69 = lgetv %directionLabel.2;
+        symbol [ directionLabel %tmp.69 150 39 53 ];
+        symbol [ Graphics %tmp.70 150 55 63 ];
+        %tmp.70 = getm $.Toybox.Graphics;
+        symbol [ FONT_TINY %tmp.71 150 64 73 ];
+        %tmp.71 = getv %tmp.70 :FONT_TINY;
+        invoke %tmp.64 %tmp.65(%tmp.66, %tmp.67, %tmp.68, %tmp.69, %tmp.71);
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 151 12 ]
+        %tmp.72 = lgetv %y.1;
+        symbol [ y %tmp.72 151 12 13 ];
+        %tmp.73 = 30;
+        %tmp.74 = add %tmp.72 %tmp.73;
+        lputv %y.1 %tmp.74;
+        symbol [ y %y.1 151 12 13 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_149_34_152_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_149_8_152_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_149_8_152_8_if_end:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 154 8 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_153_40_167_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_153_40_167_4_stop" ]
+        %tmp.75 = self;
+        symbol [ drawCentered %tmp.76 154 8 20 ];
+        %tmp.76 = getv function %tmp.75 :drawCentered;
+        %tmp.77 = lgetv %dc;
+        symbol [ dc %tmp.77 154 21 23 ];
+        %tmp.78 = lgetv %width;
+        symbol [ width %tmp.78 154 25 30 ];
+        %tmp.79 = lgetv %y.1;
+        symbol [ y %tmp.79 154 32 33 ];
+        %tmp.80 = self;
+        symbol [ getDistanceLabel %tmp.81 154 35 51 ];
+        %tmp.81 = getv function %tmp.80 :getDistanceLabel;
+        %tmp.82 = invoke %tmp.80 %tmp.81();
+        symbol [ Graphics %tmp.83 154 55 63 ];
+        %tmp.83 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.84 154 64 74 ];
+        %tmp.84 = getv %tmp.83 :FONT_SMALL;
+        invoke %tmp.75 %tmp.76(%tmp.77, %tmp.78, %tmp.79, %tmp.82, %tmp.84);
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 155 8 ]
+        %tmp.85 = lgetv %y.1;
+        symbol [ y %tmp.85 155 8 9 ];
+        %tmp.86 = 36;
+        %tmp.87 = add %tmp.85 %tmp.86;
+        lputv %y.1 %tmp.87;
+        symbol [ y %y.1 155 8 9 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 157 8 ]
+        %tmp.88 = self;
+        symbol [ drawCentered %tmp.89 157 8 20 ];
+        %tmp.89 = getv function %tmp.88 :drawCentered;
+        %tmp.90 = lgetv %dc;
+        symbol [ dc %tmp.90 157 21 23 ];
+        %tmp.91 = lgetv %width;
+        symbol [ width %tmp.91 157 25 30 ];
+        %tmp.92 = lgetv %y.1;
+        symbol [ y %tmp.92 157 32 33 ];
+        %tmp.93 = "CONF ";
+        symbol [ _alert %tmp.95 157 45 51 ];
+        %tmp.95 = getv ? :_alert;
+        symbol [ confidencePercent %tmp.96 157 52 69 ];
+        %tmp.96 = getv %tmp.95 :confidencePercent;
+        %tmp.97 = add %tmp.93 %tmp.96;
+        %tmp.98 = "%";
+        %tmp.99 = add %tmp.97 %tmp.98;
+        symbol [ Graphics %tmp.100 157 77 85 ];
+        %tmp.100 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.101 157 86 96 ];
+        %tmp.101 = getv %tmp.100 :FONT_SMALL;
+        invoke %tmp.88 %tmp.89(%tmp.90, %tmp.91, %tmp.92, %tmp.99, %tmp.101);
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_135_40_158_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 160; @symbol_functiondef = [drawBandsScreen,160,13,28]; @symbol_param<0> = [dc,160,29,31]; @symbol_param<1> = [width,160,33,38]; ]
+    function drawBandsScreen(dc, width) {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_160_40_174_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 161 8 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_160_40_174_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_160_40_174_4_stop" ]
         %y.1 = local;
-        symbol [ y %y.1 154 12 13 ];
+        symbol [ y %y.1 161 12 13 ];
         %tmp.1 = 58;
         lputv %y.1 %tmp.1;
-        symbol [ y %y.1 154 12 13 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 156 8 ]
+        symbol [ y %y.1 161 12 13 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 163 8 ]
         %tmp.2 = lgetv %dc;
-        symbol [ dc %tmp.2 156 8 10 ];
-        symbol [ setColor %tmp.3 156 11 19 ];
+        symbol [ dc %tmp.2 163 8 10 ];
+        symbol [ setColor %tmp.3 163 11 19 ];
         %tmp.3 = getv function %tmp.2 :setColor;
-        symbol [ Graphics %tmp.4 156 20 28 ];
+        symbol [ Graphics %tmp.4 163 20 28 ];
         %tmp.4 = getm $.Toybox.Graphics;
-        symbol [ COLOR_LT_GRAY %tmp.5 156 29 42 ];
+        symbol [ COLOR_LT_GRAY %tmp.5 163 29 42 ];
         %tmp.5 = getv %tmp.4 :COLOR_LT_GRAY;
-        symbol [ Graphics %tmp.6 156 44 52 ];
+        symbol [ Graphics %tmp.6 163 44 52 ];
         %tmp.6 = getm $.Toybox.Graphics;
-        symbol [ COLOR_BLACK %tmp.7 156 53 64 ];
+        symbol [ COLOR_BLACK %tmp.7 163 53 64 ];
         %tmp.7 = getv %tmp.6 :COLOR_BLACK;
         invoke %tmp.2 %tmp.3(%tmp.5, %tmp.7);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 157 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 164 8 ]
         %tmp.8 = self;
-        symbol [ drawCentered %tmp.9 157 8 20 ];
+        symbol [ drawCentered %tmp.9 164 8 20 ];
         %tmp.9 = getv function %tmp.8 :drawCentered;
         %tmp.10 = lgetv %dc;
-        symbol [ dc %tmp.10 157 21 23 ];
+        symbol [ dc %tmp.10 164 21 23 ];
         %tmp.11 = lgetv %width;
-        symbol [ width %tmp.11 157 25 30 ];
+        symbol [ width %tmp.11 164 25 30 ];
         %tmp.12 = lgetv %y.1;
-        symbol [ y %tmp.12 157 32 33 ];
+        symbol [ y %tmp.12 164 32 33 ];
         %tmp.13 = "BANDS";
-        symbol [ Graphics %tmp.14 157 44 52 ];
+        symbol [ Graphics %tmp.14 164 44 52 ];
         %tmp.14 = getm $.Toybox.Graphics;
-        symbol [ FONT_SMALL %tmp.15 157 53 63 ];
+        symbol [ FONT_SMALL %tmp.15 164 53 63 ];
         %tmp.15 = getv %tmp.14 :FONT_SMALL;
         invoke %tmp.8 %tmp.9(%tmp.10, %tmp.11, %tmp.12, %tmp.13, %tmp.15);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 158 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 165 8 ]
         %tmp.16 = lgetv %y.1;
-        symbol [ y %tmp.16 158 8 9 ];
+        symbol [ y %tmp.16 165 8 9 ];
         %tmp.17 = 34;
         %tmp.18 = add %tmp.16 %tmp.17;
         lputv %y.1 %tmp.18;
-        symbol [ y %y.1 158 8 9 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 160 8 ]
+        symbol [ y %y.1 165 8 9 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 167 8 ]
         %tmp.19 = lgetv %dc;
-        symbol [ dc %tmp.19 160 8 10 ];
-        symbol [ setColor %tmp.20 160 11 19 ];
+        symbol [ dc %tmp.19 167 8 10 ];
+        symbol [ setColor %tmp.20 167 11 19 ];
         %tmp.20 = getv function %tmp.19 :setColor;
-        symbol [ Graphics %tmp.21 160 20 28 ];
+        symbol [ Graphics %tmp.21 167 20 28 ];
         %tmp.21 = getm $.Toybox.Graphics;
-        symbol [ COLOR_WHITE %tmp.22 160 29 40 ];
+        symbol [ COLOR_WHITE %tmp.22 167 29 40 ];
         %tmp.22 = getv %tmp.21 :COLOR_WHITE;
-        symbol [ Graphics %tmp.23 160 42 50 ];
+        symbol [ Graphics %tmp.23 167 42 50 ];
         %tmp.23 = getm $.Toybox.Graphics;
-        symbol [ COLOR_BLACK %tmp.24 160 51 62 ];
+        symbol [ COLOR_BLACK %tmp.24 167 51 62 ];
         %tmp.24 = getv %tmp.23 :COLOR_BLACK;
         invoke %tmp.19 %tmp.20(%tmp.22, %tmp.24);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 162 8 ]
-        for @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_test @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_incr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_init:
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_begin" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_end" ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 169 8 ]
+        for @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_test @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_incr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_init:
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_begin" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_end" ]
         %i.2 = local;
-        symbol [ i %i.2 162 17 18 ];
+        symbol [ i %i.2 169 17 18 ];
         %tmp.25 = 0;
         lputv %i.2 %tmp.25;
-        symbol [ i %i.2 162 17 18 ];
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_test:
+        symbol [ i %i.2 169 17 18 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_test:
         %tmp.26 = lgetv %i.2;
-        symbol [ i %tmp.26 162 24 25 ];
-        symbol [ _alert %tmp.28 162 28 34 ];
+        symbol [ i %tmp.26 169 24 25 ];
+        symbol [ _alert %tmp.28 169 28 34 ];
         %tmp.28 = getv ? :_alert;
-        symbol [ activeBands %tmp.29 162 35 46 ];
+        symbol [ activeBands %tmp.29 169 35 46 ];
         %tmp.29 = getv %tmp.28 :activeBands;
-        symbol [ size %tmp.30 162 47 51 ];
+        symbol [ size %tmp.30 169 47 51 ];
         %tmp.30 = getv function %tmp.29 :size;
         %tmp.31 = invoke %tmp.29 %tmp.30();
         %tmp.32 = lt %tmp.26 %tmp.31;
-        bf %tmp.32 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_begin:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_63_166_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 163 12 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_63_166_8_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_63_166_8_stop" ]
+        bf %tmp.32 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_begin:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_63_173_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 170 12 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_63_173_8_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_63_173_8_stop" ]
         %item.3 = local;
-        symbol [ item %item.3 163 16 20 ];
-        symbol [ _alert %tmp.34 163 23 29 ];
+        symbol [ item %item.3 170 16 20 ];
+        symbol [ _alert %tmp.34 170 23 29 ];
         %tmp.34 = getv ? :_alert;
-        symbol [ activeBands %tmp.35 163 30 41 ];
+        symbol [ activeBands %tmp.35 170 30 41 ];
         %tmp.35 = getv %tmp.34 :activeBands;
         %tmp.36 = lgetv %i.2;
-        symbol [ i %tmp.36 163 42 43 ];
+        symbol [ i %tmp.36 170 42 43 ];
         %tmp.37 = agetv %tmp.35 %tmp.36;
         lputv %item.3 %tmp.37;
-        symbol [ item %item.3 163 16 20 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 164 12 ]
+        symbol [ item %item.3 170 16 20 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 171 12 ]
         %tmp.38 = self;
-        symbol [ drawCentered %tmp.39 164 12 24 ];
+        symbol [ drawCentered %tmp.39 171 12 24 ];
         %tmp.39 = getv function %tmp.38 :drawCentered;
         %tmp.40 = lgetv %dc;
-        symbol [ dc %tmp.40 164 25 27 ];
+        symbol [ dc %tmp.40 171 25 27 ];
         %tmp.41 = lgetv %width;
-        symbol [ width %tmp.41 164 29 34 ];
+        symbol [ width %tmp.41 171 29 34 ];
         %tmp.42 = lgetv %y.1;
-        symbol [ y %tmp.42 164 36 37 ];
+        symbol [ y %tmp.42 171 36 37 ];
         %tmp.43 = lgetv %item.3;
-        symbol [ item %tmp.43 164 39 43 ];
+        symbol [ item %tmp.43 171 39 43 ];
         %tmp.45 = const :band;
-        symbol [ band %tmp.45 164 45 49 const ];
+        symbol [ band %tmp.45 171 45 49 const ];
         %tmp.46 = agetv %tmp.43 %tmp.45;
         %tmp.47 = "  ";
         %tmp.48 = add %tmp.46 %tmp.47;
         %tmp.49 = lgetv %item.3;
-        symbol [ item %tmp.49 164 60 64 ];
+        symbol [ item %tmp.49 171 60 64 ];
         %tmp.51 = const :level;
-        symbol [ level %tmp.51 164 66 71 const ];
+        symbol [ level %tmp.51 171 66 71 const ];
         %tmp.52 = agetv %tmp.49 %tmp.51;
         %tmp.53 = add %tmp.48 %tmp.52;
-        symbol [ Graphics %tmp.54 164 74 82 ];
+        symbol [ Graphics %tmp.54 171 74 82 ];
         %tmp.54 = getm $.Toybox.Graphics;
-        symbol [ FONT_TINY %tmp.55 164 83 92 ];
+        symbol [ FONT_TINY %tmp.55 171 83 92 ];
         %tmp.55 = getv %tmp.54 :FONT_TINY;
         invoke %tmp.38 %tmp.39(%tmp.40, %tmp.41, %tmp.42, %tmp.53, %tmp.55);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 165 12 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 172 12 ]
         %tmp.56 = lgetv %y.1;
-        symbol [ y %tmp.56 165 12 13 ];
+        symbol [ y %tmp.56 172 12 13 ];
         %tmp.57 = 28;
         %tmp.58 = add %tmp.56 %tmp.57;
         lputv %y.1 %tmp.58;
-        symbol [ y %y.1 165 12 13 ];
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_63_166_8_stop:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_incr:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 162 ]
+        symbol [ y %y.1 172 12 13 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_63_173_8_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_incr:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 169 ]
         %tmp.59 = lgetv %i.2;
-        symbol [ i %tmp.59 162 55 56 ];
+        symbol [ i %tmp.59 169 55 56 ];
         %tmp.60 = 1;
         %tmp.61 = add %tmp.59 %tmp.60;
         lputv %i.2 %tmp.61;
-        symbol [ i %i.2 162 55 56 ];
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_test;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_162_8_166_8_for_end:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_153_40_167_4_stop:
+        symbol [ i %i.2 169 55 56 ];
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_test;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_8_173_8_for_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_160_40_174_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 169; @symbol_functiondef = [drawHistoryScreen,169,13,30]; @symbol_param<0> = [dc,169,31,33]; @symbol_param<1> = [width,169,35,40]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 176; @symbol_functiondef = [drawHistoryScreen,176,13,30]; @symbol_param<0> = [dc,176,31,33]; @symbol_param<1> = [width,176,35,40]; ]
     function drawHistoryScreen(dc, width) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_42_186_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 170 8 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_42_186_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_42_186_4_stop" ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_176_42_193_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 177 8 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_176_42_193_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_176_42_193_4_stop" ]
         %y.1 = local;
-        symbol [ y %y.1 170 12 13 ];
+        symbol [ y %y.1 177 12 13 ];
         %tmp.1 = 58;
         lputv %y.1 %tmp.1;
-        symbol [ y %y.1 170 12 13 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 172 8 ]
+        symbol [ y %y.1 177 12 13 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 179 8 ]
         %tmp.2 = lgetv %dc;
-        symbol [ dc %tmp.2 172 8 10 ];
-        symbol [ setColor %tmp.3 172 11 19 ];
+        symbol [ dc %tmp.2 179 8 10 ];
+        symbol [ setColor %tmp.3 179 11 19 ];
         %tmp.3 = getv function %tmp.2 :setColor;
-        symbol [ Graphics %tmp.4 172 20 28 ];
+        symbol [ Graphics %tmp.4 179 20 28 ];
         %tmp.4 = getm $.Toybox.Graphics;
-        symbol [ COLOR_LT_GRAY %tmp.5 172 29 42 ];
+        symbol [ COLOR_LT_GRAY %tmp.5 179 29 42 ];
         %tmp.5 = getv %tmp.4 :COLOR_LT_GRAY;
-        symbol [ Graphics %tmp.6 172 44 52 ];
+        symbol [ Graphics %tmp.6 179 44 52 ];
         %tmp.6 = getm $.Toybox.Graphics;
-        symbol [ COLOR_BLACK %tmp.7 172 53 64 ];
+        symbol [ COLOR_BLACK %tmp.7 179 53 64 ];
         %tmp.7 = getv %tmp.6 :COLOR_BLACK;
         invoke %tmp.2 %tmp.3(%tmp.5, %tmp.7);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 173 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 180 8 ]
         %tmp.8 = self;
-        symbol [ drawCentered %tmp.9 173 8 20 ];
+        symbol [ drawCentered %tmp.9 180 8 20 ];
         %tmp.9 = getv function %tmp.8 :drawCentered;
         %tmp.10 = lgetv %dc;
-        symbol [ dc %tmp.10 173 21 23 ];
+        symbol [ dc %tmp.10 180 21 23 ];
         %tmp.11 = lgetv %width;
-        symbol [ width %tmp.11 173 25 30 ];
+        symbol [ width %tmp.11 180 25 30 ];
         %tmp.12 = lgetv %y.1;
-        symbol [ y %tmp.12 173 32 33 ];
+        symbol [ y %tmp.12 180 32 33 ];
         %tmp.13 = "HISTORY";
-        symbol [ Graphics %tmp.14 173 46 54 ];
+        symbol [ Graphics %tmp.14 180 46 54 ];
         %tmp.14 = getm $.Toybox.Graphics;
-        symbol [ FONT_SMALL %tmp.15 173 55 65 ];
+        symbol [ FONT_SMALL %tmp.15 180 55 65 ];
         %tmp.15 = getv %tmp.14 :FONT_SMALL;
         invoke %tmp.8 %tmp.9(%tmp.10, %tmp.11, %tmp.12, %tmp.13, %tmp.15);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 174 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 181 8 ]
         %tmp.16 = lgetv %y.1;
-        symbol [ y %tmp.16 174 8 9 ];
+        symbol [ y %tmp.16 181 8 9 ];
         %tmp.17 = 36;
         %tmp.18 = add %tmp.16 %tmp.17;
         lputv %y.1 %tmp.18;
-        symbol [ y %y.1 174 8 9 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 176 8 ]
+        symbol [ y %y.1 181 8 9 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 183 8 ]
         %tmp.19 = lgetv %dc;
-        symbol [ dc %tmp.19 176 8 10 ];
-        symbol [ setColor %tmp.20 176 11 19 ];
+        symbol [ dc %tmp.19 183 8 10 ];
+        symbol [ setColor %tmp.20 183 11 19 ];
         %tmp.20 = getv function %tmp.19 :setColor;
-        symbol [ Graphics %tmp.21 176 20 28 ];
+        symbol [ Graphics %tmp.21 183 20 28 ];
         %tmp.21 = getm $.Toybox.Graphics;
-        symbol [ COLOR_WHITE %tmp.22 176 29 40 ];
+        symbol [ COLOR_WHITE %tmp.22 183 29 40 ];
         %tmp.22 = getv %tmp.21 :COLOR_WHITE;
-        symbol [ Graphics %tmp.23 176 42 50 ];
+        symbol [ Graphics %tmp.23 183 42 50 ];
         %tmp.23 = getm $.Toybox.Graphics;
-        symbol [ COLOR_BLACK %tmp.24 176 51 62 ];
+        symbol [ COLOR_BLACK %tmp.24 183 51 62 ];
         %tmp.24 = getv %tmp.23 :COLOR_BLACK;
         invoke %tmp.19 %tmp.20(%tmp.22, %tmp.24);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 178 8 ]
-        for @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_test @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_incr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_init:
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_begin" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_end" ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 185 8 ]
+        for @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_test @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_incr @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_init:
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_begin" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_end" ]
         %i.2 = local;
-        symbol [ i %i.2 178 17 18 ];
+        symbol [ i %i.2 185 17 18 ];
         %tmp.25 = 0;
         lputv %i.2 %tmp.25;
-        symbol [ i %i.2 178 17 18 ];
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_test:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_24_178_55_begin:
+        symbol [ i %i.2 185 17 18 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_test:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_24_185_55_begin:
         %tmp.26 = lgetv %i.2;
-        symbol [ i %tmp.26 178 25 26 ];
-        symbol [ _history %tmp.28 178 29 37 ];
+        symbol [ i %tmp.26 185 25 26 ];
+        symbol [ _history %tmp.28 185 29 37 ];
         %tmp.28 = getv ? :_history;
-        symbol [ size %tmp.29 178 38 42 ];
+        symbol [ size %tmp.29 185 38 42 ];
         %tmp.29 = getv function %tmp.28 :size;
         %tmp.30 = invoke %tmp.28 %tmp.29();
         %tmp.31 = lt %tmp.26 %tmp.30;
         %tmp.32 = dup %tmp.31;
-        bf %tmp.32 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_49_178_55_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_49_178_55_true:
+        bf %tmp.32 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_49_185_55_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_49_185_55_true:
         %tmp.33 = lgetv %i.2;
-        symbol [ i %tmp.33 178 50 51 ];
+        symbol [ i %tmp.33 185 50 51 ];
         %tmp.34 = 4;
         %tmp.35 = lt %tmp.33 %tmp.34;
         %tmp.36 = and %tmp.31 %tmp.35;
         push %tmp.36;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_49_178_55_end:
-        %tmp.37 = phi [%tmp.32 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_24_178_55_begin] [%tmp.36 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_49_178_55_true] [%tmp.37 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_49_178_55_end];
-        bf %tmp.37 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_begin:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_66_185_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 179 12 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_66_185_8_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_66_185_8_stop" ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_49_185_55_end:
+        %tmp.37 = phi [%tmp.32 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_24_185_55_begin] [%tmp.36 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_49_185_55_true] [%tmp.37 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_49_185_55_end];
+        bf %tmp.37 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_begin:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_66_192_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 186 12 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_66_192_8_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_66_192_8_stop" ]
         %record.3 = local;
-        symbol [ record %record.3 179 16 22 ];
-        symbol [ _history %tmp.39 179 25 33 ];
+        symbol [ record %record.3 186 16 22 ];
+        symbol [ _history %tmp.39 186 25 33 ];
         %tmp.39 = getv ? :_history;
-        symbol [ getRecordAt %tmp.40 179 34 45 ];
+        symbol [ getRecordAt %tmp.40 186 34 45 ];
         %tmp.40 = getv function %tmp.39 :getRecordAt;
         %tmp.41 = lgetv %i.2;
-        symbol [ i %tmp.41 179 46 47 ];
+        symbol [ i %tmp.41 186 46 47 ];
         %tmp.42 = invoke %tmp.39 %tmp.40(%tmp.41);
         lputv %record.3 %tmp.42;
-        symbol [ record %record.3 179 16 22 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 181 12 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_181_12_184_12_if_stmt:
+        symbol [ record %record.3 186 16 22 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 188 12 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_12_191_12_if_stmt:
         %tmp.43 = lgetv %record.3;
-        symbol [ record %tmp.43 181 16 22 ];
+        symbol [ record %tmp.43 188 16 22 ];
         %tmp.44 = null;
         %tmp.45 = ne %tmp.43 %tmp.44;
-        bf %tmp.45 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_181_12_184_12_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_181_12_184_12_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_181_32_184_12_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 182 16 ]
+        bf %tmp.45 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_12_191_12_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_12_191_12_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_32_191_12_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 189 16 ]
         %tmp.46 = self;
-        symbol [ drawCentered %tmp.47 182 16 28 ];
+        symbol [ drawCentered %tmp.47 189 16 28 ];
         %tmp.47 = getv function %tmp.46 :drawCentered;
         %tmp.48 = lgetv %dc;
-        symbol [ dc %tmp.48 182 29 31 ];
+        symbol [ dc %tmp.48 189 29 31 ];
         %tmp.49 = lgetv %width;
-        symbol [ width %tmp.49 182 33 38 ];
+        symbol [ width %tmp.49 189 33 38 ];
         %tmp.50 = lgetv %y.1;
-        symbol [ y %tmp.50 182 40 41 ];
+        symbol [ y %tmp.50 189 40 41 ];
         %tmp.51 = self;
-        symbol [ formatHistoryRecord %tmp.52 182 43 62 ];
+        symbol [ formatHistoryRecord %tmp.52 189 43 62 ];
         %tmp.52 = getv function %tmp.51 :formatHistoryRecord;
         %tmp.53 = lgetv %record.3;
-        symbol [ record %tmp.53 182 63 69 ];
+        symbol [ record %tmp.53 189 63 69 ];
         %tmp.54 = as %tmp.53 { (!Null) };
         %tmp.55 = invoke %tmp.51 %tmp.52(%tmp.54);
-        symbol [ Graphics %tmp.56 182 72 80 ];
+        symbol [ Graphics %tmp.56 189 72 80 ];
         %tmp.56 = getm $.Toybox.Graphics;
-        symbol [ FONT_TINY %tmp.57 182 81 90 ];
+        symbol [ FONT_TINY %tmp.57 189 81 90 ];
         %tmp.57 = getv %tmp.56 :FONT_TINY;
         invoke %tmp.46 %tmp.47(%tmp.48, %tmp.49, %tmp.50, %tmp.55, %tmp.57);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 183 16 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 190 16 ]
         %tmp.58 = lgetv %y.1;
-        symbol [ y %tmp.58 183 16 17 ];
+        symbol [ y %tmp.58 190 16 17 ];
         %tmp.59 = 28;
         %tmp.60 = add %tmp.58 %tmp.59;
         lputv %y.1 %tmp.60;
-        symbol [ y %y.1 183 16 17 ];
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_181_32_184_12_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_181_12_184_12_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_181_12_184_12_if_end:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_66_185_8_stop:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_incr:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 178 ]
+        symbol [ y %y.1 190 16 17 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_32_191_12_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_12_191_12_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_12_191_12_if_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_66_192_8_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_incr:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 185 ]
         %tmp.61 = lgetv %i.2;
-        symbol [ i %tmp.61 178 58 59 ];
+        symbol [ i %tmp.61 185 58 59 ];
         %tmp.62 = 1;
         %tmp.63 = add %tmp.61 %tmp.62;
         lputv %i.2 %tmp.63;
-        symbol [ i %i.2 178 58 59 ];
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_test;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_178_8_185_8_for_end:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_169_42_186_4_stop:
+        symbol [ i %i.2 185 58 59 ];
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_test;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_185_8_192_8_for_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_176_42_193_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 188; @symbol_functiondef = [drawAlertBanner,188,13,28]; @symbol_param<0> = [dc,188,29,31]; @symbol_param<1> = [width,188,33,38]; @symbol_param<2> = [label,188,40,45]; @symbol_param<3> = [riskLevel,188,47,56]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 195; @symbol_functiondef = [drawAlertBanner,195,13,28]; @symbol_param<0> = [dc,195,29,31]; @symbol_param<1> = [width,195,33,38]; @symbol_param<2> = [label,195,40,45]; @symbol_param<3> = [riskLevel,195,47,56]; ]
     function drawAlertBanner(dc, width, label, riskLevel) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_58_204_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 189 8 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_58_204_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_58_204_4_stop" ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_195_58_211_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 196 8 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_195_58_211_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_195_58_211_4_stop" ]
         %margin.1 = local;
-        symbol [ margin %margin.1 189 12 18 ];
+        symbol [ margin %margin.1 196 12 18 ];
         %tmp.1 = 54;
         lputv %margin.1 %tmp.1;
-        symbol [ margin %margin.1 189 12 18 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 190 8 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_58_204_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_58_204_4_stop" ]
+        symbol [ margin %margin.1 196 12 18 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 197 8 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_195_58_211_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_195_58_211_4_stop" ]
         %top.2 = local;
-        symbol [ top %top.2 190 12 15 ];
+        symbol [ top %top.2 197 12 15 ];
         %tmp.2 = 30;
         lputv %top.2 %tmp.2;
-        symbol [ top %top.2 190 12 15 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 191 8 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_58_204_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_58_204_4_stop" ]
+        symbol [ top %top.2 197 12 15 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 198 8 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_195_58_211_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_195_58_211_4_stop" ]
         %height.3 = local;
-        symbol [ height %height.3 191 12 18 ];
+        symbol [ height %height.3 198 12 18 ];
         %tmp.3 = 19;
         lputv %height.3 %tmp.3;
-        symbol [ height %height.3 191 12 18 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 193 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_193_8_196_8_if_stmt:
+        symbol [ height %height.3 198 12 18 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 200 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_200_8_203_8_if_stmt:
         %tmp.4 = lgetv %riskLevel;
-        symbol [ riskLevel %tmp.4 193 12 21 ];
+        symbol [ riskLevel %tmp.4 200 12 21 ];
         %tmp.5 = "CRITICAL";
         %tmp.6 = eq %tmp.4 %tmp.5;
-        bf %tmp.6 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_193_8_196_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_193_8_196_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_193_37_196_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 194 12 ]
+        bf %tmp.6 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_200_8_203_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_200_8_203_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_200_37_203_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 201 12 ]
         %tmp.7 = self;
-        symbol [ drawCriticalBanner %tmp.8 194 12 30 ];
+        symbol [ drawCriticalBanner %tmp.8 201 12 30 ];
         %tmp.8 = getv function %tmp.7 :drawCriticalBanner;
         %tmp.9 = lgetv %dc;
-        symbol [ dc %tmp.9 194 31 33 ];
+        symbol [ dc %tmp.9 201 31 33 ];
         %tmp.10 = lgetv %width;
-        symbol [ width %tmp.10 194 35 40 ];
+        symbol [ width %tmp.10 201 35 40 ];
         %tmp.11 = lgetv %label;
-        symbol [ label %tmp.11 194 42 47 ];
+        symbol [ label %tmp.11 201 42 47 ];
         %tmp.12 = lgetv %margin.1;
-        symbol [ margin %tmp.12 194 49 55 ];
+        symbol [ margin %tmp.12 201 49 55 ];
         %tmp.13 = lgetv %top.2;
-        symbol [ top %tmp.13 194 57 60 ];
+        symbol [ top %tmp.13 201 57 60 ];
         %tmp.14 = lgetv %height.3;
-        symbol [ height %tmp.14 194 62 68 ];
+        symbol [ height %tmp.14 201 62 68 ];
         invoke %tmp.7 %tmp.8(%tmp.9, %tmp.10, %tmp.11, %tmp.12, %tmp.13, %tmp.14);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 195 12 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 202 12 ]
         ret ?;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_193_37_196_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_193_8_196_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_193_8_196_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 198 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_198_8_201_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_200_37_203_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_200_8_203_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_200_8_203_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 205 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_205_8_208_8_if_stmt:
         %tmp.15 = lgetv %riskLevel;
-        symbol [ riskLevel %tmp.15 198 12 21 ];
+        symbol [ riskLevel %tmp.15 205 12 21 ];
         %tmp.16 = "HIGH";
         %tmp.17 = eq %tmp.15 %tmp.16;
-        bf %tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_198_8_201_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_198_8_201_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_198_33_201_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 199 12 ]
+        bf %tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_205_8_208_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_205_8_208_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_205_33_208_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 206 12 ]
         %tmp.18 = self;
-        symbol [ drawHighBanner %tmp.19 199 12 26 ];
+        symbol [ drawHighBanner %tmp.19 206 12 26 ];
         %tmp.19 = getv function %tmp.18 :drawHighBanner;
         %tmp.20 = lgetv %dc;
-        symbol [ dc %tmp.20 199 27 29 ];
+        symbol [ dc %tmp.20 206 27 29 ];
         %tmp.21 = lgetv %width;
-        symbol [ width %tmp.21 199 31 36 ];
+        symbol [ width %tmp.21 206 31 36 ];
         %tmp.22 = lgetv %label;
-        symbol [ label %tmp.22 199 38 43 ];
+        symbol [ label %tmp.22 206 38 43 ];
         %tmp.23 = lgetv %margin.1;
-        symbol [ margin %tmp.23 199 45 51 ];
+        symbol [ margin %tmp.23 206 45 51 ];
         %tmp.24 = lgetv %top.2;
-        symbol [ top %tmp.24 199 53 56 ];
+        symbol [ top %tmp.24 206 53 56 ];
         %tmp.25 = lgetv %height.3;
-        symbol [ height %tmp.25 199 58 64 ];
+        symbol [ height %tmp.25 206 58 64 ];
         invoke %tmp.18 %tmp.19(%tmp.20, %tmp.21, %tmp.22, %tmp.23, %tmp.24, %tmp.25);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 200 12 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 207 12 ]
         ret ?;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_198_33_201_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_198_8_201_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_198_8_201_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 203 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_205_33_208_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_205_8_208_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_205_8_208_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 210 8 ]
         %tmp.26 = self;
-        symbol [ drawMediumBanner %tmp.27 203 8 24 ];
+        symbol [ drawMediumBanner %tmp.27 210 8 24 ];
         %tmp.27 = getv function %tmp.26 :drawMediumBanner;
         %tmp.28 = lgetv %dc;
-        symbol [ dc %tmp.28 203 25 27 ];
+        symbol [ dc %tmp.28 210 25 27 ];
         %tmp.29 = lgetv %width;
-        symbol [ width %tmp.29 203 29 34 ];
+        symbol [ width %tmp.29 210 29 34 ];
         %tmp.30 = lgetv %label;
-        symbol [ label %tmp.30 203 36 41 ];
+        symbol [ label %tmp.30 210 36 41 ];
         %tmp.31 = lgetv %margin.1;
-        symbol [ margin %tmp.31 203 43 49 ];
+        symbol [ margin %tmp.31 210 43 49 ];
         %tmp.32 = lgetv %top.2;
-        symbol [ top %tmp.32 203 51 54 ];
+        symbol [ top %tmp.32 210 51 54 ];
         %tmp.33 = lgetv %height.3;
-        symbol [ height %tmp.33 203 56 62 ];
+        symbol [ height %tmp.33 210 56 62 ];
         invoke %tmp.26 %tmp.27(%tmp.28, %tmp.29, %tmp.30, %tmp.31, %tmp.32, %tmp.33);
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_188_58_204_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_195_58_211_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 206; @symbol_functiondef = [drawMediumBanner,206,13,29]; @symbol_param<0> = [dc,206,30,32]; @symbol_param<1> = [width,206,34,39]; @symbol_param<2> = [label,206,41,46]; @symbol_param<3> = [margin,206,48,54]; @symbol_param<4> = [top,206,56,59]; @symbol_param<5> = [height,206,61,67]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 213; @symbol_functiondef = [drawMediumBanner,213,13,29]; @symbol_param<0> = [dc,213,30,32]; @symbol_param<1> = [width,213,34,39]; @symbol_param<2> = [label,213,41,46]; @symbol_param<3> = [margin,213,48,54]; @symbol_param<4> = [top,213,56,59]; @symbol_param<5> = [height,213,61,67]; ]
     function drawMediumBanner(dc, width, label, margin, top, height) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_206_69_212_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 207 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_213_69_219_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 214 8 ]
         %tmp.1 = lgetv %dc;
-        symbol [ dc %tmp.1 207 8 10 ];
-        symbol [ setColor %tmp.2 207 11 19 ];
+        symbol [ dc %tmp.1 214 8 10 ];
+        symbol [ setColor %tmp.2 214 11 19 ];
         %tmp.2 = getv function %tmp.1 :setColor;
-        symbol [ Graphics %tmp.3 207 20 28 ];
+        symbol [ Graphics %tmp.3 214 20 28 ];
         %tmp.3 = getm $.Toybox.Graphics;
-        symbol [ COLOR_DK_GRAY %tmp.4 207 29 42 ];
+        symbol [ COLOR_DK_GRAY %tmp.4 214 29 42 ];
         %tmp.4 = getv %tmp.3 :COLOR_DK_GRAY;
-        symbol [ Graphics %tmp.5 207 44 52 ];
+        symbol [ Graphics %tmp.5 214 44 52 ];
         %tmp.5 = getm $.Toybox.Graphics;
-        symbol [ COLOR_BLACK %tmp.6 207 53 64 ];
+        symbol [ COLOR_BLACK %tmp.6 214 53 64 ];
         %tmp.6 = getv %tmp.5 :COLOR_BLACK;
         invoke %tmp.1 %tmp.2(%tmp.4, %tmp.6);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 208 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 215 8 ]
         %tmp.7 = lgetv %dc;
-        symbol [ dc %tmp.7 208 8 10 ];
-        symbol [ drawLine %tmp.8 208 11 19 ];
+        symbol [ dc %tmp.7 215 8 10 ];
+        symbol [ drawLine %tmp.8 215 11 19 ];
         %tmp.8 = getv function %tmp.7 :drawLine;
         %tmp.9 = lgetv %margin;
-        symbol [ margin %tmp.9 208 20 26 ];
+        symbol [ margin %tmp.9 215 20 26 ];
         %tmp.10 = lgetv %top;
-        symbol [ top %tmp.10 208 28 31 ];
+        symbol [ top %tmp.10 215 28 31 ];
         %tmp.11 = lgetv %height;
-        symbol [ height %tmp.11 208 34 40 ];
+        symbol [ height %tmp.11 215 34 40 ];
         %tmp.12 = add %tmp.10 %tmp.11;
         %tmp.13 = lgetv %width;
-        symbol [ width %tmp.13 208 42 47 ];
+        symbol [ width %tmp.13 215 42 47 ];
         %tmp.14 = lgetv %margin;
-        symbol [ margin %tmp.14 208 50 56 ];
+        symbol [ margin %tmp.14 215 50 56 ];
         %tmp.15 = sub %tmp.13 %tmp.14;
         %tmp.16 = lgetv %top;
-        symbol [ top %tmp.16 208 58 61 ];
+        symbol [ top %tmp.16 215 58 61 ];
         %tmp.17 = lgetv %height;
-        symbol [ height %tmp.17 208 64 70 ];
+        symbol [ height %tmp.17 215 64 70 ];
         %tmp.18 = add %tmp.16 %tmp.17;
         invoke %tmp.7 %tmp.8(%tmp.9, %tmp.12, %tmp.15, %tmp.18);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 210 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 217 8 ]
         %tmp.19 = lgetv %dc;
-        symbol [ dc %tmp.19 210 8 10 ];
-        symbol [ setColor %tmp.20 210 11 19 ];
+        symbol [ dc %tmp.19 217 8 10 ];
+        symbol [ setColor %tmp.20 217 11 19 ];
         %tmp.20 = getv function %tmp.19 :setColor;
-        symbol [ Graphics %tmp.21 210 20 28 ];
+        symbol [ Graphics %tmp.21 217 20 28 ];
         %tmp.21 = getm $.Toybox.Graphics;
-        symbol [ COLOR_WHITE %tmp.22 210 29 40 ];
+        symbol [ COLOR_WHITE %tmp.22 217 29 40 ];
         %tmp.22 = getv %tmp.21 :COLOR_WHITE;
-        symbol [ Graphics %tmp.23 210 42 50 ];
+        symbol [ Graphics %tmp.23 217 42 50 ];
         %tmp.23 = getm $.Toybox.Graphics;
-        symbol [ COLOR_BLACK %tmp.24 210 51 62 ];
+        symbol [ COLOR_BLACK %tmp.24 217 51 62 ];
         %tmp.24 = getv %tmp.23 :COLOR_BLACK;
         invoke %tmp.19 %tmp.20(%tmp.22, %tmp.24);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 211 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 218 8 ]
         %tmp.25 = self;
-        symbol [ drawCentered %tmp.26 211 8 20 ];
+        symbol [ drawCentered %tmp.26 218 8 20 ];
         %tmp.26 = getv function %tmp.25 :drawCentered;
         %tmp.27 = lgetv %dc;
-        symbol [ dc %tmp.27 211 21 23 ];
+        symbol [ dc %tmp.27 218 21 23 ];
         %tmp.28 = lgetv %width;
-        symbol [ width %tmp.28 211 25 30 ];
+        symbol [ width %tmp.28 218 25 30 ];
         %tmp.29 = lgetv %top;
-        symbol [ top %tmp.29 211 32 35 ];
+        symbol [ top %tmp.29 218 32 35 ];
         %tmp.30 = 1;
         %tmp.31 = add %tmp.29 %tmp.30;
         %tmp.32 = lgetv %label;
-        symbol [ label %tmp.32 211 41 46 ];
-        symbol [ Graphics %tmp.33 211 48 56 ];
+        symbol [ label %tmp.32 218 41 46 ];
+        symbol [ Graphics %tmp.33 218 48 56 ];
         %tmp.33 = getm $.Toybox.Graphics;
-        symbol [ FONT_SMALL %tmp.34 211 57 67 ];
+        symbol [ FONT_SMALL %tmp.34 218 57 67 ];
         %tmp.34 = getv %tmp.33 :FONT_SMALL;
         invoke %tmp.25 %tmp.26(%tmp.27, %tmp.28, %tmp.31, %tmp.32, %tmp.34);
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_206_69_212_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_213_69_219_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 214; @symbol_functiondef = [drawHighBanner,214,13,27]; @symbol_param<0> = [dc,214,28,30]; @symbol_param<1> = [width,214,32,37]; @symbol_param<2> = [label,214,39,44]; @symbol_param<3> = [margin,214,46,52]; @symbol_param<4> = [top,214,54,57]; @symbol_param<5> = [height,214,59,65]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 221; @symbol_functiondef = [drawHighBanner,221,13,27]; @symbol_param<0> = [dc,221,28,30]; @symbol_param<1> = [width,221,32,37]; @symbol_param<2> = [label,221,39,44]; @symbol_param<3> = [margin,221,46,52]; @symbol_param<4> = [top,221,54,57]; @symbol_param<5> = [height,221,59,65]; ]
     function drawHighBanner(dc, width, label, margin, top, height) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_214_67_220_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 215 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_221_67_227_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 222 8 ]
         %tmp.1 = lgetv %dc;
-        symbol [ dc %tmp.1 215 8 10 ];
-        symbol [ setColor %tmp.2 215 11 19 ];
+        symbol [ dc %tmp.1 222 8 10 ];
+        symbol [ setColor %tmp.2 222 11 19 ];
         %tmp.2 = getv function %tmp.1 :setColor;
-        symbol [ Graphics %tmp.3 215 20 28 ];
+        symbol [ Graphics %tmp.3 222 20 28 ];
         %tmp.3 = getm $.Toybox.Graphics;
-        symbol [ COLOR_WHITE %tmp.4 215 29 40 ];
+        symbol [ COLOR_WHITE %tmp.4 222 29 40 ];
         %tmp.4 = getv %tmp.3 :COLOR_WHITE;
-        symbol [ Graphics %tmp.5 215 42 50 ];
+        symbol [ Graphics %tmp.5 222 42 50 ];
         %tmp.5 = getm $.Toybox.Graphics;
-        symbol [ COLOR_BLACK %tmp.6 215 51 62 ];
+        symbol [ COLOR_BLACK %tmp.6 222 51 62 ];
         %tmp.6 = getv %tmp.5 :COLOR_BLACK;
         invoke %tmp.1 %tmp.2(%tmp.4, %tmp.6);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 216 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 223 8 ]
         %tmp.7 = lgetv %dc;
-        symbol [ dc %tmp.7 216 8 10 ];
-        symbol [ drawRectangle %tmp.8 216 11 24 ];
+        symbol [ dc %tmp.7 223 8 10 ];
+        symbol [ drawRectangle %tmp.8 223 11 24 ];
         %tmp.8 = getv function %tmp.7 :drawRectangle;
         %tmp.9 = lgetv %margin;
-        symbol [ margin %tmp.9 216 25 31 ];
+        symbol [ margin %tmp.9 223 25 31 ];
         %tmp.10 = lgetv %top;
-        symbol [ top %tmp.10 216 33 36 ];
+        symbol [ top %tmp.10 223 33 36 ];
         %tmp.11 = lgetv %width;
-        symbol [ width %tmp.11 216 38 43 ];
+        symbol [ width %tmp.11 223 38 43 ];
         %tmp.12 = lgetv %margin;
-        symbol [ margin %tmp.12 216 47 53 ];
+        symbol [ margin %tmp.12 223 47 53 ];
         %tmp.13 = 2;
         %tmp.14 = mul %tmp.12 %tmp.13;
         %tmp.15 = sub %tmp.11 %tmp.14;
         %tmp.16 = lgetv %height;
-        symbol [ height %tmp.16 216 60 66 ];
+        symbol [ height %tmp.16 223 60 66 ];
         invoke %tmp.7 %tmp.8(%tmp.9, %tmp.10, %tmp.15, %tmp.16);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 217 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 224 8 ]
         %tmp.17 = lgetv %dc;
-        symbol [ dc %tmp.17 217 8 10 ];
-        symbol [ drawRectangle %tmp.18 217 11 24 ];
+        symbol [ dc %tmp.17 224 8 10 ];
+        symbol [ drawRectangle %tmp.18 224 11 24 ];
         %tmp.18 = getv function %tmp.17 :drawRectangle;
         %tmp.19 = lgetv %margin;
-        symbol [ margin %tmp.19 217 25 31 ];
+        symbol [ margin %tmp.19 224 25 31 ];
         %tmp.20 = 1;
         %tmp.21 = add %tmp.19 %tmp.20;
         %tmp.22 = lgetv %top;
-        symbol [ top %tmp.22 217 37 40 ];
+        symbol [ top %tmp.22 224 37 40 ];
         %tmp.23 = 1;
         %tmp.24 = add %tmp.22 %tmp.23;
         %tmp.25 = lgetv %width;
-        symbol [ width %tmp.25 217 46 51 ];
+        symbol [ width %tmp.25 224 46 51 ];
         %tmp.26 = lgetv %margin;
-        symbol [ margin %tmp.26 217 55 61 ];
+        symbol [ margin %tmp.26 224 55 61 ];
         %tmp.27 = 2;
         %tmp.28 = mul %tmp.26 %tmp.27;
         %tmp.29 = sub %tmp.25 %tmp.28;
         %tmp.30 = 2;
         %tmp.31 = sub %tmp.29 %tmp.30;
         %tmp.32 = lgetv %height;
-        symbol [ height %tmp.32 217 72 78 ];
+        symbol [ height %tmp.32 224 72 78 ];
         %tmp.33 = 2;
         %tmp.34 = sub %tmp.32 %tmp.33;
         invoke %tmp.17 %tmp.18(%tmp.21, %tmp.24, %tmp.31, %tmp.34);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 219 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 226 8 ]
         %tmp.35 = self;
-        symbol [ drawCentered %tmp.36 219 8 20 ];
+        symbol [ drawCentered %tmp.36 226 8 20 ];
         %tmp.36 = getv function %tmp.35 :drawCentered;
         %tmp.37 = lgetv %dc;
-        symbol [ dc %tmp.37 219 21 23 ];
+        symbol [ dc %tmp.37 226 21 23 ];
         %tmp.38 = lgetv %width;
-        symbol [ width %tmp.38 219 25 30 ];
+        symbol [ width %tmp.38 226 25 30 ];
         %tmp.39 = lgetv %top;
-        symbol [ top %tmp.39 219 32 35 ];
+        symbol [ top %tmp.39 226 32 35 ];
         %tmp.40 = 1;
         %tmp.41 = add %tmp.39 %tmp.40;
         %tmp.42 = lgetv %label;
-        symbol [ label %tmp.42 219 41 46 ];
-        symbol [ Graphics %tmp.43 219 48 56 ];
+        symbol [ label %tmp.42 226 41 46 ];
+        symbol [ Graphics %tmp.43 226 48 56 ];
         %tmp.43 = getm $.Toybox.Graphics;
-        symbol [ FONT_SMALL %tmp.44 219 57 67 ];
+        symbol [ FONT_SMALL %tmp.44 226 57 67 ];
         %tmp.44 = getv %tmp.43 :FONT_SMALL;
         invoke %tmp.35 %tmp.36(%tmp.37, %tmp.38, %tmp.41, %tmp.42, %tmp.44);
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_214_67_220_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_221_67_227_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 222; @symbol_functiondef = [drawCriticalBanner,222,13,31]; @symbol_param<0> = [dc,222,32,34]; @symbol_param<1> = [width,222,36,41]; @symbol_param<2> = [label,222,43,48]; @symbol_param<3> = [margin,222,50,56]; @symbol_param<4> = [top,222,58,61]; @symbol_param<5> = [height,222,63,69]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 229; @symbol_functiondef = [drawCriticalBanner,229,13,31]; @symbol_param<0> = [dc,229,32,34]; @symbol_param<1> = [width,229,36,41]; @symbol_param<2> = [label,229,43,48]; @symbol_param<3> = [margin,229,50,56]; @symbol_param<4> = [top,229,58,61]; @symbol_param<5> = [height,229,63,69]; ]
     function drawCriticalBanner(dc, width, label, margin, top, height) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_222_71_237_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 223 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_223_8_230_8_if_stmt:
-        symbol [ _criticalPulseOn %tmp.2 223 12 28 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_229_71_244_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 230 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_230_8_237_8_if_stmt:
+        symbol [ _criticalPulseOn %tmp.2 230 12 28 ];
         %tmp.2 = getv ? :_criticalPulseOn;
-        bf %tmp.2 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_223_8_230_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_223_8_230_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_223_30_230_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 224 12 ]
+        bf %tmp.2 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_230_8_237_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_230_8_237_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_230_30_237_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 231 12 ]
         %tmp.3 = lgetv %dc;
-        symbol [ dc %tmp.3 224 12 14 ];
-        symbol [ setColor %tmp.4 224 15 23 ];
+        symbol [ dc %tmp.3 231 12 14 ];
+        symbol [ setColor %tmp.4 231 15 23 ];
         %tmp.4 = getv function %tmp.3 :setColor;
-        symbol [ Graphics %tmp.5 224 24 32 ];
+        symbol [ Graphics %tmp.5 231 24 32 ];
         %tmp.5 = getm $.Toybox.Graphics;
-        symbol [ COLOR_WHITE %tmp.6 224 33 44 ];
+        symbol [ COLOR_WHITE %tmp.6 231 33 44 ];
         %tmp.6 = getv %tmp.5 :COLOR_WHITE;
-        symbol [ Graphics %tmp.7 224 46 54 ];
+        symbol [ Graphics %tmp.7 231 46 54 ];
         %tmp.7 = getm $.Toybox.Graphics;
-        symbol [ COLOR_WHITE %tmp.8 224 55 66 ];
+        symbol [ COLOR_WHITE %tmp.8 231 55 66 ];
         %tmp.8 = getv %tmp.7 :COLOR_WHITE;
         invoke %tmp.3 %tmp.4(%tmp.6, %tmp.8);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 225 12 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 232 12 ]
         %tmp.9 = lgetv %dc;
-        symbol [ dc %tmp.9 225 12 14 ];
-        symbol [ fillRectangle %tmp.10 225 15 28 ];
+        symbol [ dc %tmp.9 232 12 14 ];
+        symbol [ fillRectangle %tmp.10 232 15 28 ];
         %tmp.10 = getv function %tmp.9 :fillRectangle;
         %tmp.11 = lgetv %margin;
-        symbol [ margin %tmp.11 225 29 35 ];
+        symbol [ margin %tmp.11 232 29 35 ];
         %tmp.12 = lgetv %top;
-        symbol [ top %tmp.12 225 37 40 ];
+        symbol [ top %tmp.12 232 37 40 ];
         %tmp.13 = lgetv %width;
-        symbol [ width %tmp.13 225 42 47 ];
+        symbol [ width %tmp.13 232 42 47 ];
         %tmp.14 = lgetv %margin;
-        symbol [ margin %tmp.14 225 51 57 ];
+        symbol [ margin %tmp.14 232 51 57 ];
         %tmp.15 = 2;
         %tmp.16 = mul %tmp.14 %tmp.15;
         %tmp.17 = sub %tmp.13 %tmp.16;
         %tmp.18 = lgetv %height;
-        symbol [ height %tmp.18 225 64 70 ];
+        symbol [ height %tmp.18 232 64 70 ];
         invoke %tmp.9 %tmp.10(%tmp.11, %tmp.12, %tmp.17, %tmp.18);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 227 12 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 234 12 ]
         %tmp.19 = lgetv %dc;
-        symbol [ dc %tmp.19 227 12 14 ];
-        symbol [ setColor %tmp.20 227 15 23 ];
+        symbol [ dc %tmp.19 234 12 14 ];
+        symbol [ setColor %tmp.20 234 15 23 ];
         %tmp.20 = getv function %tmp.19 :setColor;
-        symbol [ Graphics %tmp.21 227 24 32 ];
+        symbol [ Graphics %tmp.21 234 24 32 ];
         %tmp.21 = getm $.Toybox.Graphics;
-        symbol [ COLOR_BLACK %tmp.22 227 33 44 ];
+        symbol [ COLOR_BLACK %tmp.22 234 33 44 ];
         %tmp.22 = getv %tmp.21 :COLOR_BLACK;
-        symbol [ Graphics %tmp.23 227 46 54 ];
+        symbol [ Graphics %tmp.23 234 46 54 ];
         %tmp.23 = getm $.Toybox.Graphics;
-        symbol [ COLOR_WHITE %tmp.24 227 55 66 ];
+        symbol [ COLOR_WHITE %tmp.24 234 55 66 ];
         %tmp.24 = getv %tmp.23 :COLOR_WHITE;
         invoke %tmp.19 %tmp.20(%tmp.22, %tmp.24);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 228 12 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 235 12 ]
         %tmp.25 = self;
-        symbol [ drawCentered %tmp.26 228 12 24 ];
+        symbol [ drawCentered %tmp.26 235 12 24 ];
         %tmp.26 = getv function %tmp.25 :drawCentered;
         %tmp.27 = lgetv %dc;
-        symbol [ dc %tmp.27 228 25 27 ];
+        symbol [ dc %tmp.27 235 25 27 ];
         %tmp.28 = lgetv %width;
-        symbol [ width %tmp.28 228 29 34 ];
+        symbol [ width %tmp.28 235 29 34 ];
         %tmp.29 = lgetv %top;
-        symbol [ top %tmp.29 228 36 39 ];
+        symbol [ top %tmp.29 235 36 39 ];
         %tmp.30 = 1;
         %tmp.31 = add %tmp.29 %tmp.30;
         %tmp.32 = lgetv %label;
-        symbol [ label %tmp.32 228 45 50 ];
-        symbol [ Graphics %tmp.33 228 52 60 ];
+        symbol [ label %tmp.32 235 45 50 ];
+        symbol [ Graphics %tmp.33 235 52 60 ];
         %tmp.33 = getm $.Toybox.Graphics;
-        symbol [ FONT_SMALL %tmp.34 228 61 71 ];
+        symbol [ FONT_SMALL %tmp.34 235 61 71 ];
         %tmp.34 = getv %tmp.33 :FONT_SMALL;
         invoke %tmp.25 %tmp.26(%tmp.27, %tmp.28, %tmp.31, %tmp.32, %tmp.34);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 229 12 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 236 12 ]
         ret ?;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_223_30_230_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_223_8_230_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_223_8_230_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 232 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_230_30_237_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_230_8_237_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_230_8_237_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 239 8 ]
         %tmp.35 = lgetv %dc;
-        symbol [ dc %tmp.35 232 8 10 ];
-        symbol [ setColor %tmp.36 232 11 19 ];
+        symbol [ dc %tmp.35 239 8 10 ];
+        symbol [ setColor %tmp.36 239 11 19 ];
         %tmp.36 = getv function %tmp.35 :setColor;
-        symbol [ Graphics %tmp.37 232 20 28 ];
+        symbol [ Graphics %tmp.37 239 20 28 ];
         %tmp.37 = getm $.Toybox.Graphics;
-        symbol [ COLOR_DK_GRAY %tmp.38 232 29 42 ];
+        symbol [ COLOR_DK_GRAY %tmp.38 239 29 42 ];
         %tmp.38 = getv %tmp.37 :COLOR_DK_GRAY;
-        symbol [ Graphics %tmp.39 232 44 52 ];
+        symbol [ Graphics %tmp.39 239 44 52 ];
         %tmp.39 = getm $.Toybox.Graphics;
-        symbol [ COLOR_DK_GRAY %tmp.40 232 53 66 ];
+        symbol [ COLOR_DK_GRAY %tmp.40 239 53 66 ];
         %tmp.40 = getv %tmp.39 :COLOR_DK_GRAY;
         invoke %tmp.35 %tmp.36(%tmp.38, %tmp.40);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 233 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 240 8 ]
         %tmp.41 = lgetv %dc;
-        symbol [ dc %tmp.41 233 8 10 ];
-        symbol [ fillRectangle %tmp.42 233 11 24 ];
+        symbol [ dc %tmp.41 240 8 10 ];
+        symbol [ fillRectangle %tmp.42 240 11 24 ];
         %tmp.42 = getv function %tmp.41 :fillRectangle;
         %tmp.43 = lgetv %margin;
-        symbol [ margin %tmp.43 233 25 31 ];
+        symbol [ margin %tmp.43 240 25 31 ];
         %tmp.44 = lgetv %top;
-        symbol [ top %tmp.44 233 33 36 ];
+        symbol [ top %tmp.44 240 33 36 ];
         %tmp.45 = lgetv %width;
-        symbol [ width %tmp.45 233 38 43 ];
+        symbol [ width %tmp.45 240 38 43 ];
         %tmp.46 = lgetv %margin;
-        symbol [ margin %tmp.46 233 47 53 ];
+        symbol [ margin %tmp.46 240 47 53 ];
         %tmp.47 = 2;
         %tmp.48 = mul %tmp.46 %tmp.47;
         %tmp.49 = sub %tmp.45 %tmp.48;
         %tmp.50 = lgetv %height;
-        symbol [ height %tmp.50 233 60 66 ];
+        symbol [ height %tmp.50 240 60 66 ];
         invoke %tmp.41 %tmp.42(%tmp.43, %tmp.44, %tmp.49, %tmp.50);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 235 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 242 8 ]
         %tmp.51 = lgetv %dc;
-        symbol [ dc %tmp.51 235 8 10 ];
-        symbol [ setColor %tmp.52 235 11 19 ];
+        symbol [ dc %tmp.51 242 8 10 ];
+        symbol [ setColor %tmp.52 242 11 19 ];
         %tmp.52 = getv function %tmp.51 :setColor;
-        symbol [ Graphics %tmp.53 235 20 28 ];
+        symbol [ Graphics %tmp.53 242 20 28 ];
         %tmp.53 = getm $.Toybox.Graphics;
-        symbol [ COLOR_WHITE %tmp.54 235 29 40 ];
+        symbol [ COLOR_WHITE %tmp.54 242 29 40 ];
         %tmp.54 = getv %tmp.53 :COLOR_WHITE;
-        symbol [ Graphics %tmp.55 235 42 50 ];
+        symbol [ Graphics %tmp.55 242 42 50 ];
         %tmp.55 = getm $.Toybox.Graphics;
-        symbol [ COLOR_DK_GRAY %tmp.56 235 51 64 ];
+        symbol [ COLOR_DK_GRAY %tmp.56 242 51 64 ];
         %tmp.56 = getv %tmp.55 :COLOR_DK_GRAY;
         invoke %tmp.51 %tmp.52(%tmp.54, %tmp.56);
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 236 8 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 243 8 ]
         %tmp.57 = self;
-        symbol [ drawCentered %tmp.58 236 8 20 ];
+        symbol [ drawCentered %tmp.58 243 8 20 ];
         %tmp.58 = getv function %tmp.57 :drawCentered;
         %tmp.59 = lgetv %dc;
-        symbol [ dc %tmp.59 236 21 23 ];
+        symbol [ dc %tmp.59 243 21 23 ];
         %tmp.60 = lgetv %width;
-        symbol [ width %tmp.60 236 25 30 ];
+        symbol [ width %tmp.60 243 25 30 ];
         %tmp.61 = lgetv %top;
-        symbol [ top %tmp.61 236 32 35 ];
+        symbol [ top %tmp.61 243 32 35 ];
         %tmp.62 = 1;
         %tmp.63 = add %tmp.61 %tmp.62;
         %tmp.64 = lgetv %label;
-        symbol [ label %tmp.64 236 41 46 ];
-        symbol [ Graphics %tmp.65 236 48 56 ];
+        symbol [ label %tmp.64 243 41 46 ];
+        symbol [ Graphics %tmp.65 243 48 56 ];
         %tmp.65 = getm $.Toybox.Graphics;
-        symbol [ FONT_SMALL %tmp.66 236 57 67 ];
+        symbol [ FONT_SMALL %tmp.66 243 57 67 ];
         %tmp.66 = getv %tmp.65 :FONT_SMALL;
         invoke %tmp.57 %tmp.58(%tmp.59, %tmp.60, %tmp.63, %tmp.64, %tmp.66);
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_222_71_237_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_229_71_244_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 239; @symbol_functiondef = [getAlertTitle,239,13,26]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 246; @symbol_functiondef = [getAlertTitle,246,13,26]; ]
     function getAlertTitle() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_239_29_241_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 240 8 ]
-        symbol [ _alert %tmp.2 240 15 21 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_246_29_248_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 247 8 ]
+        symbol [ _alert %tmp.2 247 15 21 ];
         %tmp.2 = getv ? :_alert;
-        symbol [ threatType %tmp.3 240 22 32 ];
+        symbol [ threatType %tmp.3 247 22 32 ];
         %tmp.3 = getv %tmp.2 :threatType;
         %tmp.4 = " ";
         %tmp.5 = add %tmp.3 %tmp.4;
         %tmp.6 = self;
-        symbol [ getAlertStatus %tmp.7 240 41 55 ];
+        symbol [ getAlertStatus %tmp.7 247 41 55 ];
         %tmp.7 = getv function %tmp.6 :getAlertStatus;
         %tmp.8 = invoke %tmp.6 %tmp.7();
         %tmp.9 = add %tmp.5 %tmp.8;
         ret %tmp.9;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_239_29_241_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_246_29_248_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 243; @symbol_functiondef = [getAlertTitleFont,243,13,30]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 250; @symbol_functiondef = [getAlertTitleFont,250,13,30]; ]
     function getAlertTitleFont() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_243_33_245_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 244 8 ]
-        symbol [ Graphics %tmp.1 244 15 23 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_250_33_252_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 251 8 ]
+        symbol [ Graphics %tmp.1 251 15 23 ];
         %tmp.1 = getm $.Toybox.Graphics;
-        symbol [ FONT_SMALL %tmp.2 244 24 34 ];
+        symbol [ FONT_SMALL %tmp.2 251 24 34 ];
         %tmp.2 = getv %tmp.1 :FONT_SMALL;
         ret %tmp.2;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_243_33_245_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_250_33_252_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 247; @symbol_functiondef = [getAlertStatus,247,13,27]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 254; @symbol_functiondef = [getAlertStatus,254,13,27]; ]
     function getAlertStatus() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_247_30_257_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 248 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_248_8_250_8_if_stmt:
-        symbol [ _alert %tmp.2 248 12 18 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_254_30_264_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 255 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_255_8_257_8_if_stmt:
+        symbol [ _alert %tmp.2 255 12 18 ];
         %tmp.2 = getv ? :_alert;
-        symbol [ riskLevel %tmp.3 248 19 28 ];
+        symbol [ riskLevel %tmp.3 255 19 28 ];
         %tmp.3 = getv %tmp.2 :riskLevel;
         %tmp.4 = "CRITICAL";
         %tmp.5 = eq %tmp.3 %tmp.4;
-        bf %tmp.5 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_248_8_250_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_248_8_250_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_248_44_250_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 249 12 ]
+        bf %tmp.5 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_255_8_257_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_255_8_257_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_255_44_257_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 256 12 ]
         %tmp.6 = "CRITICAL";
         ret %tmp.6;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_248_44_250_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_248_8_250_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_248_8_250_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 252 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_252_8_254_8_if_stmt:
-        symbol [ _alert %tmp.8 252 12 18 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_255_44_257_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_255_8_257_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_255_8_257_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 259 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_259_8_261_8_if_stmt:
+        symbol [ _alert %tmp.8 259 12 18 ];
         %tmp.8 = getv ? :_alert;
-        symbol [ threatType %tmp.9 252 19 29 ];
+        symbol [ threatType %tmp.9 259 19 29 ];
         %tmp.9 = getv %tmp.8 :threatType;
         %tmp.10 = "FPV";
         %tmp.11 = eq %tmp.9 %tmp.10;
-        bf %tmp.11 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_252_8_254_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_252_8_254_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_252_40_254_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 253 12 ]
+        bf %tmp.11 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_259_8_261_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_259_8_261_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_259_40_261_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 260 12 ]
         %tmp.12 = "ATTACK";
         ret %tmp.12;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_252_40_254_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_252_8_254_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_252_8_254_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 256 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_259_40_261_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_259_8_261_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_259_8_261_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 263 8 ]
         %tmp.13 = "SIGNAL";
         ret %tmp.13;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_247_30_257_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_254_30_264_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 259; @symbol_functiondef = [getDistanceLabel,259,13,29]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 266; @symbol_functiondef = [getDistanceLabel,266,13,29]; ]
     function getDistanceLabel() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_259_32_265_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 260 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_260_8_262_8_if_stmt:
-        symbol [ _alert %tmp.2 260 12 18 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_266_32_272_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 267 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_267_8_269_8_if_stmt:
+        symbol [ _alert %tmp.2 267 12 18 ];
         %tmp.2 = getv ? :_alert;
-        symbol [ distanceLabel %tmp.3 260 19 32 ];
+        symbol [ distanceLabel %tmp.3 267 19 32 ];
         %tmp.3 = getv %tmp.2 :distanceLabel;
         %tmp.4 = "MED";
         %tmp.5 = eq %tmp.3 %tmp.4;
-        bf %tmp.5 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_260_8_262_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_260_8_262_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_260_43_262_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 261 12 ]
+        bf %tmp.5 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_267_8_269_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_267_8_269_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_267_43_269_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 268 12 ]
         %tmp.6 = "MID";
         ret %tmp.6;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_260_43_262_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_260_8_262_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_260_8_262_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 264 8 ]
-        symbol [ _alert %tmp.8 264 15 21 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_267_43_269_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_267_8_269_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_267_8_269_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 271 8 ]
+        symbol [ _alert %tmp.8 271 15 21 ];
         %tmp.8 = getv ? :_alert;
-        symbol [ distanceLabel %tmp.9 264 22 35 ];
+        symbol [ distanceLabel %tmp.9 271 22 35 ];
         %tmp.9 = getv %tmp.8 :distanceLabel;
         ret %tmp.9;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_259_32_265_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_266_32_272_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 267; @symbol_functiondef = [getShortRiskLabel,267,13,30]; @symbol_param<0> = [riskLevel,267,31,40]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 274; @symbol_functiondef = [getDirectionLabel,274,13,30]; ]
+    function getDirectionLabel() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_274_33_292_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 275 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_275_8_277_8_if_stmt:
+        symbol [ _alert %tmp.2 275 12 18 ];
+        %tmp.2 = getv ? :_alert;
+        symbol [ directionLabel %tmp.3 275 19 33 ];
+        %tmp.3 = getv %tmp.2 :directionLabel;
+        %tmp.4 = "FRONT";
+        %tmp.5 = eq %tmp.3 %tmp.4;
+        bf %tmp.5 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_275_8_277_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_275_8_277_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_275_46_277_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 276 12 ]
+        %tmp.6 = "^ FRONT";
+        ret %tmp.6;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_275_46_277_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_275_8_277_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_275_8_277_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 279 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_279_8_281_8_if_stmt:
+        symbol [ _alert %tmp.8 279 12 18 ];
+        %tmp.8 = getv ? :_alert;
+        symbol [ directionLabel %tmp.9 279 19 33 ];
+        %tmp.9 = getv %tmp.8 :directionLabel;
+        %tmp.10 = "LEFT";
+        %tmp.11 = eq %tmp.9 %tmp.10;
+        bf %tmp.11 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_279_8_281_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_279_8_281_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_279_45_281_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 280 12 ]
+        %tmp.12 = "< LEFT";
+        ret %tmp.12;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_279_45_281_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_279_8_281_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_279_8_281_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 283 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_8_285_8_if_stmt:
+        symbol [ _alert %tmp.14 283 12 18 ];
+        %tmp.14 = getv ? :_alert;
+        symbol [ directionLabel %tmp.15 283 19 33 ];
+        %tmp.15 = getv %tmp.14 :directionLabel;
+        %tmp.16 = "RIGHT";
+        %tmp.17 = eq %tmp.15 %tmp.16;
+        bf %tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_8_285_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_8_285_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_46_285_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 284 12 ]
+        %tmp.18 = "> RIGHT";
+        ret %tmp.18;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_46_285_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_8_285_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_8_285_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 287 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_287_8_289_8_if_stmt:
+        symbol [ _alert %tmp.20 287 12 18 ];
+        %tmp.20 = getv ? :_alert;
+        symbol [ directionLabel %tmp.21 287 19 33 ];
+        %tmp.21 = getv %tmp.20 :directionLabel;
+        %tmp.22 = "REAR";
+        %tmp.23 = eq %tmp.21 %tmp.22;
+        bf %tmp.23 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_287_8_289_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_287_8_289_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_287_45_289_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 288 12 ]
+        %tmp.24 = "v REAR";
+        ret %tmp.24;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_287_45_289_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_287_8_289_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_287_8_289_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 291 8 ]
+        %tmp.25 = "";
+        ret %tmp.25;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_274_33_292_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 294; @symbol_functiondef = [getShortRiskLabel,294,13,30]; @symbol_param<0> = [riskLevel,294,31,40]; ]
     function getShortRiskLabel(riskLevel) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_267_42_277_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 268 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_268_8_270_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_294_42_304_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 295 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_295_8_297_8_if_stmt:
         %tmp.1 = lgetv %riskLevel;
-        symbol [ riskLevel %tmp.1 268 12 21 ];
+        symbol [ riskLevel %tmp.1 295 12 21 ];
         %tmp.2 = "CRITICAL";
         %tmp.3 = eq %tmp.1 %tmp.2;
-        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_268_8_270_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_268_8_270_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_268_37_270_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 269 12 ]
+        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_295_8_297_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_295_8_297_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_295_37_297_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 296 12 ]
         %tmp.4 = "!!! CRITICAL !!!";
         ret %tmp.4;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_268_37_270_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_268_8_270_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_268_8_270_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 272 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_272_8_274_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_295_37_297_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_295_8_297_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_295_8_297_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 299 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_299_8_301_8_if_stmt:
         %tmp.5 = lgetv %riskLevel;
-        symbol [ riskLevel %tmp.5 272 12 21 ];
+        symbol [ riskLevel %tmp.5 299 12 21 ];
         %tmp.6 = "MEDIUM";
         %tmp.7 = eq %tmp.5 %tmp.6;
-        bf %tmp.7 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_272_8_274_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_272_8_274_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_272_35_274_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 273 12 ]
+        bf %tmp.7 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_299_8_301_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_299_8_301_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_299_35_301_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 300 12 ]
         %tmp.8 = "MED";
         ret %tmp.8;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_272_35_274_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_272_8_274_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_272_8_274_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 276 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_299_35_301_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_299_8_301_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_299_8_301_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 303 8 ]
         %tmp.9 = lgetv %riskLevel;
-        symbol [ riskLevel %tmp.9 276 15 24 ];
+        symbol [ riskLevel %tmp.9 303 15 24 ];
         ret %tmp.9;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_267_42_277_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_294_42_304_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 279; @symbol_functiondef = [formatHistoryRecord,279,13,32]; @symbol_param<0> = [record,279,33,39]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 306; @symbol_functiondef = [formatHistoryRecord,306,13,32]; @symbol_param<0> = [record,306,33,39]; ]
     function formatHistoryRecord(record) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_279_41_281_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 280 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_306_41_308_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 307 8 ]
         %tmp.1 = "#";
         %tmp.2 = self;
-        symbol [ formatHistorySequence %tmp.3 280 21 42 ];
+        symbol [ formatHistorySequence %tmp.3 307 21 42 ];
         %tmp.3 = getv function %tmp.2 :formatHistorySequence;
         %tmp.4 = lgetv %record;
-        symbol [ record %tmp.4 280 43 49 ];
+        symbol [ record %tmp.4 307 43 49 ];
         %tmp.6 = const :sequence;
-        symbol [ sequence %tmp.6 280 51 59 const ];
+        symbol [ sequence %tmp.6 307 51 59 const ];
         %tmp.7 = agetv %tmp.4 %tmp.6;
         %tmp.8 = invoke %tmp.2 %tmp.3(%tmp.7);
         %tmp.9 = add %tmp.1 %tmp.8;
         %tmp.10 = " ";
         %tmp.11 = add %tmp.9 %tmp.10;
         %tmp.12 = self;
-        symbol [ getHistorySeverity %tmp.13 280 70 88 ];
+        symbol [ getHistorySeverity %tmp.13 307 70 88 ];
         %tmp.13 = getv function %tmp.12 :getHistorySeverity;
         %tmp.14 = lgetv %record;
-        symbol [ record %tmp.14 280 89 95 ];
+        symbol [ record %tmp.14 307 89 95 ];
         %tmp.16 = const :severity;
-        symbol [ severity %tmp.16 280 97 105 const ];
+        symbol [ severity %tmp.16 307 97 105 const ];
         %tmp.17 = agetv %tmp.14 %tmp.16;
         %tmp.18 = invoke %tmp.12 %tmp.13(%tmp.17);
         %tmp.19 = add %tmp.11 %tmp.18;
         %tmp.20 = " ";
         %tmp.21 = add %tmp.19 %tmp.20;
         %tmp.22 = self;
-        symbol [ getHistoryThreat %tmp.23 280 116 132 ];
+        symbol [ getHistoryThreat %tmp.23 307 116 132 ];
         %tmp.23 = getv function %tmp.22 :getHistoryThreat;
         %tmp.24 = lgetv %record;
-        symbol [ record %tmp.24 280 133 139 ];
+        symbol [ record %tmp.24 307 133 139 ];
         %tmp.26 = const :threat;
-        symbol [ threat %tmp.26 280 141 147 const ];
+        symbol [ threat %tmp.26 307 141 147 const ];
         %tmp.27 = agetv %tmp.24 %tmp.26;
         %tmp.28 = invoke %tmp.22 %tmp.23(%tmp.27);
         %tmp.29 = add %tmp.21 %tmp.28;
         ret %tmp.29;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_279_41_281_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_306_41_308_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 283; @symbol_functiondef = [formatHistorySequence,283,13,34]; @symbol_param<0> = [sequence,283,35,43]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 310; @symbol_functiondef = [formatHistorySequence,310,13,34]; @symbol_param<0> = [sequence,310,35,43]; ]
     function formatHistorySequence(sequence) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_45_291_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 284 8 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_45_291_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_45_291_4_stop" ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_310_45_318_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 311 8 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_310_45_318_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_310_45_318_4_stop" ]
         %displaySequence.1 = local;
-        symbol [ displaySequence %displaySequence.1 284 12 27 ];
+        symbol [ displaySequence %displaySequence.1 311 12 27 ];
         %tmp.1 = lgetv %sequence;
-        symbol [ sequence %tmp.1 284 30 38 ];
+        symbol [ sequence %tmp.1 311 30 38 ];
         %tmp.2 = 100;
         %tmp.3 = mod %tmp.1 %tmp.2;
         lputv %displaySequence.1 %tmp.3;
-        symbol [ displaySequence %displaySequence.1 284 12 27 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 286 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_286_8_288_8_if_stmt:
+        symbol [ displaySequence %displaySequence.1 311 12 27 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 313 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_313_8_315_8_if_stmt:
         %tmp.4 = lgetv %displaySequence.1;
-        symbol [ displaySequence %tmp.4 286 12 27 ];
+        symbol [ displaySequence %tmp.4 313 12 27 ];
         %tmp.5 = 10;
         %tmp.6 = lt %tmp.4 %tmp.5;
-        bf %tmp.6 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_286_8_288_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_286_8_288_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_286_34_288_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 287 12 ]
+        bf %tmp.6 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_313_8_315_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_313_8_315_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_313_34_315_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 314 12 ]
         %tmp.7 = "0";
         %tmp.8 = lgetv %displaySequence.1;
-        symbol [ displaySequence %tmp.8 287 25 40 ];
+        symbol [ displaySequence %tmp.8 314 25 40 ];
         %tmp.9 = add %tmp.7 %tmp.8;
         ret %tmp.9;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_286_34_288_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_286_8_288_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_286_8_288_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 290 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_313_34_315_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_313_8_315_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_313_8_315_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 317 8 ]
         %tmp.10 = lgetv %displaySequence.1;
-        symbol [ displaySequence %tmp.10 290 15 30 ];
+        symbol [ displaySequence %tmp.10 317 15 30 ];
         ret %tmp.10;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_283_45_291_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_310_45_318_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 293; @symbol_functiondef = [getHistorySeverity,293,13,31]; @symbol_param<0> = [severity,293,32,40]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 320; @symbol_functiondef = [getHistorySeverity,320,13,31]; @symbol_param<0> = [severity,320,32,40]; ]
     function getHistorySeverity(severity) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_293_42_303_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 294 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_294_8_296_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_320_42_330_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 321 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_321_8_323_8_if_stmt:
         %tmp.1 = lgetv %severity;
-        symbol [ severity %tmp.1 294 12 20 ];
+        symbol [ severity %tmp.1 321 12 20 ];
         %tmp.2 = "CRITICAL";
         %tmp.3 = eq %tmp.1 %tmp.2;
-        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_294_8_296_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_294_8_296_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_294_36_296_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 295 12 ]
+        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_321_8_323_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_321_8_323_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_321_36_323_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 322 12 ]
         %tmp.4 = "CRIT";
         ret %tmp.4;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_294_36_296_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_294_8_296_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_294_8_296_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 298 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_298_8_300_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_321_36_323_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_321_8_323_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_321_8_323_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 325 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_325_8_327_8_if_stmt:
         %tmp.5 = lgetv %severity;
-        symbol [ severity %tmp.5 298 12 20 ];
+        symbol [ severity %tmp.5 325 12 20 ];
         %tmp.6 = "MEDIUM";
         %tmp.7 = eq %tmp.5 %tmp.6;
-        bf %tmp.7 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_298_8_300_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_298_8_300_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_298_34_300_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 299 12 ]
+        bf %tmp.7 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_325_8_327_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_325_8_327_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_325_34_327_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 326 12 ]
         %tmp.8 = "MED";
         ret %tmp.8;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_298_34_300_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_298_8_300_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_298_8_300_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 302 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_325_34_327_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_325_8_327_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_325_8_327_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 329 8 ]
         %tmp.9 = "HIGH";
         ret %tmp.9;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_293_42_303_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_320_42_330_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 305; @symbol_functiondef = [getHistoryThreat,305,13,29]; @symbol_param<0> = [threat,305,30,36]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 332; @symbol_functiondef = [getHistoryThreat,332,13,29]; @symbol_param<0> = [threat,332,30,36]; ]
     function getHistoryThreat(threat) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_305_38_311_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 306 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_306_8_308_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_332_38_338_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 333 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_333_8_335_8_if_stmt:
         %tmp.1 = lgetv %threat;
-        symbol [ threat %tmp.1 306 12 18 ];
+        symbol [ threat %tmp.1 333 12 18 ];
         %tmp.2 = "UNKNOWN";
         %tmp.3 = eq %tmp.1 %tmp.2;
-        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_306_8_308_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_306_8_308_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_306_33_308_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 307 12 ]
+        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_333_8_335_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_333_8_335_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_333_33_335_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 334 12 ]
         %tmp.4 = "UNK";
         ret %tmp.4;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_306_33_308_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_306_8_308_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_306_8_308_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 310 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_333_33_335_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_333_8_335_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_333_8_335_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 337 8 ]
         %tmp.5 = lgetv %threat;
-        symbol [ threat %tmp.5 310 15 21 ];
+        symbol [ threat %tmp.5 337 15 21 ];
         ret %tmp.5;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_305_38_311_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_332_38_338_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 313; @symbol_functiondef = [drawCentered,313,13,25]; @symbol_param<0> = [dc,313,26,28]; @symbol_param<1> = [width,313,30,35]; @symbol_param<2> = [y,313,37,38]; @symbol_param<3> = [text,313,40,44]; @symbol_param<4> = [font,313,46,50]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 340; @symbol_functiondef = [drawCentered,340,13,25]; @symbol_param<0> = [dc,340,26,28]; @symbol_param<1> = [width,340,30,35]; @symbol_param<2> = [y,340,37,38]; @symbol_param<3> = [text,340,40,44]; @symbol_param<4> = [font,340,46,50]; ]
     function drawCentered(dc, width, y, text, font) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_313_52_315_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 314 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_340_52_342_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 341 8 ]
         %tmp.1 = lgetv %dc;
-        symbol [ dc %tmp.1 314 8 10 ];
-        symbol [ drawText %tmp.2 314 11 19 ];
+        symbol [ dc %tmp.1 341 8 10 ];
+        symbol [ drawText %tmp.2 341 11 19 ];
         %tmp.2 = getv function %tmp.1 :drawText;
         %tmp.3 = lgetv %width;
-        symbol [ width %tmp.3 314 20 25 ];
+        symbol [ width %tmp.3 341 20 25 ];
         %tmp.4 = 2;
         %tmp.5 = div %tmp.3 %tmp.4;
         %tmp.6 = lgetv %y;
-        symbol [ y %tmp.6 314 31 32 ];
+        symbol [ y %tmp.6 341 31 32 ];
         %tmp.7 = lgetv %font;
-        symbol [ font %tmp.7 314 34 38 ];
+        symbol [ font %tmp.7 341 34 38 ];
         %tmp.8 = lgetv %text;
-        symbol [ text %tmp.8 314 40 44 ];
-        symbol [ Graphics %tmp.9 314 46 54 ];
+        symbol [ text %tmp.8 341 40 44 ];
+        symbol [ Graphics %tmp.9 341 46 54 ];
         %tmp.9 = getm $.Toybox.Graphics;
-        symbol [ TEXT_JUSTIFY_CENTER %tmp.10 314 55 74 ];
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.10 341 55 74 ];
         %tmp.10 = getv %tmp.9 :TEXT_JUSTIFY_CENTER;
         invoke %tmp.1 %tmp.2(%tmp.5, %tmp.6, %tmp.7, %tmp.8, %tmp.10);
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_313_52_315_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_340_52_342_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 317; @symbol_functiondef = [getRiskColor,317,13,25]; @symbol_param<0> = [riskLevel,317,26,35]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 344; @symbol_functiondef = [getRiskColor,344,13,25]; @symbol_param<0> = [riskLevel,344,26,35]; ]
     function getRiskColor(riskLevel) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_317_37_331_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 318 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_318_8_320_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_344_37_358_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 345 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_345_8_347_8_if_stmt:
         %tmp.1 = lgetv %riskLevel;
-        symbol [ riskLevel %tmp.1 318 12 21 ];
+        symbol [ riskLevel %tmp.1 345 12 21 ];
         %tmp.2 = "CRITICAL";
         %tmp.3 = eq %tmp.1 %tmp.2;
-        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_318_8_320_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_318_8_320_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_318_37_320_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 319 12 ]
-        symbol [ Graphics %tmp.4 319 19 27 ];
+        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_345_8_347_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_345_8_347_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_345_37_347_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 346 12 ]
+        symbol [ Graphics %tmp.4 346 19 27 ];
         %tmp.4 = getm $.Toybox.Graphics;
-        symbol [ COLOR_RED %tmp.5 319 28 37 ];
+        symbol [ COLOR_RED %tmp.5 346 28 37 ];
         %tmp.5 = getv %tmp.4 :COLOR_RED;
         ret %tmp.5;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_318_37_320_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_318_8_320_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_318_8_320_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 322 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_322_8_324_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_345_37_347_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_345_8_347_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_345_8_347_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 349 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_349_8_351_8_if_stmt:
         %tmp.6 = lgetv %riskLevel;
-        symbol [ riskLevel %tmp.6 322 12 21 ];
+        symbol [ riskLevel %tmp.6 349 12 21 ];
         %tmp.7 = "HIGH";
         %tmp.8 = eq %tmp.6 %tmp.7;
-        bf %tmp.8 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_322_8_324_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_322_8_324_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_322_33_324_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 323 12 ]
-        symbol [ Graphics %tmp.9 323 19 27 ];
+        bf %tmp.8 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_349_8_351_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_349_8_351_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_349_33_351_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 350 12 ]
+        symbol [ Graphics %tmp.9 350 19 27 ];
         %tmp.9 = getm $.Toybox.Graphics;
-        symbol [ COLOR_GREEN %tmp.10 323 28 39 ];
+        symbol [ COLOR_GREEN %tmp.10 350 28 39 ];
         %tmp.10 = getv %tmp.9 :COLOR_GREEN;
         ret %tmp.10;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_322_33_324_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_322_8_324_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_322_8_324_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 326 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_326_8_328_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_349_33_351_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_349_8_351_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_349_8_351_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 353 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_353_8_355_8_if_stmt:
         %tmp.11 = lgetv %riskLevel;
-        symbol [ riskLevel %tmp.11 326 12 21 ];
+        symbol [ riskLevel %tmp.11 353 12 21 ];
         %tmp.12 = "MEDIUM";
         %tmp.13 = eq %tmp.11 %tmp.12;
-        bf %tmp.13 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_326_8_328_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_326_8_328_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_326_35_328_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 327 12 ]
-        symbol [ Graphics %tmp.14 327 19 27 ];
+        bf %tmp.13 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_353_8_355_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_353_8_355_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_353_35_355_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 354 12 ]
+        symbol [ Graphics %tmp.14 354 19 27 ];
         %tmp.14 = getm $.Toybox.Graphics;
-        symbol [ COLOR_YELLOW %tmp.15 327 28 40 ];
+        symbol [ COLOR_YELLOW %tmp.15 354 28 40 ];
         %tmp.15 = getv %tmp.14 :COLOR_YELLOW;
         ret %tmp.15;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_326_35_328_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_326_8_328_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_326_8_328_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 330 8 ]
-        symbol [ Graphics %tmp.16 330 15 23 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_353_35_355_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_353_8_355_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_353_8_355_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 357 8 ]
+        symbol [ Graphics %tmp.16 357 15 23 ];
         %tmp.16 = getm $.Toybox.Graphics;
-        symbol [ COLOR_WHITE %tmp.17 330 24 35 ];
+        symbol [ COLOR_WHITE %tmp.17 357 24 35 ];
         %tmp.17 = getv %tmp.16 :COLOR_WHITE;
         ret %tmp.17;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_317_37_331_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_344_37_358_4_stop:
     }
 }
 [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 1; ]

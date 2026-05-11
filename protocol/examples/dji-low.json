@@ -2,6 +2,7 @@
   "threat": "DJI",
   "severity": "LOW",
   "band": "2.4GHz",
+  "direction": "LEFT",
   "distance": "FAR",
   "confidence": 64,
   "bands": {
