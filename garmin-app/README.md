@@ -1,10 +1,10 @@
 # Garmin App
 
-This folder contains the first Garmin Connect IQ MVP skeleton for SKYSHIELD.
+This folder contains the Garmin Connect IQ MVP prototype for SKYSHIELD.
 
 Target device: Garmin Enduro 2.
 
-The prototype uses hardcoded mock alert data. It does not use BLE, RF detection, detector adapters, or live SKYSHIELD protocol parsing yet.
+The prototype uses hardcoded rotating mock alert data. It does not use BLE, RF detection, detector adapters, or live SKYSHIELD protocol parsing yet.
 
 ## MVP Role
 
@@ -12,9 +12,11 @@ The Garmin app will act as the wearable alert UI for SKYSHIELD.
 
 Current prototype responsibilities:
 
-- Show one tactical mock alert
+- Show a tactical boot splash
+- Rotate between mock FPV, DJI, and unknown threat alerts
+- Alternate between ALERT and BANDS screens
 - Display threat type, risk level, confidence, band, distance label, and active bands
-- Trigger a simple vibration for high or critical alerts
+- Trigger severity-based vibration patterns
 - Use high-contrast text for the Garmin Enduro 2 MIP display
 
 Future responsibilities:
@@ -37,6 +39,7 @@ garmin-app/
     SkyShieldView.mc
     AlertModel.mc
     AlertEngine.mc
+    SettingsModel.mc
     VibrationEngine.mc
     MockAlertProvider.mc
   resources/
@@ -62,6 +65,35 @@ monkeydo bin/SKYSHIELD.prg enduro2
 
 The exact SDK commands may vary by local Garmin SDK installation and developer key path.
 
+## Current MVP Status
+
+The MVP is a watch-only tactical UI prototype. It includes:
+
+- Monochrome-safe tactical alert banner
+- Boot splash
+- Rotating mock alerts every 4 seconds
+- ALERT screen for immediate action
+- BANDS screen for technical signal detail
+- Critical banner pulse
+- Severity-based vibration patterns
+- Simple in-app settings model for future settings UI
+
+## Vibration Patterns
+
+Current haptic behavior:
+
+- `MEDIUM`: one short pulse
+- `HIGH`: three short pulses
+- `CRITICAL`: one long pulse, pause, then one long pulse
+
+Vibration is controlled by `SettingsModel`:
+
+- `vibrationEnabled`: defaults to `true`
+- `sensitivity`: defaults to `NORMAL`
+- `silentMode`: defaults to `false`
+
+There is no settings screen yet. The model exists so future UI or persisted settings can wire into the same behavior.
+
 ## Not Responsible For
 
 - Drone detection
@@ -78,10 +110,11 @@ Those responsibilities belong to the detector layer or ESP32-S3 bridge.
 - BLE integration is intentionally not implemented.
 - Alert JSON schema validation is not implemented on the watch.
 - Vibration behavior must be validated on Garmin hardware or simulator support.
-- UI is a minimal single-screen prototype, not a production interaction model.
+- Settings are in-memory defaults only and are not user-editable yet.
+- No sound behavior exists. `silentMode` is reserved for future sound-related logic.
 
 ## Future Implementation Notes
 
 Before writing code, confirm Garmin Connect IQ support for the required BLE client behavior and haptic patterns on the Enduro 2.
 
-BLE integration should be added around `AlertEngine` and should populate `AlertModel` from normalized SKYSHIELD alert payloads delivered by the ESP32-S3 bridge.
+Next step: implement the ESP32 BLE bridge and connect it to `AlertEngine` so `AlertModel` is populated from normalized SKYSHIELD alert payloads delivered by the ESP32-S3 bridge.

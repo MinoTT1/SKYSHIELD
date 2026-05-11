@@ -17,369 +17,364 @@ class SkyShieldView extends WatchUi.View {
     var _engine;
     [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 7; @position = 8; @symbol_vardef = [_alert,7,8,14]; ]
     var _alert;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 8; @position = 8; @symbol_vardef = [_vibrationEngine,8,8,24]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 8; @position = 8; @symbol_vardef = [_settings,8,8,17]; ]
+    var _settings;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 9; @position = 8; @symbol_vardef = [_vibrationEngine,9,8,24]; ]
     var _vibrationEngine;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 9; @position = 8; @symbol_vardef = [_timer,9,8,14]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 10; @position = 8; @symbol_vardef = [_timer,10,8,14]; ]
     var _timer;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 10; @position = 8; @symbol_vardef = [_screenPhase,10,8,20]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 11; @position = 8; @symbol_vardef = [_screenPhase,11,8,20]; ]
     var _screenPhase;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 11; @position = 8; @symbol_vardef = [_tickCount,11,8,18]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 12; @position = 8; @symbol_vardef = [_tickCount,12,8,18]; ]
     var _tickCount;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 12; @position = 8; @symbol_vardef = [_showSplash,12,8,19]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 13; @position = 8; @symbol_vardef = [_showSplash,13,8,19]; ]
     var _showSplash;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 13; @position = 8; @symbol_vardef = [_criticalPulseOn,13,8,24]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 14; @position = 8; @symbol_vardef = [_criticalPulseOn,14,8,24]; ]
     var _criticalPulseOn;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 15; @symbol_functiondef = [initialize,15,13,23]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 16; @symbol_functiondef = [initialize,16,13,23]; ]
     function initialize() as Void {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_15_26_24_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 16 8 ]
-        symbol [ View %tmp.2 16 8 12 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_16_26_26_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 17 8 ]
+        symbol [ View %tmp.2 17 8 12 ];
         %tmp.2 = getv ? :View;
-        symbol [ initialize %tmp.3 16 13 23 ];
+        symbol [ initialize %tmp.3 17 13 23 ];
         %tmp.3 = getv function %tmp.2 :initialize;
         invoke %tmp.2 %tmp.3();
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 17 8 ]
-        symbol [ AlertEngine %tmp.7 17 22 33 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 18 8 ]
+        symbol [ AlertEngine %tmp.7 18 22 33 ];
         %tmp.7 = getv ? :AlertEngine;
         %tmp.4 = newc %tmp.7 ();
-        symbol [ _engine ? 17 8 15 ];
+        symbol [ _engine ? 18 8 15 ];
         putv self :_engine %tmp.4;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 18 8 ]
-        symbol [ VibrationEngine %tmp.11 18 31 46 ];
-        %tmp.11 = getv ? :VibrationEngine;
-        %tmp.8 = newc %tmp.11 ();
-        symbol [ _vibrationEngine ? 18 8 24 ];
-        putv self :_vibrationEngine %tmp.8;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 19 8 ]
-        %tmp.12 = null;
-        symbol [ _timer ? 19 8 14 ];
-        putv self :_timer %tmp.12;
+        symbol [ SettingsModel %tmp.11 19 24 37 ];
+        %tmp.11 = getv ? :SettingsModel;
+        %tmp.8 = newc %tmp.11 ();
+        symbol [ _settings ? 19 8 17 ];
+        putv self :_settings %tmp.8;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 20 8 ]
-        %tmp.13 = 0;
-        symbol [ _screenPhase ? 20 8 20 ];
-        putv self :_screenPhase %tmp.13;
+        symbol [ VibrationEngine %tmp.15 20 31 46 ];
+        %tmp.15 = getv ? :VibrationEngine;
+        symbol [ _settings %tmp.17 20 47 56 ];
+        %tmp.17 = getv ? :_settings;
+        %tmp.12 = newc %tmp.15 (%tmp.17);
+        symbol [ _vibrationEngine ? 20 8 24 ];
+        putv self :_vibrationEngine %tmp.12;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 21 8 ]
-        %tmp.14 = 0;
-        symbol [ _tickCount ? 21 8 18 ];
-        putv self :_tickCount %tmp.14;
+        %tmp.18 = null;
+        symbol [ _timer ? 21 8 14 ];
+        putv self :_timer %tmp.18;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 22 8 ]
-        %tmp.15 = true;
-        symbol [ _showSplash ? 22 8 19 ];
-        putv self :_showSplash %tmp.15;
+        %tmp.19 = 0;
+        symbol [ _screenPhase ? 22 8 20 ];
+        putv self :_screenPhase %tmp.19;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 23 8 ]
-        %tmp.16 = true;
-        symbol [ _criticalPulseOn ? 23 8 24 ];
-        putv self :_criticalPulseOn %tmp.16;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_15_26_24_4_stop:
+        %tmp.20 = 0;
+        symbol [ _tickCount ? 23 8 18 ];
+        putv self :_tickCount %tmp.20;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 24 8 ]
+        %tmp.21 = true;
+        symbol [ _showSplash ? 24 8 19 ];
+        putv self :_showSplash %tmp.21;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 25 8 ]
+        %tmp.22 = true;
+        symbol [ _criticalPulseOn ? 25 8 24 ];
+        putv self :_criticalPulseOn %tmp.22;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_16_26_26_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 26; @symbol_functiondef = [onShow,26,13,19]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 28; @symbol_functiondef = [onShow,28,13,19]; ]
     function onShow() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_26_22_39_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 27 8 ]
-        symbol [ _engine %tmp.2 27 17 24 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_28_22_41_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 29 8 ]
+        symbol [ _engine %tmp.2 29 17 24 ];
         %tmp.2 = getv ? :_engine;
-        symbol [ getActiveAlert %tmp.3 27 25 39 ];
+        symbol [ getActiveAlert %tmp.3 29 25 39 ];
         %tmp.3 = getv function %tmp.2 :getActiveAlert;
         %tmp.4 = invoke %tmp.2 %tmp.3();
-        symbol [ _alert ? 27 8 14 ];
+        symbol [ _alert ? 29 8 14 ];
         putv self :_alert %tmp.4;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 28 8 ]
-        %tmp.5 = 0;
-        symbol [ _screenPhase ? 28 8 20 ];
-        putv self :_screenPhase %tmp.5;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 29 8 ]
-        %tmp.6 = 0;
-        symbol [ _tickCount ? 29 8 18 ];
-        putv self :_tickCount %tmp.6;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 30 8 ]
-        %tmp.7 = true;
-        symbol [ _showSplash ? 30 8 19 ];
-        putv self :_showSplash %tmp.7;
+        %tmp.5 = 0;
+        symbol [ _screenPhase ? 30 8 20 ];
+        putv self :_screenPhase %tmp.5;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 31 8 ]
-        %tmp.8 = true;
-        symbol [ _criticalPulseOn ? 31 8 24 ];
-        putv self :_criticalPulseOn %tmp.8;
+        %tmp.6 = 0;
+        symbol [ _tickCount ? 31 8 18 ];
+        putv self :_tickCount %tmp.6;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 32 8 ]
+        %tmp.7 = true;
+        symbol [ _showSplash ? 32 8 19 ];
+        putv self :_showSplash %tmp.7;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 33 8 ]
+        %tmp.8 = true;
+        symbol [ _criticalPulseOn ? 33 8 24 ];
+        putv self :_criticalPulseOn %tmp.8;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 34 8 ]
         %tmp.9 = self;
-        symbol [ triggerVibrationIfNeeded %tmp.10 32 8 32 ];
+        symbol [ triggerVibrationIfNeeded %tmp.10 34 8 32 ];
         %tmp.10 = getv function %tmp.9 :triggerVibrationIfNeeded;
         invoke %tmp.9 %tmp.10();
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 34 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_34_8_36_8_if_stmt:
-        symbol [ _timer %tmp.12 34 12 18 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 36 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_36_8_38_8_if_stmt:
+        symbol [ _timer %tmp.12 36 12 18 ];
         %tmp.12 = getv ? :_timer;
         %tmp.13 = null;
         %tmp.14 = eq %tmp.12 %tmp.13;
-        bf %tmp.14 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_34_8_36_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_34_8_36_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_34_28_36_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 35 12 ]
-        symbol [ Timer %tmp.17 35 25 30 ];
+        bf %tmp.14 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_36_8_38_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_36_8_38_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_36_28_38_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 37 12 ]
+        symbol [ Timer %tmp.17 37 25 30 ];
         %tmp.17 = getm $.Toybox.Timer;
-        symbol [ Timer %tmp.18 35 31 36 ];
+        symbol [ Timer %tmp.18 37 31 36 ];
         %tmp.18 = getv function ? %tmp.17 :Timer;
         %tmp.15 = newc %tmp.18 ();
-        symbol [ _timer ? 35 12 18 ];
+        symbol [ _timer ? 37 12 18 ];
         putv self :_timer %tmp.15;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_34_28_36_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_34_8_36_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_34_8_36_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 38 8 ]
-        symbol [ _timer %tmp.20 38 8 14 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_36_28_38_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_36_8_38_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_36_8_38_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 40 8 ]
+        symbol [ _timer %tmp.20 40 8 14 ];
         %tmp.20 = getv ? :_timer;
-        symbol [ start %tmp.21 38 15 20 ];
+        symbol [ start %tmp.21 40 15 20 ];
         %tmp.21 = getv function %tmp.20 :start;
         %tmp.22 = self;
-        symbol [ method %tmp.23 38 21 27 ];
+        symbol [ method %tmp.23 40 21 27 ];
         %tmp.23 = getv function %tmp.22 :method;
         %tmp.25 = const :onTimerTick;
-        symbol [ onTimerTick %tmp.25 38 29 40 const ];
+        symbol [ onTimerTick %tmp.25 40 29 40 const ];
         %tmp.26 = invoke %tmp.22 %tmp.23(%tmp.25);
         %tmp.27 = 250;
         %tmp.28 = true;
         invoke %tmp.20 %tmp.21(%tmp.26, %tmp.27, %tmp.28);
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_26_22_39_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_28_22_41_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 41; @symbol_functiondef = [onHide,41,13,19]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 43; @symbol_functiondef = [onHide,43,13,19]; ]
     function onHide() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_41_22_45_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 42 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_42_8_44_8_if_stmt:
-        symbol [ _timer %tmp.2 42 12 18 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_43_22_47_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 44 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_44_8_46_8_if_stmt:
+        symbol [ _timer %tmp.2 44 12 18 ];
         %tmp.2 = getv ? :_timer;
         %tmp.3 = null;
         %tmp.4 = ne %tmp.2 %tmp.3;
-        bf %tmp.4 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_42_8_44_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_42_8_44_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_42_28_44_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 43 12 ]
-        symbol [ _timer %tmp.6 43 12 18 ];
+        bf %tmp.4 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_44_8_46_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_44_8_46_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_44_28_46_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 45 12 ]
+        symbol [ _timer %tmp.6 45 12 18 ];
         %tmp.6 = getv ? :_timer;
         %tmp.7 = as %tmp.6 { (!Null) };
-        symbol [ stop %tmp.8 43 19 23 ];
+        symbol [ stop %tmp.8 45 19 23 ];
         %tmp.8 = getv function %tmp.7 :stop;
         invoke %tmp.7 %tmp.8();
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_42_28_44_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_42_8_44_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_42_8_44_8_if_end:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_41_22_45_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_44_28_46_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_44_8_46_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_44_8_46_8_if_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_43_22_47_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 47; @symbol_functiondef = [onTimerTick,47,13,24]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 49; @symbol_functiondef = [onTimerTick,49,13,24]; ]
     function onTimerTick() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_47_27_81_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 48 8 ]
-        symbol [ _tickCount %tmp.1 48 8 18 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_49_27_83_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 50 8 ]
+        symbol [ _tickCount %tmp.1 50 8 18 ];
         %tmp.1 = getv self :_tickCount;
         %tmp.2 = 1;
         %tmp.3 = add %tmp.1 %tmp.2;
-        symbol [ _tickCount ? 48 8 18 ];
+        symbol [ _tickCount ? 50 8 18 ];
         putv self :_tickCount dup %tmp.3;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 50 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_50_8_58_8_if_stmt:
-        symbol [ _showSplash %tmp.5 50 12 23 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 52 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_52_8_60_8_if_stmt:
+        symbol [ _showSplash %tmp.5 52 12 23 ];
         %tmp.5 = getv ? :_showSplash;
-        bf %tmp.5 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_50_8_58_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_50_8_58_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_50_25_58_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 51 12 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_51_12_54_12_if_stmt:
-        symbol [ _tickCount %tmp.7 51 16 26 ];
+        bf %tmp.5 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_52_8_60_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_52_8_60_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_52_25_60_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 53 12 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_53_12_56_12_if_stmt:
+        symbol [ _tickCount %tmp.7 53 16 26 ];
         %tmp.7 = getv ? :_tickCount;
         %tmp.8 = 4;
         %tmp.9 = gte %tmp.7 %tmp.8;
-        bf %tmp.9 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_51_12_54_12_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_51_12_54_12_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_51_33_54_12_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 52 16 ]
+        bf %tmp.9 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_53_12_56_12_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_53_12_56_12_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_53_33_56_12_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 54 16 ]
         %tmp.10 = 0;
-        symbol [ _tickCount ? 52 16 26 ];
+        symbol [ _tickCount ? 54 16 26 ];
         putv self :_tickCount %tmp.10;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 53 16 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 55 16 ]
         %tmp.11 = false;
-        symbol [ _showSplash ? 53 16 27 ];
+        symbol [ _showSplash ? 55 16 27 ];
         putv self :_showSplash %tmp.11;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_51_33_54_12_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_51_12_54_12_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_51_12_54_12_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 56 12 ]
-        symbol [ WatchUi %tmp.12 56 12 19 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_53_33_56_12_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_53_12_56_12_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_53_12_56_12_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 58 12 ]
+        symbol [ WatchUi %tmp.12 58 12 19 ];
         %tmp.12 = getm $.Toybox.WatchUi;
-        symbol [ requestUpdate %tmp.13 56 20 33 ];
+        symbol [ requestUpdate %tmp.13 58 20 33 ];
         %tmp.13 = getv function %tmp.12 :requestUpdate;
         invoke %tmp.12 %tmp.13();
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 57 12 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 59 12 ]
         ret ?;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_50_25_58_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_50_8_58_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_50_8_58_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 60 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_8_64_8_if_stmt:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_12_60_90_begin:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_12_60_63_begin:
-        symbol [ _alert %tmp.15 60 13 19 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_52_25_60_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_52_8_60_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_52_8_60_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 62 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_8_66_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_12_62_90_begin:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_12_62_63_begin:
+        symbol [ _alert %tmp.15 62 13 19 ];
         %tmp.15 = getv ? :_alert;
         %tmp.16 = null;
         %tmp.17 = ne %tmp.15 %tmp.16;
-        bf %tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_8_64_8_if_false;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_32_60_63_true:
-        symbol [ _alert %tmp.19 60 33 39 ];
+        bf %tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_8_66_8_if_false;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_32_62_63_true:
+        symbol [ _alert %tmp.19 62 33 39 ];
         %tmp.19 = getv ? :_alert;
         %tmp.20 = as %tmp.19 { (!Null) };
-        symbol [ riskLevel %tmp.21 60 40 49 ];
+        symbol [ riskLevel %tmp.21 62 40 49 ];
         %tmp.21 = getv %tmp.20 :riskLevel;
         %tmp.22 = "CRITICAL";
         %tmp.23 = eq %tmp.21 %tmp.22;
         push %tmp.23;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_32_60_63_end:
-        %tmp.24 = phi [%tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_12_60_63_begin] [%tmp.23 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_32_60_63_true] [%tmp.24 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_32_60_63_end];
-        bf %tmp.24 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_8_64_8_if_false;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_68_60_90_true:
-        symbol [ _tickCount %tmp.26 60 70 80 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_32_62_63_end:
+        %tmp.24 = phi [%tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_12_62_63_begin] [%tmp.23 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_32_62_63_true] [%tmp.24 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_32_62_63_end];
+        bf %tmp.24 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_8_66_8_if_false;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_68_62_90_true:
+        symbol [ _tickCount %tmp.26 62 70 80 ];
         %tmp.26 = getv ? :_tickCount;
         %tmp.27 = 3;
         %tmp.28 = mod %tmp.26 %tmp.27;
         %tmp.29 = 0;
         %tmp.30 = eq %tmp.28 %tmp.29;
         push %tmp.30;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_68_60_90_end:
-        %tmp.31 = phi [%tmp.24 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_12_60_90_begin] [%tmp.30 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_68_60_90_true] [%tmp.31 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_68_60_90_end];
-        bf %tmp.31 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_8_64_8_if_false;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_8_64_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_93_62_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 61 12 ]
-        symbol [ _criticalPulseOn %tmp.33 61 32 48 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_68_62_90_end:
+        %tmp.31 = phi [%tmp.24 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_12_62_90_begin] [%tmp.30 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_68_62_90_true] [%tmp.31 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_68_62_90_end];
+        bf %tmp.31 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_8_66_8_if_false;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_8_66_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_93_64_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 63 12 ]
+        symbol [ _criticalPulseOn %tmp.33 63 32 48 ];
         %tmp.33 = getv ? :_criticalPulseOn;
         %tmp.34 = not %tmp.33;
-        symbol [ _criticalPulseOn ? 61 12 28 ];
+        symbol [ _criticalPulseOn ? 63 12 28 ];
         putv self :_criticalPulseOn %tmp.34;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_93_62_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_8_64_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_8_64_8_if_false:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 62 15 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_15_64_8_if_stmt:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_19_62_70_begin:
-        symbol [ _alert %tmp.36 62 20 26 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_93_64_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_8_66_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_8_66_8_if_false:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 64 15 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_15_66_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_19_64_70_begin:
+        symbol [ _alert %tmp.36 64 20 26 ];
         %tmp.36 = getv ? :_alert;
         %tmp.37 = null;
         %tmp.38 = eq %tmp.36 %tmp.37;
-        bt %tmp.38 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_15_64_8_if_true;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_39_62_70_false:
-        symbol [ _alert %tmp.40 62 40 46 ];
+        bt %tmp.38 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_15_66_8_if_true;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_39_64_70_false:
+        symbol [ _alert %tmp.40 64 40 46 ];
         %tmp.40 = getv ? :_alert;
         %tmp.41 = as %tmp.40 { (!Null) };
-        symbol [ riskLevel %tmp.42 62 47 56 ];
+        symbol [ riskLevel %tmp.42 64 47 56 ];
         %tmp.42 = getv %tmp.41 :riskLevel;
         %tmp.43 = "CRITICAL";
         %tmp.44 = ne %tmp.42 %tmp.43;
         push %tmp.44;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_39_62_70_end:
-        %tmp.45 = phi [%tmp.38 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_19_62_70_begin] [%tmp.44 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_39_62_70_false] [%tmp.45 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_39_62_70_end];
-        bf %tmp.45 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_15_64_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_15_64_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_73_64_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 63 12 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_39_64_70_end:
+        %tmp.45 = phi [%tmp.38 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_19_64_70_begin] [%tmp.44 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_39_64_70_false] [%tmp.45 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_39_64_70_end];
+        bf %tmp.45 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_15_66_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_15_66_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_73_66_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 65 12 ]
         %tmp.46 = true;
-        symbol [ _criticalPulseOn ? 63 12 28 ];
+        symbol [ _criticalPulseOn ? 65 12 28 ];
         putv self :_criticalPulseOn %tmp.46;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_73_64_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_15_64_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_15_64_8_if_end:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_60_8_64_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 66 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_66_8_70_8_if_stmt:
-        symbol [ _tickCount %tmp.48 66 12 22 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_73_66_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_15_66_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_64_15_66_8_if_end:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_62_8_66_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 68 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_8_72_8_if_stmt:
+        symbol [ _tickCount %tmp.48 68 12 22 ];
         %tmp.48 = getv ? :_tickCount;
         %tmp.49 = 12;
         %tmp.50 = gte %tmp.48 %tmp.49;
-        bf %tmp.50 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_66_8_70_8_if_else_false;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_66_8_70_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_66_30_68_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 67 12 ]
-        %tmp.51 = 3;
-        symbol [ _screenPhase ? 67 12 24 ];
-        putv self :_screenPhase %tmp.51;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_66_30_68_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_66_8_70_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_66_8_70_8_if_else_false:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_15_70_8_start:
+        bf %tmp.50 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_8_72_8_if_else_false;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_8_72_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_30_70_8_start:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 69 12 ]
-        %tmp.52 = 0;
+        %tmp.51 = 3;
         symbol [ _screenPhase ? 69 12 24 ];
+        putv self :_screenPhase %tmp.51;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_30_70_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_8_72_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_8_72_8_if_else_false:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_70_15_72_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 71 12 ]
+        %tmp.52 = 0;
+        symbol [ _screenPhase ? 71 12 24 ];
         putv self :_screenPhase %tmp.52;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_15_70_8_stop:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_66_8_70_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 72 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_72_8_78_8_if_stmt:
-        symbol [ _tickCount %tmp.54 72 12 22 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_70_15_72_8_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_68_8_72_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 74 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_74_8_80_8_if_stmt:
+        symbol [ _tickCount %tmp.54 74 12 22 ];
         %tmp.54 = getv ? :_tickCount;
         %tmp.55 = 16;
         %tmp.56 = gte %tmp.54 %tmp.55;
-        bf %tmp.56 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_72_8_78_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_72_8_78_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_72_30_78_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 73 12 ]
-        %tmp.57 = 0;
-        symbol [ _tickCount ? 73 12 22 ];
-        putv self :_tickCount %tmp.57;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 74 12 ]
-        %tmp.58 = 0;
-        symbol [ _screenPhase ? 74 12 24 ];
-        putv self :_screenPhase %tmp.58;
+        bf %tmp.56 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_74_8_80_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_74_8_80_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_74_30_80_8_start:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 75 12 ]
-        %tmp.59 = true;
-        symbol [ _criticalPulseOn ? 75 12 28 ];
-        putv self :_criticalPulseOn %tmp.59;
+        %tmp.57 = 0;
+        symbol [ _tickCount ? 75 12 22 ];
+        putv self :_tickCount %tmp.57;
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 76 12 ]
-        symbol [ _engine %tmp.61 76 21 28 ];
+        %tmp.58 = 0;
+        symbol [ _screenPhase ? 76 12 24 ];
+        putv self :_screenPhase %tmp.58;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 77 12 ]
+        %tmp.59 = true;
+        symbol [ _criticalPulseOn ? 77 12 28 ];
+        putv self :_criticalPulseOn %tmp.59;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 78 12 ]
+        symbol [ _engine %tmp.61 78 21 28 ];
         %tmp.61 = getv ? :_engine;
-        symbol [ getNextAlert %tmp.62 76 29 41 ];
+        symbol [ getNextAlert %tmp.62 78 29 41 ];
         %tmp.62 = getv function %tmp.61 :getNextAlert;
         %tmp.63 = invoke %tmp.61 %tmp.62();
-        symbol [ _alert ? 76 12 18 ];
+        symbol [ _alert ? 78 12 18 ];
         putv self :_alert %tmp.63;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 77 12 ]
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 79 12 ]
         %tmp.64 = self;
-        symbol [ triggerVibrationIfNeeded %tmp.65 77 12 36 ];
+        symbol [ triggerVibrationIfNeeded %tmp.65 79 12 36 ];
         %tmp.65 = getv function %tmp.64 :triggerVibrationIfNeeded;
         invoke %tmp.64 %tmp.65();
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_72_30_78_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_72_8_78_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_72_8_78_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 80 8 ]
-        symbol [ WatchUi %tmp.66 80 8 15 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_74_30_80_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_74_8_80_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_74_8_80_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 82 8 ]
+        symbol [ WatchUi %tmp.66 82 8 15 ];
         %tmp.66 = getm $.Toybox.WatchUi;
-        symbol [ requestUpdate %tmp.67 80 16 29 ];
+        symbol [ requestUpdate %tmp.67 82 16 29 ];
         %tmp.67 = getv function %tmp.66 :requestUpdate;
         invoke %tmp.66 %tmp.67();
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_47_27_81_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_49_27_83_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 83; @symbol_functiondef = [triggerVibrationIfNeeded,83,13,37]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 85; @symbol_functiondef = [triggerVibrationIfNeeded,85,13,37]; ]
     function triggerVibrationIfNeeded() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_83_40_87_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 84 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_84_8_86_8_if_stmt:
-        symbol [ _engine %tmp.2 84 12 19 ];
-        %tmp.2 = getv ? :_engine;
-        symbol [ isHighUrgency %tmp.3 84 20 33 ];
-        %tmp.3 = getv function %tmp.2 :isHighUrgency;
-        symbol [ _alert %tmp.5 84 34 40 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_85_40_87_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 86 8 ]
+        symbol [ _vibrationEngine %tmp.2 86 8 24 ];
+        %tmp.2 = getv ? :_vibrationEngine;
+        symbol [ triggerForAlert %tmp.3 86 25 40 ];
+        %tmp.3 = getv function %tmp.2 :triggerForAlert;
+        symbol [ _alert %tmp.5 86 41 47 ];
         %tmp.5 = getv ? :_alert;
-        %tmp.6 = invoke %tmp.2 %tmp.3(%tmp.5);
-        bf %tmp.6 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_84_8_86_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_84_8_86_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_84_43_86_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc" 85 12 ]
-        symbol [ _vibrationEngine %tmp.8 85 12 28 ];
-        %tmp.8 = getv ? :_vibrationEngine;
-        symbol [ triggerForAlert %tmp.9 85 29 44 ];
-        %tmp.9 = getv function %tmp.8 :triggerForAlert;
-        symbol [ _alert %tmp.11 85 45 51 ];
-        %tmp.11 = getv ? :_alert;
-        invoke %tmp.8 %tmp.9(%tmp.11);
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_84_43_86_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_84_8_86_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_84_8_86_8_if_end:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_83_40_87_4_stop:
+        invoke %tmp.2 %tmp.3(%tmp.5);
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_SkyShieldView_mc_85_40_87_4_stop:
     }
     [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/SkyShieldView.mc"; @line = 89; @symbol_functiondef = [onUpdate,89,13,21]; @symbol_param<0> = [dc,89,22,24]; ]
     function onUpdate(dc) {

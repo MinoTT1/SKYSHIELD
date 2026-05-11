@@ -5,6 +5,7 @@ import Toybox.WatchUi;
 class SkyShieldView extends WatchUi.View {
     var _engine;
     var _alert;
+    var _settings;
     var _vibrationEngine;
     var _timer;
     var _screenPhase;
@@ -15,7 +16,8 @@ class SkyShieldView extends WatchUi.View {
     function initialize() {
         View.initialize();
         _engine = new AlertEngine();
-        _vibrationEngine = new VibrationEngine();
+        _settings = new SettingsModel();
+        _vibrationEngine = new VibrationEngine(_settings);
         _timer = null;
         _screenPhase = 0;
         _tickCount = 0;
@@ -81,9 +83,7 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function triggerVibrationIfNeeded() {
-        if (_engine.isHighUrgency(_alert)) {
-            _vibrationEngine.triggerForAlert(_alert);
-        }
+        _vibrationEngine.triggerForAlert(_alert);
     }
 
     function onUpdate(dc) {
