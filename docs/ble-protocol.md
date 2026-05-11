@@ -9,8 +9,8 @@ For the planned service and characteristic layout, see `docs/ble-gatt-design.md`
 ## Roles
 
 - ESP32-S3: BLE peripheral/server and alert bridge
-- Garmin Enduro 2: BLE central/client and tactical display
-- Drone detectors: external sensor inputs to the bridge in future versions
+- Garmin Enduro 2: BLE central/client and wearable RF HUD
+- RF telemetry sources or future detector adapters: external sensor inputs to the bridge in future versions
 
 ## Canonical Alert Packet
 
@@ -38,6 +38,8 @@ Band strength values are:
 - `HIGH`
 - `NONE`
 
+Note: the `distance` field is a legacy protocol term for coarse RF signal-strength category. Garmin UI should display `FAR` as `WEAK`, `MID` as `MODERATE`, and `NEAR` as `STRONG`. RSSI-like values are not precise physical distance measurements.
+
 Example:
 
 ```json
@@ -48,7 +50,7 @@ Example:
 
 The first ESP32 bridge scaffold does not use BLE yet. It emits the same canonical JSON packet over Serial every 4 seconds.
 
-This lets the team validate alert shape, sequence behavior, mock alert rotation, and Garmin-side parsing assumptions before BLE transport is added.
+This lets the team validate packet shape, sequence behavior, mock alert rotation, freshness handling, and Garmin-side parsing assumptions before BLE transport is added.
 
 ## Future BLE GATT Shape
 
@@ -73,11 +75,11 @@ The Garmin app will later parse the same JSON payload currently printed by the E
 
 ## Alert Delivery Behavior
 
-The ESP32-S3 should notify the Garmin app when a new alert arrives or when a higher-priority alert supersedes an active one.
+The ESP32-S3 should notify the Garmin app when a new RF telemetry event arrives or when a higher-priority RF activity cue supersedes an active one.
 
 Recommended behavior:
 
-- Send critical alerts immediately.
+- Send elevated RF activity immediately.
 - Avoid repeatedly sending identical low-risk alerts.
 - Include `sequence` so the watch can ignore duplicate packets.
 - Keep payloads small enough for BLE notification constraints.
@@ -96,3 +98,20 @@ The ESP32-S3 should maintain a short recent-alert cache so the Garmin app can re
 - Mesh forwarding
 - Binary payload encoding
 - Firmware over-the-air update
+
+## Limitations
+
+- BLE payload delivery does not validate RF detection accuracy.
+- The `confidence` value is source-provided or heuristic until validated.
+- The `distance` field is not physical range.
+- Direction values are optional and experimental.
+
+## Validation And KPIs
+
+Future validation should measure:
+
+- Packet latency from ESP32 generation to Garmin display
+- Packet freshness and stale packet behavior
+- BLE stability and reconnect behavior
+- False alert rate once real RF inputs are integrated
+- Battery runtime under simulated and live telemetry workloads

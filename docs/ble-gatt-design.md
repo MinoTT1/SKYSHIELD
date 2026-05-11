@@ -10,7 +10,7 @@ No BLE implementation is included yet. This is the design contract for the next 
 - ESP32-S3 role: BLE peripheral/server
 - Garmin role: BLE central/client
 
-The ESP32 Bridge owns alert generation, normalization, and BLE notification. The Garmin app subscribes to alerts and renders the tactical HUD.
+The ESP32 Bridge owns simulated RF alert generation, normalization, and BLE notification. The Garmin app subscribes to alerts and renders the wearable RF HUD.
 
 ## GATT Service
 
@@ -30,7 +30,7 @@ Properties:
 Payload:
 
 - UTF-8 string
-- Canonical SKYSHIELD JSON alert packet
+- Canonical SKYSHIELD JSON RF telemetry packet
 - One alert per notification
 
 Packet strategy:
@@ -110,7 +110,7 @@ Garmin BLE parsing is not implemented in the current MVP.
 
 Planned ESP32 bridge flow:
 
-1. Generate simulated alert or receive detector alert.
+1. Generate simulated RF alert or receive future RF source event.
 2. Normalize alert to the canonical SKYSHIELD JSON packet.
 3. Print the same JSON over Serial for debugging.
 4. Notify the Alert Characteristic with the UTF-8 JSON payload.
@@ -125,14 +125,25 @@ The Serial mock mode remains useful for debugging even after BLE is added.
 - Short compact JSON only.
 - Simulator-first workflow.
 - No chunking in the first BLE implementation.
-- No real RF direction finding yet.
+- No validated RF direction finding yet.
+- No detection-performance claims from BLE transport alone.
 
 ## Future Work
 
 - Pairing and security policy
 - Packet chunking for larger payloads
 - Multiple Garmin clients
-- Detector adapter framework
+- RF source adapter framework
 - LoRa relay or field relay mode
 - Persistent bridge configuration
-- Direction-finding payload refinement
+- Direction-estimation payload research
+
+## Validation And KPIs
+
+BLE integration should be evaluated with measurable RF telemetry workflow metrics:
+
+- Packet latency
+- Packet freshness and stale-packet handling
+- BLE stability and reconnect recovery
+- Garmin vibration/display update latency
+- Bridge and watch battery runtime

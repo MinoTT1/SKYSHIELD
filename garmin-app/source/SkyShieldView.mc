@@ -10,6 +10,8 @@ const ALERT_DURATION_MS = 8000;
 const BANDS_DURATION_MS = 1500;
 const MOCK_ALERT_ROTATION_MS = 4000;
 const CRITICAL_PULSE_MS = 750;
+const STALE_PACKET_MS = 10000;
+const IDLE_PACKET_MS = 30000;
 
 class SkyShieldView extends WatchUi.View {
     var _engine;
@@ -23,6 +25,7 @@ class SkyShieldView extends WatchUi.View {
     var _currentScreen;
     var _screenElapsedMs;
     var _alertElapsedMs;
+    var _packetAgeMs;
     var _splashElapsedMs;
     var _criticalPulseElapsedMs;
     var _showSplash;
@@ -40,6 +43,7 @@ class SkyShieldView extends WatchUi.View {
         _currentScreen = SCREEN_ALERT;
         _screenElapsedMs = 0;
         _alertElapsedMs = 0;
+        _packetAgeMs = 0;
         _splashElapsedMs = 0;
         _criticalPulseElapsedMs = 0;
         _showSplash = true;
@@ -51,6 +55,7 @@ class SkyShieldView extends WatchUi.View {
         _currentScreen = SCREEN_ALERT;
         _screenElapsedMs = 0;
         _alertElapsedMs = 0;
+        _packetAgeMs = 0;
         _splashElapsedMs = 0;
         _criticalPulseElapsedMs = 0;
         _showSplash = true;
@@ -90,6 +95,7 @@ class SkyShieldView extends WatchUi.View {
         }
 
         _alertElapsedMs += TIMER_INTERVAL_MS;
+        updatePacketAge();
         _screenElapsedMs += TIMER_INTERVAL_MS;
         _criticalPulseElapsedMs += TIMER_INTERVAL_MS;
 
@@ -123,10 +129,17 @@ class SkyShieldView extends WatchUi.View {
     function updateAlertData() {
         if (_alertElapsedMs >= MOCK_ALERT_ROTATION_MS) {
             _alertElapsedMs = 0;
+            _packetAgeMs = 0;
             _alert = _engine.getNextAlert();
             _history.addAlert(_alert);
             triggerVibrationIfNeeded();
             showAlertForNewAlert();
+        }
+    }
+
+    function updatePacketAge() {
+        if (_packetAgeMs < 60000) {
+            _packetAgeMs += TIMER_INTERVAL_MS;
         }
     }
 
@@ -174,14 +187,11 @@ class SkyShieldView extends WatchUi.View {
         }
 
         if (_alert == null) {
-            drawConnectionState(dc, width);
             drawAlertBanner(dc, width, "LOW", "LOW");
             drawCentered(dc, width, 86, "SKYSHIELD", Graphics.FONT_SMALL);
             drawCentered(dc, width, 124, "NO ACTIVE ALERT", Graphics.FONT_TINY);
             return;
         }
-
-        drawConnectionState(dc, width);
 
         if (_currentScreen == SCREEN_BANDS) {
             drawBandsScreen(dc, width);
@@ -212,35 +222,40 @@ class SkyShieldView extends WatchUi.View {
 
     function getConnectionStateLabel() {
         if (_connectionState.getState() == "SIGNAL_LOST") {
-            return "lost";
+            return "RF LINK";
         }
 
         if (_connectionState.getState() == "SCANNING") {
-            return "scan";
+            return "RF ACTIVE";
         }
 
         if (_connectionState.getState() == "CONNECTING") {
-            return "conn";
+            return "TRACKING";
         }
 
         if (_connectionState.getState() == "CONNECTED") {
-            return "ok";
+            return "LIVE";
         }
 
-        return "lost";
+        return "RF ACTIVE";
     }
 
     function drawAlertScreen(dc, width) {
         var y = 70;
 
+        drawHealthMetadata(dc, width);
         drawAlertBanner(dc, width, getShortRiskLabel(_alert.riskLevel), _alert.riskLevel);
         dc.setColor(getRiskColor(_alert.riskLevel), Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, getAlertTitle(), getAlertTitleFont());
-        y += 36;
+        y += 24;
+
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, "CONF " + _alert.confidencePercent + "%", Graphics.FONT_TINY);
+        y += 24;
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, _alert.band, Graphics.FONT_SMALL);
-        y += 28;
+        drawCentered(dc, width, y, _alert.band, Graphics.FONT_TINY);
+        y += 24;
 
         var directionLabel = getDirectionLabel();
 
@@ -252,6 +267,55 @@ class SkyShieldView extends WatchUi.View {
         drawCentered(dc, width, y, getDistanceLabel(), Graphics.FONT_TINY);
 
         drawActionState(dc, width, 198);
+    }
+
+    function drawHealthMetadata(dc, width) {
+        dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, 22, getScanActivityLabel(), Graphics.FONT_TINY);
+    }
+
+    function getPacketAgeLabel() {
+        if (_packetAgeMs > STALE_PACKET_MS) {
+            return "STALE";
+        }
+
+        if (_packetAgeMs >= STALE_PACKET_MS) {
+            return "10s";
+        }
+
+        if (_packetAgeMs >= 5000) {
+            return "5s";
+        }
+
+        if (_packetAgeMs >= 2000) {
+            return "2s";
+        }
+
+        return "NOW";
+    }
+
+    function getScanActivityLabel() {
+        if (_packetAgeMs > IDLE_PACKET_MS) {
+            return "IDLE";
+        }
+
+        if (_packetAgeMs > STALE_PACKET_MS) {
+            return "SCAN";
+        }
+
+        return "TRACK";
+    }
+
+    function getBleHealthLabel() {
+        if (_connectionState.getState() == "SIGNAL_LOST") {
+            return "BLE LOST";
+        }
+
+        if ((_connectionState.getState() == "SCANNING") || (_connectionState.getState() == "CONNECTING")) {
+            return "BLE SCAN";
+        }
+
+        return "BLE OK";
     }
 
     function drawBandsScreen(dc, width) {
@@ -341,7 +405,7 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function getAlertTitle() {
-        return _alert.threatType + " " + getAlertStatus();
+        return _alert.threatType + " RF";
     }
 
     function getAlertTitleFont() {
@@ -350,19 +414,31 @@ class SkyShieldView extends WatchUi.View {
 
     function getAlertStatus() {
         if (_alert.riskLevel == "CRITICAL") {
-            return "CRITICAL";
+            return "ELEVATED";
         }
 
         if (_alert.threatType == "FPV") {
-            return "ATTACK";
+            return "RF";
         }
 
-        return "SIGNAL";
+        return "RF";
     }
 
     function getDistanceLabel() {
+        if (_alert.distanceLabel == "NEAR") {
+            return "STRONG";
+        }
+
+        if (_alert.distanceLabel == "MID") {
+            return "MODERATE";
+        }
+
+        if (_alert.distanceLabel == "FAR") {
+            return "WEAK";
+        }
+
         if (_alert.distanceLabel == "MED") {
-            return "MID";
+            return "MODERATE";
         }
 
         return _alert.distanceLabel;
@@ -376,18 +452,6 @@ class SkyShieldView extends WatchUi.View {
         dc.drawLine(margin, y - 12, width - margin, y - 12);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-
-        if (action == "TAKE COVER") {
-            dc.drawRectangle(margin, y - 7, width - (margin * 2), 34);
-            drawCentered(dc, width, y - 1, action, Graphics.FONT_MEDIUM);
-            return;
-        }
-
-        if (action == "ALERT") {
-            drawCentered(dc, width, y, action, Graphics.FONT_SMALL);
-            return;
-        }
-
         drawCentered(dc, width, y + 2, action, Graphics.FONT_TINY);
     }
 
@@ -426,7 +490,7 @@ class SkyShieldView extends WatchUi.View {
 
     function getShortRiskLabel(riskLevel) {
         if (riskLevel == "CRITICAL") {
-            return "!!! CRITICAL !!!";
+            return "ELEVATED";
         }
 
         if (riskLevel == "MEDIUM") {
@@ -452,7 +516,7 @@ class SkyShieldView extends WatchUi.View {
 
     function getHistorySeverity(severity) {
         if (severity == "CRITICAL") {
-            return "CRIT";
+            return "ELEV";
         }
 
         if (severity == "MEDIUM") {

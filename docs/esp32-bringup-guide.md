@@ -2,7 +2,7 @@
 
 This guide covers the first hardware bring-up for the SKYSHIELD ESP32-S3 bridge.
 
-The goal is simple: confirm the board powers on, appears as a serial device on macOS, accepts firmware upload from PlatformIO, and prints simulated SKYSHIELD alert packets over Serial.
+The goal is simple: confirm the board powers on, appears as a serial device on macOS, accepts firmware upload from PlatformIO, and prints simulated SKYSHIELD RF telemetry packets over Serial.
 
 No RF detector hardware is required for this step.
 
@@ -86,7 +86,7 @@ On boot, the ESP32-S3 should print:
 SKYSHIELD ESP32 Bridge starting...
 ```
 
-Then it should print one canonical SKYSHIELD JSON alert approximately every 4 seconds:
+Then it should print one canonical SKYSHIELD JSON RF telemetry packet approximately every 4 seconds:
 
 ```json
 {"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87,"bands":{"band_1_2":"LOW","band_2_4":"LOW","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":1}
@@ -155,7 +155,7 @@ After serial bring-up works, the next firmware milestone is BLE GATT:
 - Enable a BLE GATT server on the ESP32-S3.
 - Advertise as `SKYSHIELD-BRIDGE`.
 - Expose the SKYSHIELD alert notify characteristic.
-- Send one compact canonical JSON alert per BLE notification.
+- Send one compact canonical JSON RF telemetry packet per BLE notification.
 - Continue printing the same JSON over Serial for debugging.
 
-The Garmin app will later subscribe to the alert characteristic, receive the UTF-8 JSON payload, pass it into `AlertParser`, and update the tactical HUD.
+The Garmin app will later subscribe to the alert characteristic, receive the UTF-8 JSON payload, pass it into `AlertParser`, and update the wearable RF HUD.

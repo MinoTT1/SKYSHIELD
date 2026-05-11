@@ -8,14 +8,14 @@ The prototype uses hardcoded rotating mock alert data. It does not use BLE, RF d
 
 ## MVP Role
 
-The Garmin app will act as the wearable alert UI for SKYSHIELD.
+The Garmin app will act as the wearable RF HUD for SKYSHIELD.
 
 Current prototype responsibilities:
 
 - Show a tactical boot splash
 - Rotate between mock FPV, DJI, and unknown threat alerts
 - Alternate automatically between ALERT and BANDS screens
-- Display threat type, risk level, band, distance label, action state, and active bands
+- Display threat type, RF activity level, band, signal-strength label, confidence, action state, and active bands
 - Track the last five mock alerts in memory
 - Parse canonical SKYSHIELD JSON alert packets into Garmin alert models
 - Show optional simulated direction hints on the ALERT screen
@@ -28,7 +28,7 @@ Future responsibilities:
 - Connect to the ESP32-S3 bridge over BLE
 - Receive normalized SKYSHIELD alert payloads
 - Validate or safely parse alert fields from the shared protocol
-- Display tactical warning information
+- Display RF situational awareness information
 - Trigger vibration patterns based on risk level
 - Clear or downgrade expired alerts
 
@@ -81,17 +81,18 @@ The exact SDK commands may vary by local Garmin SDK installation and developer k
 The MVP is a watch-only tactical UI prototype. It includes:
 
 - Monochrome-safe tactical alert banner
-- ACTION state on the ALERT screen for immediate field response
+- RF action state on the ALERT screen for immediate field awareness
 - Centralized tactical action mapping in `TacticalActionEngine`
+- Compact system-health metadata on the ALERT screen
 - Boot splash
 - Rotating mock alerts every 4 seconds
-- ALERT screen for immediate action
+- ALERT screen for RF situational awareness
 - BANDS screen for technical signal detail
 - HISTORY screen implementation retained for manual/debug use
 - Garmin-side parser for the canonical SKYSHIELD JSON packet
 - AlertSource abstraction for swapping mock data with future BLE data
-- Simulated BLE lifecycle state display
-- Critical banner pulse
+- Simulated BLE lifecycle state tracking
+- Elevated RF activity banner pulse
 - Severity-based vibration patterns
 - Simple in-app settings model for future settings UI
 
@@ -104,7 +105,7 @@ After the boot splash, the app automatically cycles screens:
 
 Mock alerts continue rotating every 4 seconds. The screen cycle and alert rotation use separate lightweight elapsed-time counters so ALERT remains the primary field view and BANDS remains the secondary technical view.
 
-Each new mock alert immediately returns the HUD to ALERT. The HISTORY screen remains implemented in code, but it is not part of the automatic field rotation.
+If a new mock alert arrives while BANDS is visible, the HUD returns to ALERT. The HISTORY screen remains implemented in code, but it is not part of the automatic field rotation.
 
 ## Alert History
 
@@ -114,35 +115,47 @@ Each new mock alert immediately returns the HUD to ALERT. The HISTORY screen rem
 - threat type
 - severity
 - band
-- distance
+- RF signal-strength category
 - confidence
 
 The HISTORY screen displays the newest records first using compact monochrome rows.
 
 ## Action State
 
-`TacticalActionEngine` maps severity and distance into a compact operator action:
+`TacticalActionEngine` keeps the bottom action label credibility-safe for the MVP:
 
-- `CRITICAL` + `NEAR`: `TAKE COVER`
-- `CRITICAL` + `MID` or `FAR`: `ALERT`
-- `HIGH` + `NEAR`: `TAKE COVER`
-- `HIGH` + `MID` or `FAR`: `ALERT`
-- `MEDIUM` or `LOW`: `MONITOR`
-- Connection `SIGNAL LOST`: `SIGNAL LOST`
+- Any active RF packet: `MONITOR`
+- Connection `SIGNAL_LOST`: `NO RF LINK`
 
-This keeps the primary ALERT screen focused on what the user should do next, while BANDS remains available for supporting detail. HISTORY is retained in code for future manual/debug access but is not part of the automatic field cycle.
+The protocol still uses `CRITICAL`, `NEAR`, `MID`, and `FAR`, but the Garmin HUD translates these user-facing labels:
+
+- `CRITICAL`: `ELEVATED`
+- `NEAR`: `STRONG`
+- `MID`: `MODERATE`
+- `FAR`: `WEAK`
+
+This keeps the primary ALERT screen focused on RF situational awareness, while BANDS remains available for supporting detail. HISTORY is retained in code for future manual/debug access but is not part of the automatic field cycle.
 
 The ALERT screen visual priority is:
 
 1. action
 2. severity
 3. threat type
-4. distance
+4. signal strength
 5. band
 6. direction
-7. connection metadata
+7. confidence
+8. system-health metadata
 
-`TAKE COVER` receives the strongest bottom-screen emphasis, `ALERT` uses medium emphasis, and `MONITOR` is intentionally quieter.
+`MONITOR` is intentionally calm and compact. Confidence is displayed on the ALERT screen so the HUD does not imply absolute certainty.
+
+## System Health Metadata
+
+The ALERT screen includes a tiny gray metadata line for operator trust:
+
+- RF activity: `TRACK` for recent packets, `SCAN` after stale packets, `IDLE` after a longer quiet period.
+
+Packet age and BLE health are still tracked internally for future display, but the ALERT screen currently renders only the RF activity state to avoid clutter on the round Garmin display. This line is intentionally subtle and does not compete with the main alert or action state.
 
 ## Protocol Parser
 
@@ -170,12 +183,7 @@ BleAlertSource -> AlertParser -> AlertModel -> AlertEngine -> SkyShieldView
 
 ## Simulated BLE Lifecycle
 
-The HUD shows a very small monochrome connection state:
-
-- `scan`: scanning
-- `conn`: connecting
-- `ok`: connected
-- `lost`: signal lost
+The simulated connection state still runs internally, but the top metadata label is not rendered on the ALERT screen. The HUD prioritizes RF activity, signal strength, confidence, and action state over connection plumbing.
 
 Current simulated flow:
 
@@ -203,13 +211,13 @@ There is no settings screen yet. The model exists so future UI or persisted sett
 
 ## Not Responsible For
 
-- Drone detection
-- RF processing
-- Direction finding
+- RF detection or raw spectrum processing
+- Validated RF classification
+- Precise direction finding
 - Detector-specific parsing
 - Alert normalization
 
-Those responsibilities belong to the detector layer or ESP32-S3 bridge.
+Those responsibilities belong to future RF source adapters, detector hardware, or the ESP32-S3 bridge.
 
 ## Current Limitations
 
@@ -219,6 +227,28 @@ Those responsibilities belong to the detector layer or ESP32-S3 bridge.
 - Vibration behavior must be validated on Garmin hardware or simulator support.
 - Settings are in-memory defaults only and are not user-editable yet.
 - No sound behavior exists. `silentMode` is reserved for future sound-related logic.
+- RSSI-like signal strength is not precise physical distance.
+- Direction hints are simulated/experimental until validated.
+- Classification confidence is heuristic in the MVP.
+
+## Validation Roadmap
+
+Future Garmin validation should include:
+
+- Packet-to-HUD latency measurement
+- Packet freshness and stale state behavior
+- BLE reconnect behavior
+- Vibration latency and perceived clarity
+- Watch battery runtime during long monitoring sessions
+
+## Future KPIs
+
+- Alert packet-to-HUD latency
+- Stale packet rate
+- BLE reconnect success rate
+- Vibration delivery reliability
+- Watch battery runtime
+- Operator readability in simulated field scenarios
 
 ## Future Implementation Notes
 

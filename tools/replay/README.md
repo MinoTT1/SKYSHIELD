@@ -1,13 +1,13 @@
 # SKYSHIELD Replay Simulator
 
-This tool replays canonical SKYSHIELD alert packets over time.
+This tool replays canonical SKYSHIELD RF telemetry packets over time.
 
-It is intended for protocol testing, demo sessions, and future bridge development. It does not implement BLE and does not talk to Garmin directly yet.
+It is intended for protocol testing, replay sessions, packet freshness testing, and future bridge development. It does not implement BLE and does not talk to Garmin directly yet.
 
 ## Files
 
 - `replay.py`: loads a replay session and prints packets in real time
-- `sample-session.json`: example timed alert sequence
+- `sample-session.json`: example timed RF telemetry sequence
 
 ## Usage
 
@@ -35,7 +35,7 @@ Output format:
 The session file is a JSON array. Each entry has:
 
 - `offset`: seconds from replay start
-- `packet`: canonical SKYSHIELD alert payload
+- `packet`: canonical SKYSHIELD RF telemetry payload
 
 Packets should remain aligned with `protocol/skyshield-alert.schema.json`.
 
@@ -49,4 +49,4 @@ Possible future flow:
 sample-session.json -> replay.py -> ESP32 bridge test transport -> BLE notify -> Garmin app
 ```
 
-For now, stdout replay is enough to validate timing, packet shape, and scenario design.
+For now, stdout replay is enough to validate timing, packet shape, freshness behavior, and scenario design. It does not validate RF detection accuracy.
