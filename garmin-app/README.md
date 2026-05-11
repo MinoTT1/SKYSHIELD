@@ -14,8 +14,8 @@ Current prototype responsibilities:
 
 - Show a tactical boot splash
 - Rotate between mock FPV, DJI, and unknown threat alerts
-- Alternate between ALERT, BANDS, and HISTORY screens
-- Display threat type, risk level, confidence, band, distance label, and active bands
+- Alternate automatically between ALERT and BANDS screens
+- Display threat type, risk level, band, distance label, action state, and active bands
 - Track the last five mock alerts in memory
 - Parse canonical SKYSHIELD JSON alert packets into Garmin alert models
 - Show optional simulated direction hints on the ALERT screen
@@ -44,6 +44,7 @@ garmin-app/
     AlertModel.mc
     AlertParser.mc
     AlertEngine.mc
+    TacticalActionEngine.mc
     AlertSource.mc
     MockAlertSource.mc
     BleAlertSource.mc
@@ -80,11 +81,13 @@ The exact SDK commands may vary by local Garmin SDK installation and developer k
 The MVP is a watch-only tactical UI prototype. It includes:
 
 - Monochrome-safe tactical alert banner
+- ACTION state on the ALERT screen for immediate field response
+- Centralized tactical action mapping in `TacticalActionEngine`
 - Boot splash
 - Rotating mock alerts every 4 seconds
 - ALERT screen for immediate action
 - BANDS screen for technical signal detail
-- HISTORY screen with the last five mock alerts
+- HISTORY screen implementation retained for manual/debug use
 - Garmin-side parser for the canonical SKYSHIELD JSON packet
 - AlertSource abstraction for swapping mock data with future BLE data
 - Simulated BLE lifecycle state display
@@ -96,11 +99,12 @@ The MVP is a watch-only tactical UI prototype. It includes:
 
 After the boot splash, the app automatically cycles screens:
 
-- `ALERT`: about 3 seconds
-- `BANDS`: about 1.5 seconds
-- `HISTORY`: about 1.5 seconds
+- `ALERT`: 8 seconds
+- `BANDS`: 1.5 seconds
 
-Mock alerts continue rotating every 4 seconds. The screen cycle and alert rotation use separate lightweight counters so the history view can appear without slowing alert rotation.
+Mock alerts continue rotating every 4 seconds. The screen cycle and alert rotation use separate lightweight elapsed-time counters so ALERT remains the primary field view and BANDS remains the secondary technical view.
+
+Each new mock alert immediately returns the HUD to ALERT. The HISTORY screen remains implemented in code, but it is not part of the automatic field rotation.
 
 ## Alert History
 
@@ -114,6 +118,31 @@ Mock alerts continue rotating every 4 seconds. The screen cycle and alert rotati
 - confidence
 
 The HISTORY screen displays the newest records first using compact monochrome rows.
+
+## Action State
+
+`TacticalActionEngine` maps severity and distance into a compact operator action:
+
+- `CRITICAL` + `NEAR`: `TAKE COVER`
+- `CRITICAL` + `MID` or `FAR`: `ALERT`
+- `HIGH` + `NEAR`: `TAKE COVER`
+- `HIGH` + `MID` or `FAR`: `ALERT`
+- `MEDIUM` or `LOW`: `MONITOR`
+- Connection `SIGNAL LOST`: `SIGNAL LOST`
+
+This keeps the primary ALERT screen focused on what the user should do next, while BANDS remains available for supporting detail. HISTORY is retained in code for future manual/debug access but is not part of the automatic field cycle.
+
+The ALERT screen visual priority is:
+
+1. action
+2. severity
+3. threat type
+4. distance
+5. band
+6. direction
+7. connection metadata
+
+`TAKE COVER` receives the strongest bottom-screen emphasis, `ALERT` uses medium emphasis, and `MONITOR` is intentionally quieter.
 
 ## Protocol Parser
 
@@ -141,12 +170,12 @@ BleAlertSource -> AlertParser -> AlertModel -> AlertEngine -> SkyShieldView
 
 ## Simulated BLE Lifecycle
 
-The HUD shows a compact monochrome connection state:
+The HUD shows a very small monochrome connection state:
 
-- `[SCANNING]`
-- `[CONNECTING]`
-- `[CONNECTED]`
-- `[SIGNAL LOST]`
+- `scan`: scanning
+- `conn`: connecting
+- `ok`: connected
+- `lost`: signal lost
 
 Current simulated flow:
 
