@@ -1,163 +1,338 @@
-[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 3; @symbol_classdef = [AlertEngine,3,6,17]; ]
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 1; @symbol_importdef<0> = [Toybox,1,7,13]; @symbol_importdef<1> = [System,1,14,20]; ]
+import Toybox.System;
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 4; @position = 6; @symbol_constdef = [USE_MOCK_FALLBACK,4,6,23]; ]
+const USE_MOCK_FALLBACK = false;
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 5; @position = 6; @symbol_constdef = [ALERT_SOURCE_BLE,5,6,22]; ]
+const ALERT_SOURCE_BLE = "BLE";
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 6; @position = 6; @symbol_constdef = [ALERT_SOURCE_MOCK,6,6,23]; ]
+const ALERT_SOURCE_MOCK = "MOCK";
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 7; @position = 6; @symbol_constdef = [ALERT_SOURCE_NONE,7,6,23]; ]
+const ALERT_SOURCE_NONE = "NONE";
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 9; @symbol_classdef = [AlertEngine,9,6,17]; ]
 class AlertEngine {
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 3; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 9; ]
     <init> {
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 3; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 9; ]
     static
     <init> {
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 4; @position = 8; @symbol_vardef = [_bleSource,4,8,18]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 10; @position = 8; @symbol_vardef = [_bleSource,10,8,18]; ]
     var _bleSource;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 5; @position = 8; @symbol_vardef = [_mockSource,5,8,19]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 11; @position = 8; @symbol_vardef = [_mockSource,11,8,19]; ]
     var _mockSource;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 6; @position = 8; @symbol_vardef = [_currentAlert,6,8,21]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 12; @position = 8; @symbol_vardef = [_currentAlert,12,8,21]; ]
     var _currentAlert;
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 8; @symbol_functiondef = [initialize,8,13,23]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 13; @position = 8; @symbol_vardef = [_currentSource,13,8,22]; ]
+    var _currentSource;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 14; @position = 8; @symbol_vardef = [_bleStarted,14,8,19]; ]
+    var _bleStarted;
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 16; @symbol_functiondef = [initialize,16,13,23]; ]
     function initialize() as Void {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_8_26_13_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 9 8 ]
-        symbol [ BleAlertSource %tmp.4 9 25 39 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_16_26_23_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 17 8 ]
+        symbol [ BleAlertSource %tmp.4 17 25 39 ];
         %tmp.4 = getv ? :BleAlertSource;
         %tmp.1 = newc %tmp.4 ();
-        symbol [ _bleSource ? 9 8 18 ];
+        symbol [ _bleSource ? 17 8 18 ];
         putv self :_bleSource %tmp.1;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 10 8 ]
-        symbol [ MockAlertSource %tmp.8 10 26 41 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 18 8 ]
+        symbol [ MockAlertSource %tmp.8 18 26 41 ];
         %tmp.8 = getv ? :MockAlertSource;
         %tmp.5 = newc %tmp.8 ();
-        symbol [ _mockSource ? 10 8 19 ];
+        symbol [ _mockSource ? 18 8 19 ];
         putv self :_mockSource %tmp.5;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 11 8 ]
-        symbol [ _bleSource %tmp.10 11 8 18 ];
-        %tmp.10 = getv ? :_bleSource;
-        symbol [ start %tmp.11 11 19 24 ];
-        %tmp.11 = getv function %tmp.10 :start;
-        invoke %tmp.10 %tmp.11();
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 12 8 ]
-        symbol [ _mockSource %tmp.13 12 24 35 ];
-        %tmp.13 = getv ? :_mockSource;
-        symbol [ getNextAlert %tmp.14 12 36 48 ];
-        %tmp.14 = getv function %tmp.13 :getNextAlert;
-        %tmp.15 = invoke %tmp.13 %tmp.14();
-        symbol [ _currentAlert ? 12 8 21 ];
-        putv self :_currentAlert %tmp.15;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_8_26_13_4_stop:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 19 8 ]
+        %tmp.9 = null;
+        symbol [ _currentAlert ? 19 8 21 ];
+        putv self :_currentAlert %tmp.9;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 20 8 ]
+        symbol [ ALERT_SOURCE_NONE %tmp.11 20 25 42 ];
+        %tmp.11 = getv ? :ALERT_SOURCE_NONE;
+        symbol [ _currentSource ? 20 8 22 ];
+        putv self :_currentSource %tmp.11;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 21 8 ]
+        %tmp.12 = false;
+        symbol [ _bleStarted ? 21 8 19 ];
+        putv self :_bleStarted %tmp.12;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 22 8 ]
+        %tmp.13 = self;
+        symbol [ logSource %tmp.14 22 8 17 ];
+        %tmp.14 = getv function %tmp.13 :logSource;
+        invoke %tmp.13 %tmp.14();
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_16_26_23_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 15; @symbol_functiondef = [getActiveAlert,15,13,27]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 25; @symbol_functiondef = [startBle,25,13,21]; ]
+    function startBle() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_25_24_32_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 26 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_26_8_28_8_if_stmt:
+        symbol [ _bleStarted %tmp.2 26 12 23 ];
+        %tmp.2 = getv ? :_bleStarted;
+        bf %tmp.2 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_26_8_28_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_26_8_28_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_26_25_28_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 27 12 ]
+        ret ?;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_26_25_28_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_26_8_28_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_26_8_28_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 30 8 ]
+        %tmp.3 = true;
+        symbol [ _bleStarted ? 30 8 19 ];
+        putv self :_bleStarted %tmp.3;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 31 8 ]
+        symbol [ _bleSource %tmp.5 31 8 18 ];
+        %tmp.5 = getv ? :_bleSource;
+        symbol [ start %tmp.6 31 19 24 ];
+        %tmp.6 = getv function %tmp.5 :start;
+        invoke %tmp.5 %tmp.6();
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_25_24_32_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 34; @symbol_functiondef = [getActiveAlert,34,13,27]; ]
     function getActiveAlert() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_15_30_17_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 16 8 ]
-        symbol [ _currentAlert %tmp.2 16 15 28 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_34_30_36_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 35 8 ]
+        symbol [ _currentAlert %tmp.2 35 15 28 ];
         %tmp.2 = getv ? :_currentAlert;
         ret %tmp.2;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_15_30_17_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_34_30_36_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 19; @symbol_functiondef = [getNextAlert,19,13,25]; ]
-    function getNextAlert() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_19_28_29_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 20 8 ]
-        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_19_28_29_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_19_28_29_4_stop" ]
-        %bleAlert.1 = local;
-        symbol [ bleAlert %bleAlert.1 20 12 20 ];
-        symbol [ _bleSource %tmp.2 20 23 33 ];
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 38; @symbol_functiondef = [tick,38,13,17]; @symbol_param<0> = [elapsedMs,38,18,27]; ]
+    function tick(elapsedMs) {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_38_29_40_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 39 8 ]
+        symbol [ _bleSource %tmp.2 39 8 18 ];
         %tmp.2 = getv ? :_bleSource;
-        symbol [ getNextAlert %tmp.3 20 34 46 ];
+        symbol [ tick %tmp.3 39 19 23 ];
+        %tmp.3 = getv function %tmp.2 :tick;
+        %tmp.4 = lgetv %elapsedMs;
+        symbol [ elapsedMs %tmp.4 39 24 33 ];
+        invoke %tmp.2 %tmp.3(%tmp.4);
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_38_29_40_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 42; @symbol_functiondef = [getNextAlert,42,13,25]; ]
+    function getNextAlert() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_42_28_60_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 43 8 ]
+        [ "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_42_28_60_4_start" "_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_42_28_60_4_stop" ]
+        %bleAlert.1 = local;
+        symbol [ bleAlert %bleAlert.1 43 12 20 ];
+        symbol [ _bleSource %tmp.2 43 23 33 ];
+        %tmp.2 = getv ? :_bleSource;
+        symbol [ getNextAlert %tmp.3 43 34 46 ];
         %tmp.3 = getv function %tmp.2 :getNextAlert;
         %tmp.4 = invoke %tmp.2 %tmp.3();
         lputv %bleAlert.1 %tmp.4;
-        symbol [ bleAlert %bleAlert.1 20 12 20 ];
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 22 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_22_8_25_8_if_stmt:
+        symbol [ bleAlert %bleAlert.1 43 12 20 ];
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 45 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_45_8_49_8_if_stmt:
         %tmp.5 = lgetv %bleAlert.1;
-        symbol [ bleAlert %tmp.5 22 12 20 ];
+        symbol [ bleAlert %tmp.5 45 12 20 ];
         %tmp.6 = null;
         %tmp.7 = ne %tmp.5 %tmp.6;
-        bf %tmp.7 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_22_8_25_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_22_8_25_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_22_30_25_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 23 12 ]
+        bf %tmp.7 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_45_8_49_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_45_8_49_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_45_30_49_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 46 12 ]
         %tmp.8 = lgetv %bleAlert.1;
-        symbol [ bleAlert %tmp.8 23 28 36 ];
+        symbol [ bleAlert %tmp.8 46 28 36 ];
         %tmp.9 = as %tmp.8 { (!Null) };
-        symbol [ _currentAlert ? 23 12 25 ];
+        symbol [ _currentAlert ? 46 12 25 ];
         putv self :_currentAlert %tmp.9;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 24 12 ]
-        symbol [ _currentAlert %tmp.11 24 19 32 ];
-        %tmp.11 = getv ? :_currentAlert;
-        ret %tmp.11;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_22_30_25_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_22_8_25_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_22_8_25_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 27 8 ]
-        symbol [ _mockSource %tmp.13 27 24 35 ];
-        %tmp.13 = getv ? :_mockSource;
-        symbol [ getNextAlert %tmp.14 27 36 48 ];
-        %tmp.14 = getv function %tmp.13 :getNextAlert;
-        %tmp.15 = invoke %tmp.13 %tmp.14();
-        symbol [ _currentAlert ? 27 8 21 ];
-        putv self :_currentAlert %tmp.15;
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 28 8 ]
-        symbol [ _currentAlert %tmp.17 28 15 28 ];
-        %tmp.17 = getv ? :_currentAlert;
-        ret %tmp.17;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_19_28_29_4_stop:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 47 12 ]
+        %tmp.10 = self;
+        symbol [ setSource %tmp.11 47 12 21 ];
+        %tmp.11 = getv function %tmp.10 :setSource;
+        symbol [ ALERT_SOURCE_BLE %tmp.13 47 22 38 ];
+        %tmp.13 = getv ? :ALERT_SOURCE_BLE;
+        invoke %tmp.10 %tmp.11(%tmp.13);
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 48 12 ]
+        symbol [ _currentAlert %tmp.15 48 19 32 ];
+        %tmp.15 = getv ? :_currentAlert;
+        ret %tmp.15;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_45_30_49_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_45_8_49_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_45_8_49_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 51 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_51_8_55_8_if_stmt:
+        symbol [ USE_MOCK_FALLBACK %tmp.17 51 12 29 ];
+        %tmp.17 = getv ? :USE_MOCK_FALLBACK;
+        bf %tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_51_8_55_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_51_8_55_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_51_31_55_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 52 12 ]
+        symbol [ _mockSource %tmp.19 52 28 39 ];
+        %tmp.19 = getv ? :_mockSource;
+        symbol [ getNextAlert %tmp.20 52 40 52 ];
+        %tmp.20 = getv function %tmp.19 :getNextAlert;
+        %tmp.21 = invoke %tmp.19 %tmp.20();
+        symbol [ _currentAlert ? 52 12 25 ];
+        putv self :_currentAlert %tmp.21;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 53 12 ]
+        %tmp.22 = self;
+        symbol [ setSource %tmp.23 53 12 21 ];
+        %tmp.23 = getv function %tmp.22 :setSource;
+        symbol [ ALERT_SOURCE_MOCK %tmp.25 53 22 39 ];
+        %tmp.25 = getv ? :ALERT_SOURCE_MOCK;
+        invoke %tmp.22 %tmp.23(%tmp.25);
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 54 12 ]
+        symbol [ _currentAlert %tmp.27 54 19 32 ];
+        %tmp.27 = getv ? :_currentAlert;
+        ret %tmp.27;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_51_31_55_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_51_8_55_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_51_8_55_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 57 8 ]
+        %tmp.28 = null;
+        symbol [ _currentAlert ? 57 8 21 ];
+        putv self :_currentAlert %tmp.28;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 58 8 ]
+        %tmp.29 = self;
+        symbol [ setSource %tmp.30 58 8 17 ];
+        %tmp.30 = getv function %tmp.29 :setSource;
+        symbol [ ALERT_SOURCE_NONE %tmp.32 58 18 35 ];
+        %tmp.32 = getv ? :ALERT_SOURCE_NONE;
+        invoke %tmp.29 %tmp.30(%tmp.32);
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 59 8 ]
+        symbol [ _currentAlert %tmp.34 59 15 28 ];
+        %tmp.34 = getv ? :_currentAlert;
+        ret %tmp.34;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_42_28_60_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 31; @symbol_functiondef = [getBleState,31,13,24]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 62; @symbol_functiondef = [getBleState,62,13,24]; ]
     function getBleState() {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_31_27_33_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 32 8 ]
-        symbol [ _bleSource %tmp.2 32 15 25 ];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_62_27_64_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 63 8 ]
+        symbol [ _bleSource %tmp.2 63 15 25 ];
         %tmp.2 = getv ? :_bleSource;
-        symbol [ getState %tmp.3 32 26 34 ];
+        symbol [ getState %tmp.3 63 26 34 ];
         %tmp.3 = getv function %tmp.2 :getState;
         %tmp.4 = invoke %tmp.2 %tmp.3();
         ret %tmp.4;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_31_27_33_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_62_27_64_4_stop:
     }
-    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 35; @symbol_functiondef = [isHighUrgency,35,13,26]; @symbol_param<0> = [alert,35,27,32]; ]
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 66; @symbol_functiondef = [getBleDiagnosticState,66,13,34]; ]
+    function getBleDiagnosticState() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_66_37_68_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 67 8 ]
+        symbol [ _bleSource %tmp.2 67 15 25 ];
+        %tmp.2 = getv ? :_bleSource;
+        symbol [ getDiagnosticState %tmp.3 67 26 44 ];
+        %tmp.3 = getv function %tmp.2 :getDiagnosticState;
+        %tmp.4 = invoke %tmp.2 %tmp.3();
+        ret %tmp.4;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_66_37_68_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 70; @symbol_functiondef = [getBleStatus,70,13,25]; ]
+    function getBleStatus() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_70_28_72_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 71 8 ]
+        symbol [ _bleSource %tmp.2 71 15 25 ];
+        %tmp.2 = getv ? :_bleSource;
+        symbol [ getBleStatus %tmp.3 71 26 38 ];
+        %tmp.3 = getv function %tmp.2 :getBleStatus;
+        %tmp.4 = invoke %tmp.2 %tmp.3();
+        ret %tmp.4;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_70_28_72_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 74; @symbol_functiondef = [getCurrentSource,74,13,29]; ]
+    function getCurrentSource() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_74_32_76_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 75 8 ]
+        symbol [ _currentSource %tmp.2 75 15 29 ];
+        %tmp.2 = getv ? :_currentSource;
+        ret %tmp.2;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_74_32_76_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 78; @symbol_functiondef = [setSource,78,13,22]; @symbol_param<0> = [source,78,23,29]; ]
+    function setSource(source) {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_78_31_85_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 79 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_79_8_81_8_if_stmt:
+        symbol [ _currentSource %tmp.2 79 12 26 ];
+        %tmp.2 = getv ? :_currentSource;
+        %tmp.3 = lgetv %source;
+        symbol [ source %tmp.3 79 30 36 ];
+        %tmp.4 = eq %tmp.2 %tmp.3;
+        bf %tmp.4 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_79_8_81_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_79_8_81_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_79_38_81_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 80 12 ]
+        ret ?;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_79_38_81_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_79_8_81_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_79_8_81_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 83 8 ]
+        %tmp.5 = lgetv %source;
+        symbol [ source %tmp.5 83 25 31 ];
+        symbol [ _currentSource ? 83 8 22 ];
+        putv self :_currentSource %tmp.5;
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 84 8 ]
+        %tmp.6 = self;
+        symbol [ logSource %tmp.7 84 8 17 ];
+        %tmp.7 = getv function %tmp.6 :logSource;
+        invoke %tmp.6 %tmp.7();
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_78_31_85_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 87; @symbol_functiondef = [logSource,87,13,22]; ]
+    function logSource() {
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_87_25_89_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 88 8 ]
+        symbol [ System %tmp.1 88 8 14 ];
+        %tmp.1 = getm $.Toybox.System;
+        symbol [ println %tmp.2 88 15 22 ];
+        %tmp.2 = getv function %tmp.1 :println;
+        %tmp.3 = "SKYSHIELD source=";
+        symbol [ _currentSource %tmp.5 88 45 59 ];
+        %tmp.5 = getv ? :_currentSource;
+        %tmp.6 = add %tmp.3 %tmp.5;
+        invoke %tmp.1 %tmp.2(%tmp.6);
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_87_25_89_4_stop:
+    }
+    [ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 91; @symbol_functiondef = [isHighUrgency,91,13,26]; @symbol_param<0> = [alert,91,27,32]; ]
     function isHighUrgency(alert) {
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_35_34_41_4_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 36 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_36_8_38_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_91_34_97_4_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 92 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_92_8_94_8_if_stmt:
         %tmp.1 = lgetv %alert;
-        symbol [ alert %tmp.1 36 12 17 ];
+        symbol [ alert %tmp.1 92 12 17 ];
         %tmp.2 = null;
         %tmp.3 = eq %tmp.1 %tmp.2;
-        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_36_8_38_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_36_8_38_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_36_27_38_8_start:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 37 12 ]
+        bf %tmp.3 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_92_8_94_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_92_8_94_8_if_true:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_92_27_94_8_start:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 93 12 ]
         %tmp.4 = false;
         ret %tmp.4;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_36_27_38_8_stop:
-        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_36_8_38_8_if_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_36_8_38_8_if_end:
-[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 40 8 ]
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_40_15_40_76_begin:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_92_27_94_8_stop:
+        goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_92_8_94_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_92_8_94_8_if_end:
+[ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc" 96 8 ]
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_96_15_96_76_begin:
         %tmp.5 = lgetv %alert;
-        symbol [ alert %tmp.5 40 16 21 ];
-        symbol [ riskLevel %tmp.6 40 22 31 ];
+        symbol [ alert %tmp.5 96 16 21 ];
+        symbol [ riskLevel %tmp.6 96 22 31 ];
         %tmp.6 = getv %tmp.5 :riskLevel;
         %tmp.7 = "HIGH";
         %tmp.8 = eq %tmp.6 %tmp.7;
         %tmp.9 = dup %tmp.8;
-        bt %tmp.9 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_40_46_40_76_end;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_40_46_40_76_false:
+        bt %tmp.9 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_96_46_96_76_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_96_46_96_76_false:
         %tmp.10 = lgetv %alert;
-        symbol [ alert %tmp.10 40 47 52 ];
-        symbol [ riskLevel %tmp.11 40 53 62 ];
+        symbol [ alert %tmp.10 96 47 52 ];
+        symbol [ riskLevel %tmp.11 96 53 62 ];
         %tmp.11 = getv %tmp.10 :riskLevel;
         %tmp.12 = "CRITICAL";
         %tmp.13 = eq %tmp.11 %tmp.12;
         %tmp.14 = or %tmp.8 %tmp.13;
         push %tmp.14;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_40_46_40_76_end:
-        %tmp.15 = phi [%tmp.9 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_40_15_40_76_begin] [%tmp.14 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_40_46_40_76_false] [%tmp.15 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_40_46_40_76_end];
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_96_46_96_76_end:
+        %tmp.15 = phi [%tmp.9 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_96_15_96_76_begin] [%tmp.14 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_96_46_96_76_false] [%tmp.15 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_96_46_96_76_end];
         ret %tmp.15;
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_35_34_41_4_stop:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_AlertEngine_mc_91_34_97_4_stop:
     }
 }
-[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 3; ]
+[ @file = "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/AlertEngine.mc"; @line = 1; ]
 <init> {
 }

@@ -21,7 +21,7 @@ Current prototype responsibilities:
 - Track the last five mock alerts in memory
 - Parse canonical SKYSHIELD JSON alert packets into Garmin alert models
 - Prepare a BLE source for the ESP32 `SKYSHIELD-BRIDGE` notify characteristic
-- Show optional simulated direction hints on the ALERT screen
+- Preserve protocol direction fields for future research, but do not display direction on the HUD
 - Simulate BLE connection lifecycle states on the HUD
 - Trigger severity-based vibration patterns
 - Use high-contrast text for the Garmin Enduro 2 MIP display
@@ -91,7 +91,7 @@ The MVP is a watch-only tactical UI prototype. It includes:
 - Compact system-health metadata on the ALERT screen
 - Track stability labels for transient, stable, and locked RF activity
 - Boot splash
-- Rotating mock alerts every 4 seconds
+- BLE validation mode with mock fallback disabled by default
 - ALERT screen for RF situational awareness
 - BANDS screen for technical signal detail
 - HISTORY screen implementation retained for manual/debug use
@@ -110,7 +110,7 @@ After the boot splash, the app automatically cycles screens:
 - `ALERT`: 8 seconds
 - `BANDS`: 1.5 seconds
 
-Mock alerts continue rotating every 4 seconds. The screen cycle and alert rotation use separate lightweight elapsed-time counters so ALERT remains the primary field view and BANDS remains the secondary technical view.
+The alert poll interval remains 4 seconds. In BLE validation mode, the HUD updates from received BLE packets only. If mock fallback is enabled for simulator/demo work, mock alerts rotate on that same interval. The screen cycle and alert polling use separate lightweight elapsed-time counters so ALERT remains the primary field view and BANDS remains the secondary technical view.
 
 If a new mock alert arrives while BANDS is visible, the HUD returns to ALERT. The HISTORY screen remains implemented in code, but it is not part of the automatic field rotation.
 
@@ -150,9 +150,8 @@ The ALERT screen top-to-bottom order is:
 3. threat type
 4. confidence
 5. band
-6. direction
-7. signal strength
-8. action state
+6. signal strength
+7. action state
 
 The metadata remains visually secondary despite appearing first. `MONITOR` is intentionally calm and compact. Confidence is displayed on the ALERT screen so the HUD does not imply absolute certainty.
 
@@ -220,7 +219,41 @@ Implemented BLE lifecycle states:
 - `DISCONNECTED`
 - `SIGNAL_LOST`
 
-The Garmin app registers the SKYSHIELD service profile, scans for `SKYSHIELD-BRIDGE`, pairs with the matching peripheral, discovers the alert service and characteristic, writes the CCCD to enable notifications, decodes UTF-8 notification payloads, and passes each JSON string to `AlertParser.parse()`.
+The Garmin app registers the SKYSHIELD service profile, scans for peripherals advertising the SKYSHIELD service UUID, pairs with the matching peripheral, discovers the alert service and characteristic, writes the CCCD to enable notifications, decodes UTF-8 notification payloads, and passes each JSON string to `AlertParser.parse()`.
+
+## Source Modes
+
+`AlertEngine` exposes the current alert source:
+
+- `BLE`: a parsed ESP32 BLE packet is currently driving the HUD
+- `MOCK`: simulator/demo fallback is driving the HUD
+- `NONE`: no BLE packet is available and mock fallback is disabled
+
+`USE_MOCK_FALLBACK` is defined in `source/AlertEngine.mc` and defaults to `false` for real BLE validation. Simulator/dev demo can set it to `true` to restore the rotating mock carousel.
+
+The ALERT screen shows a tiny source label:
+
+- `BLE SCAN`
+- `BLE FOUND`
+- `BLE CONN`
+- `BLE SVC`
+- `BLE CHAR`
+- `BLE SUB`
+- `BLE RX`
+- `BLE ERR`
+- `MOCK`
+
+These diagnostic BLE labels are temporary for real Enduro 2 validation. They show the current BLE pipeline stage in the same position where `NO BLE` previously appeared.
+
+The bottom of the HUD also shows a simplified BLE status string:
+
+- `BLE OFF`: BLE source is stopped or not initialized
+- `SCAN`: scanning has started
+- `FOUND`: `SKYSHIELD-BRIDGE` was discovered
+- `CONNECT`: pairing/connection or service/characteristic discovery is underway
+- `SUBSCRIBE`: CCCD notification enable was requested or completed
+- `RX`: at least one valid notification packet was received and parsed
+- `ERROR`: BLE exception, disconnect, missing service/characteristic/descriptor, decode failure, or parse failure
 
 ## BLE Test Plan
 
@@ -234,7 +267,7 @@ Simulator-oriented test:
 SKYSHIELD BLE: scan started for SKYSHIELD-BRIDGE
 ```
 
-This confirms the BLE source initializes while mock alerts remain the safe fallback. BLE scanning and peripheral connection usually require real hardware; simulator behavior depends on the installed Connect IQ SDK and simulator BLE support.
+With `USE_MOCK_FALLBACK = false`, the simulator should show a BLE diagnostic state such as `BLE SCAN` plus `SCAN` unless a real BLE packet is received. BLE scanning and peripheral connection usually require real hardware; simulator behavior depends on the installed Connect IQ SDK and simulator BLE support. Set `USE_MOCK_FALLBACK = true` only for simulator/demo UI work.
 
 Real watch and ESP32 test:
 
@@ -245,25 +278,33 @@ Real watch and ESP32 test:
 
 ```text
 SKYSHIELD BLE: scan started for SKYSHIELD-BRIDGE
-SKYSHIELD BLE: peripheral found: SKYSHIELD-BRIDGE
-SKYSHIELD BLE: connecting
+SKYSHIELD BLE: BLE found peripheral name=<name-or-none>
+SKYSHIELD BLE: BLE advertised services 9f4d0001-7c31-4f9b-9a4b-8f4c0f000001
+SKYSHIELD BLE: BLE matched SKYSHIELD service
+SKYSHIELD BLE: BLE connecting
 SKYSHIELD BLE: connected
 SKYSHIELD BLE: service discovered
 SKYSHIELD BLE: characteristic discovered
 SKYSHIELD BLE: subscribe requested
-SKYSHIELD BLE: subscribed
+SKYSHIELD BLE: BLE subscribed
+SKYSHIELD BLE: BLE RX packet
 SKYSHIELD BLE: packet received: {...}
 SKYSHIELD BLE: parser success
 ```
 
-5. Verify the HUD updates from received ESP32 JSON. If BLE is unavailable or no packet has arrived, the app continues with mock alerts.
+5. With ESP32 unplugged or out of range, verify the HUD shows `BLE SCAN` and `SCAN`.
+6. With ESP32 advertising and sending notifications, verify the HUD advances through `BLE FOUND`, `BLE CONN`, `BLE SVC`, `BLE CHAR`, `BLE SUB`, then `BLE RX`.
+7. When `BLE RX` is shown, alert fields should update from received ESP32 JSON.
 
 Troubleshooting:
 
-- If the watch never finds the bridge, confirm the ESP32 serial log says `BLE advertising as SKYSHIELD-BRIDGE`.
+- If the watch never finds the bridge, confirm the ESP32 serial log says `BLE advertising as SKYSHIELD-BRIDGE` and the scanner logs include service UUID `9f4d0001-7c31-4f9b-9a4b-8f4c0f000001`.
 - If the watch connects but receives no packets, confirm notifications are enabled on characteristic `9f4d0002-7c31-4f9b-9a4b-8f4c0f000001`.
 - If parsing fails, compare the ESP32 Serial JSON with `protocol/skyshield-alert.schema.json`.
-- If BLE disconnects, `BleAlertSource` enters `SIGNAL_LOST` and restarts scanning while mock alerts continue as fallback.
+- If BLE remains at `BLE SCAN` for more than 20 seconds, the app logs `scan timeout` and continues scanning.
+- If BLE reaches `BLE SUB` but no packet arrives within 20 seconds, the app logs `notification timeout after subscribe` and keeps showing `BLE SUB`.
+- If BLE errors before notifications, the HUD shows `BLE ERR`.
+- If BLE disconnects, `BleAlertSource` enters `SIGNAL_LOST` and restarts scanning. With `USE_MOCK_FALLBACK = false`, the HUD should return to `BLE SCAN` and `SCAN`.
 
 ## Simulated BLE Lifecycle
 
@@ -306,13 +347,13 @@ Those responsibilities belong to future RF source adapters, detector hardware, o
 ## Current Limitations
 
 - Mock alert JSON strings are hardcoded in `source/MockAlertSource.mc`.
-- BLE integration is intentionally not implemented.
+- BLE validation is implemented; real watch testing is required.
 - Alert JSON schema validation is not implemented on the watch.
 - Vibration behavior must be validated on Garmin hardware or simulator support.
 - Settings are in-memory defaults only and are not user-editable yet.
 - No sound behavior exists. `silentMode` is reserved for future sound-related logic.
 - RSSI-like signal strength is not precise physical distance.
-- Direction hints are simulated/experimental until validated.
+- Direction fields are parsed for future compatibility but are not displayed on the Garmin HUD until real direction-finding hardware is validated.
 - Classification confidence is heuristic in the MVP.
 
 ## Validation Roadmap

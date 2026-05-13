@@ -69,7 +69,7 @@ class SkyShieldView extends WatchUi.View {
         _showSplash = true;
         _criticalPulseOn = true;
         _connectionState.reset();
-        _history.addAlert(_alert);
+        addAlertToHistory(_alert);
         triggerVibrationIfNeeded();
 
         if (_timer == null) {
@@ -96,6 +96,7 @@ class SkyShieldView extends WatchUi.View {
                 _screenElapsedMs = 0;
                 _showSplash = false;
                 _currentScreen = SCREEN_ALERT;
+                _engine.startBle();
             }
 
             WatchUi.requestUpdate();
@@ -106,6 +107,7 @@ class SkyShieldView extends WatchUi.View {
         updatePacketAge();
         _screenElapsedMs += TIMER_INTERVAL_MS;
         _criticalPulseElapsedMs += TIMER_INTERVAL_MS;
+        _engine.tick(TIMER_INTERVAL_MS);
 
         updateCriticalPulse();
         updateAlertData();
@@ -140,9 +142,15 @@ class SkyShieldView extends WatchUi.View {
             _packetAgeMs = 0;
             _alert = _engine.getNextAlert();
             updateTrackStability(_alert);
-            _history.addAlert(_alert);
+            addAlertToHistory(_alert);
             triggerVibrationIfNeeded();
             showAlertForNewAlert();
+        }
+    }
+
+    function addAlertToHistory(alert) {
+        if (alert != null) {
+            _history.addAlert(alert);
         }
     }
 
@@ -264,7 +272,9 @@ class SkyShieldView extends WatchUi.View {
 
         if (_alert == null) {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-            drawCentered(dc, width, 112, _formatter.formatTrackState("SCAN"), Graphics.FONT_TINY);
+            drawCentered(dc, width, 88, getSourceLabel(), Graphics.FONT_TINY);
+            drawCentered(dc, width, 122, _formatter.formatTrackState("SCAN"), Graphics.FONT_TINY);
+            drawBleStatusFooter(dc, width);
             return;
         }
 
@@ -334,21 +344,37 @@ class SkyShieldView extends WatchUi.View {
         drawCentered(dc, width, y, _formatter.formatBand(_alert.band), Graphics.FONT_TINY);
         y += 27;
 
-        var directionLabel = _formatter.formatDirection(_alert.directionLabel);
-
-        if (directionLabel != "") {
-            drawCentered(dc, width, y, directionLabel, Graphics.FONT_TINY);
-            y += 27;
-        }
-
         drawCentered(dc, width, y, _formatter.formatStrength(_alert.distanceLabel), Graphics.FONT_TINY);
 
         drawActionState(dc, width, 214);
+        drawBleStatusFooter(dc, width);
+    }
+
+    function drawBleStatusFooter(dc, width) {
+        dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, dc.getHeight() - 30, _engine.getBleStatus(), Graphics.FONT_TINY);
     }
 
     function drawHealthMetadata(dc, width) {
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, 30, _formatter.formatTrackState(getSystemHealthState()), Graphics.FONT_TINY);
+        drawCentered(dc, width, 24, getSourceLabel(), Graphics.FONT_TINY);
+        drawCentered(dc, width, 38, _formatter.formatTrackState(getSystemHealthState()), Graphics.FONT_TINY);
+    }
+
+    function getSourceLabel() {
+        if (_engine.getCurrentSource() == ALERT_SOURCE_NONE) {
+            return _engine.getBleDiagnosticState();
+        }
+
+        if (_engine.getCurrentSource() == ALERT_SOURCE_BLE) {
+            return _engine.getBleDiagnosticState();
+        }
+
+        if (_engine.getCurrentSource() == ALERT_SOURCE_MOCK) {
+            return "MOCK";
+        }
+
+        return "NO BLE";
     }
 
     function getPacketAgeLabel() {
@@ -526,10 +552,6 @@ class SkyShieldView extends WatchUi.View {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y + 2, action, Graphics.FONT_TINY);
-    }
-
-    function getDirectionLabel() {
-        return _formatter.formatDirection(_alert.directionLabel);
     }
 
     function hasAlertValue(value, expected) {
