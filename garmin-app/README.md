@@ -16,6 +16,8 @@ Current prototype responsibilities:
 - Rotate between mock FPV, DJI, and unknown threat alerts
 - Alternate automatically between ALERT and BANDS screens
 - Display threat type, RF activity level, band, signal-strength label, confidence, action state, and active bands
+- Translate protocol terminology into credibility-safe RF awareness wording on the HUD
+- Show lightweight track stability and packet freshness metadata
 - Track the last five mock alerts in memory
 - Parse canonical SKYSHIELD JSON alert packets into Garmin alert models
 - Show optional simulated direction hints on the ALERT screen
@@ -43,6 +45,7 @@ garmin-app/
     SkyShieldView.mc
     AlertModel.mc
     AlertParser.mc
+    DisplayFormatter.mc
     AlertEngine.mc
     TacticalActionEngine.mc
     AlertSource.mc
@@ -83,7 +86,9 @@ The MVP is a watch-only tactical UI prototype. It includes:
 - Monochrome-safe tactical alert banner
 - RF action state on the ALERT screen for immediate field awareness
 - Centralized tactical action mapping in `TacticalActionEngine`
+- Centralized HUD label mapping in `DisplayFormatter`
 - Compact system-health metadata on the ALERT screen
+- Track stability labels for transient, stable, and locked RF activity
 - Boot splash
 - Rotating mock alerts every 4 seconds
 - ALERT screen for RF situational awareness
@@ -125,37 +130,54 @@ The HISTORY screen displays the newest records first using compact monochrome ro
 `TacticalActionEngine` keeps the bottom action label credibility-safe for the MVP:
 
 - Any active RF packet: `MONITOR`
-- Connection `SIGNAL_LOST`: `NO RF LINK`
 
-The protocol still uses `CRITICAL`, `NEAR`, `MID`, and `FAR`, but the Garmin HUD translates these user-facing labels:
+The protocol still uses `CRITICAL`, `NEAR`, `MID`, `FAR`, and `MULTI`, but the Garmin HUD translates these user-facing labels through `DisplayFormatter`:
 
 - `CRITICAL`: `ELEVATED`
 - `NEAR`: `STRONG`
 - `MID`: `MODERATE`
 - `FAR`: `WEAK`
+- `MULTI`: `MULTI RF`
 
-This keeps the primary ALERT screen focused on RF situational awareness, while BANDS remains available for supporting detail. HISTORY is retained in code for future manual/debug access but is not part of the automatic field cycle.
+`DisplayFormatter` is the single source of truth for user-facing HUD labels. Parser and protocol enums remain unchanged internally. This keeps the primary ALERT screen focused on RF situational awareness, while BANDS remains available for supporting detail. HISTORY is retained in code for future manual/debug access but is not part of the automatic field cycle.
 
-The ALERT screen visual priority is:
+The ALERT screen top-to-bottom order is:
 
-1. action
-2. severity
+1. system-health metadata, tiny and gray
+2. RF activity level
 3. threat type
-4. signal strength
+4. confidence
 5. band
 6. direction
-7. confidence
-8. system-health metadata
+7. signal strength
+8. action state
 
-`MONITOR` is intentionally calm and compact. Confidence is displayed on the ALERT screen so the HUD does not imply absolute certainty.
+The metadata remains visually secondary despite appearing first. `MONITOR` is intentionally calm and compact. Confidence is displayed on the ALERT screen so the HUD does not imply absolute certainty.
 
 ## System Health Metadata
 
 The ALERT screen includes a tiny gray metadata line for operator trust:
 
-- RF activity: `TRACK` for recent packets, `SCAN` after stale packets, `IDLE` after a longer quiet period.
+- `TRANSIENT`: short-duration or low-confidence RF activity
+- `STABLE`: repeated same threat and band
+- `LOCKED`: repeated same threat and band with confidence of 90% or higher
+- `STALE`: packet freshness exceeds 10 seconds
+- `SCAN`: no active alert model is available
 
-Packet age and BLE health are still tracked internally for future display, but the ALERT screen currently renders only the RF activity state to avoid clutter on the round Garmin display. This line is intentionally subtle and does not compete with the main alert or action state.
+BLE connection state is still simulated internally for future integration, but the ALERT screen does not render long BLE strings. This keeps the metadata compact on the round Garmin display and avoids presenting the MVP as a validated detector.
+
+## Severity Scoring
+
+`DisplayFormatter` resolves display severity from the parsed protocol severity plus RF context:
+
+- parsed `CRITICAL` remains user-facing `ELEVATED`
+- parsed `HIGH` remains `HIGH`
+- `MULTI` band with confidence of 70% or higher resolves to `ELEVATED`
+- `LOCKED` strong RF activity resolves to `ELEVATED`
+- `LOCKED` activity never resolves to `LOW`
+- FPV with confidence of 80% or higher resolves to `HIGH`
+- DJI with confidence of 70% or higher resolves to `MEDIUM`
+- `LOW` is reserved for weak, low-confidence, or fallback RF activity
 
 ## Protocol Parser
 

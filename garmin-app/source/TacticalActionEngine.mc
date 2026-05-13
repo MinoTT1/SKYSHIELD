@@ -5,14 +5,12 @@ class TacticalActionEngine {
     }
 
     function getAction(alert, connectionState) {
-        if ((connectionState != null) && connectionState.isSignalLost()) {
-            return "NO RF LINK";
-        }
-
         if (alert == null) {
             return "MONITOR";
         }
 
+        // Until classification is validated, the HUD should recommend monitoring
+        // instead of implying a confirmed physical threat or command action.
         return "MONITOR";
     }
 }
