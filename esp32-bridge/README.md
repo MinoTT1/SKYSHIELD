@@ -2,7 +2,7 @@
 
 This folder contains the initial ESP32-S3 firmware scaffold for the SKYSHIELD RF telemetry bridge.
 
-The current firmware is an Arduino/PlatformIO-compatible simulated-alert prototype. It does not implement BLE or real RF detection yet.
+The current firmware is an Arduino/PlatformIO-compatible simulated-alert prototype. It exposes simulated SKYSHIELD alert packets over Serial and a first BLE GATT notify characteristic. It does not implement real RF detection yet.
 
 ## Purpose
 
@@ -46,7 +46,7 @@ On boot, the firmware prints:
 SKYSHIELD ESP32 Bridge starting...
 ```
 
-Then every 4 seconds it rotates through compact JSON alerts over Serial:
+Then every 4 seconds it rotates through compact JSON alerts over Serial and updates the BLE alert characteristic with the same payload:
 
 ```json
 {"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87,"bands":{"band_1_2":"LOW","band_2_4":"LOW","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":1}
@@ -54,13 +54,50 @@ Then every 4 seconds it rotates through compact JSON alerts over Serial:
 {"threat":"UNKNOWN","severity":"CRITICAL","band":"MULTI","distance":"NEAR","confidence":94,"bands":{"band_1_2":"HIGH","band_2_4":"MED","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":3}
 ```
 
-This simulated mode is intended to validate packet shape, freshness, and timing before BLE transport is added.
+This simulated mode is intended to validate packet shape, freshness, and timing before real RF inputs are added.
 
 ## BLE Server Role
 
-The ESP32-S3 should operate as the BLE server/peripheral. The Garmin Enduro 2 app should connect as the BLE client/central and subscribe to alert notifications.
+The ESP32-S3 operates as the BLE server/peripheral. The Garmin Enduro 2 app will later connect as the BLE client/central and subscribe to alert notifications.
 
-Next step: implement a BLE GATT server that exposes the current SKYSHIELD RF telemetry packet through a notify characteristic.
+Current BLE settings:
+
+- Advertised name: `SKYSHIELD-BRIDGE`
+- Service UUID: `9f4d0001-7c31-4f9b-9a4b-8f4c0f000001`
+- Alert characteristic UUID: `9f4d0002-7c31-4f9b-9a4b-8f4c0f000001`
+- Alert characteristic properties: `READ`, `NOTIFY`
+- Alert payload: compact canonical SKYSHIELD JSON, identical to the Serial payload
+
+The status and config characteristics described in `docs/ble-gatt-design.md` are reserved for a later firmware step.
+
+## BLE Test Instructions
+
+Use a BLE scanner app such as nRF Connect or LightBlue:
+
+1. Build and upload the firmware with PlatformIO.
+2. Open the serial monitor at `115200`.
+3. Confirm the boot logs include:
+
+```text
+SKYSHIELD ESP32 Bridge starting...
+BLE advertising as SKYSHIELD-BRIDGE
+```
+
+4. In the BLE scanner app, scan for `SKYSHIELD-BRIDGE`.
+5. Connect to the device.
+6. Open service `9f4d0001-7c31-4f9b-9a4b-8f4c0f000001`.
+7. Open characteristic `9f4d0002-7c31-4f9b-9a4b-8f4c0f000001`.
+8. Enable notifications.
+9. Verify a new compact JSON alert arrives about every 4 seconds.
+
+Serial should also show connection events:
+
+```text
+BLE client connected
+BLE client disconnected
+```
+
+The BLE payload and Serial payload should match for each alert sequence.
 
 ## Future RF Source Inputs
 
@@ -79,13 +116,15 @@ Future compatibility targets include Chuyka, Tsukorok, SkyDroid, and custom RF d
 - Real RF scanning
 - Validated direction finding
 - Production detector adapters
-- BLE GATT transport in this first scaffold
+- Garmin BLE client parsing
 - Mesh networking
 - Encrypted transport policy
 
 ## Limitations
 
-- The scaffold prints simulated packets only.
+- The scaffold emits simulated packets only.
+- BLE is unencrypted and intended for MVP validation only.
+- Only the alert characteristic is implemented.
 - Signal-strength categories are not physical distance.
 - Classification confidence is heuristic until validated.
 - False positives and environment-specific RF behavior must be measured later.

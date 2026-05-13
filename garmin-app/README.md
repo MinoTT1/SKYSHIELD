@@ -4,7 +4,7 @@ This folder contains the Garmin Connect IQ MVP prototype for SKYSHIELD.
 
 Target device: Garmin Enduro 2.
 
-The prototype uses hardcoded rotating mock alert data. It does not use BLE, RF detection, detector adapters, or live SKYSHIELD protocol parsing yet.
+The prototype uses hardcoded rotating mock alert data with a first Garmin BLE source skeleton prepared for ESP32 notifications. It does not use real RF detection or detector adapters yet.
 
 ## MVP Role
 
@@ -20,6 +20,7 @@ Current prototype responsibilities:
 - Show lightweight track stability and packet freshness metadata
 - Track the last five mock alerts in memory
 - Parse canonical SKYSHIELD JSON alert packets into Garmin alert models
+- Prepare a BLE source for the ESP32 `SKYSHIELD-BRIDGE` notify characteristic
 - Show optional simulated direction hints on the ALERT screen
 - Simulate BLE connection lifecycle states on the HUD
 - Trigger severity-based vibration patterns
@@ -96,6 +97,7 @@ The MVP is a watch-only tactical UI prototype. It includes:
 - HISTORY screen implementation retained for manual/debug use
 - Garmin-side parser for the canonical SKYSHIELD JSON packet
 - AlertSource abstraction for swapping mock data with future BLE data
+- BLE source with Connect IQ scan/connect/subscribe/notification wiring and mock fallback
 - Simulated BLE lifecycle state tracking
 - Elevated RF activity banner pulse
 - Severity-based vibration patterns
@@ -189,23 +191,83 @@ Current mock alerts are stored as local JSON strings in `MockAlertSource` and pa
 
 `AlertEngine` depends on an AlertSource-style object with a simple `getNextAlert()` method.
 
-Current flow:
+Current runtime flow:
+
+```text
+BleAlertSource -> AlertParser -> AlertModel -> AlertEngine -> SkyShieldView
+     |
+     +-- falls back to MockAlertSource when no BLE packet is available
+```
+
+Mock fallback flow:
 
 ```text
 MockAlertSource -> AlertParser -> AlertModel -> AlertEngine -> SkyShieldView
 ```
 
-Future BLE flow:
+`BleAlertSource` contains the fixed ESP32 BLE contract and Connect IQ central/client flow:
+
+- Advertised name: `SKYSHIELD-BRIDGE`
+- Service UUID: `9f4d0001-7c31-4f9b-9a4b-8f4c0f000001`
+- Alert characteristic UUID: `9f4d0002-7c31-4f9b-9a4b-8f4c0f000001`
+- Payload: UTF-8 canonical SKYSHIELD JSON
+
+Implemented BLE lifecycle states:
+
+- `SCANNING`
+- `CONNECTING`
+- `CONNECTED`
+- `DISCONNECTED`
+- `SIGNAL_LOST`
+
+The Garmin app registers the SKYSHIELD service profile, scans for `SKYSHIELD-BRIDGE`, pairs with the matching peripheral, discovers the alert service and characteristic, writes the CCCD to enable notifications, decodes UTF-8 notification payloads, and passes each JSON string to `AlertParser.parse()`.
+
+## BLE Test Plan
+
+Simulator-oriented test:
+
+1. Build and run the Garmin app in the Connect IQ simulator.
+2. Confirm the app still displays rotating mock alerts.
+3. Check simulator logs for:
 
 ```text
-BleAlertSource -> AlertParser -> AlertModel -> AlertEngine -> SkyShieldView
+SKYSHIELD BLE: scan started for SKYSHIELD-BRIDGE
 ```
 
-`BleAlertSource` is a placeholder only. It documents where the future ESP32 BLE notify payload will be received and passed into `AlertParser.parse()`.
+This confirms the BLE source initializes while mock alerts remain the safe fallback. BLE scanning and peripheral connection usually require real hardware; simulator behavior depends on the installed Connect IQ SDK and simulator BLE support.
+
+Real watch and ESP32 test:
+
+1. Flash the ESP32 bridge firmware.
+2. Confirm the ESP32 advertises as `SKYSHIELD-BRIDGE`.
+3. Install/run the Garmin app on Enduro 2 or fenix7.
+4. Watch Garmin logs for:
+
+```text
+SKYSHIELD BLE: scan started for SKYSHIELD-BRIDGE
+SKYSHIELD BLE: peripheral found: SKYSHIELD-BRIDGE
+SKYSHIELD BLE: connecting
+SKYSHIELD BLE: connected
+SKYSHIELD BLE: service discovered
+SKYSHIELD BLE: characteristic discovered
+SKYSHIELD BLE: subscribe requested
+SKYSHIELD BLE: subscribed
+SKYSHIELD BLE: packet received: {...}
+SKYSHIELD BLE: parser success
+```
+
+5. Verify the HUD updates from received ESP32 JSON. If BLE is unavailable or no packet has arrived, the app continues with mock alerts.
+
+Troubleshooting:
+
+- If the watch never finds the bridge, confirm the ESP32 serial log says `BLE advertising as SKYSHIELD-BRIDGE`.
+- If the watch connects but receives no packets, confirm notifications are enabled on characteristic `9f4d0002-7c31-4f9b-9a4b-8f4c0f000001`.
+- If parsing fails, compare the ESP32 Serial JSON with `protocol/skyshield-alert.schema.json`.
+- If BLE disconnects, `BleAlertSource` enters `SIGNAL_LOST` and restarts scanning while mock alerts continue as fallback.
 
 ## Simulated BLE Lifecycle
 
-The simulated connection state still runs internally, but the top metadata label is not rendered on the ALERT screen. The HUD prioritizes RF activity, signal strength, confidence, and action state over connection plumbing.
+The simulated connection state still runs internally for the HUD prototype, but real BLE state is also exposed from `AlertEngine.getBleState()`. The top metadata label is not rendered on the ALERT screen. The HUD prioritizes RF activity, signal strength, confidence, and action state over connection plumbing.
 
 Current simulated flow:
 
