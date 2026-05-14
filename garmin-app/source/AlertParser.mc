@@ -81,11 +81,23 @@ class AlertParser {
             return "FPV";
         }
 
+        if (hasToken(jsonString, "\"t\":\"F\"")) {
+            return "FPV";
+        }
+
         if (hasToken(jsonString, "\"threat\":\"DJI\"")) {
             return "DJI";
         }
 
+        if (hasToken(jsonString, "\"t\":\"D\"")) {
+            return "DJI";
+        }
+
         if (hasToken(jsonString, "\"threat\":\"UNKNOWN\"")) {
+            return "UNKNOWN";
+        }
+
+        if (hasToken(jsonString, "\"t\":\"U\"")) {
             return "UNKNOWN";
         }
 
@@ -97,7 +109,15 @@ class AlertParser {
             return "LOW";
         }
 
+        if (hasToken(jsonString, "\"s\":\"L\"")) {
+            return "LOW";
+        }
+
         if (hasToken(jsonString, "\"severity\":\"MEDIUM\"")) {
+            return "MEDIUM";
+        }
+
+        if (hasToken(jsonString, "\"s\":\"M\"")) {
             return "MEDIUM";
         }
 
@@ -105,7 +125,15 @@ class AlertParser {
             return "HIGH";
         }
 
+        if (hasToken(jsonString, "\"s\":\"H\"")) {
+            return "HIGH";
+        }
+
         if (hasToken(jsonString, "\"severity\":\"CRITICAL\"")) {
+            return "CRITICAL";
+        }
+
+        if (hasToken(jsonString, "\"s\":\"C\"")) {
             return "CRITICAL";
         }
 
@@ -117,7 +145,15 @@ class AlertParser {
             return "1.2GHz";
         }
 
+        if (hasToken(jsonString, "\"b\":\"12\"")) {
+            return "1.2GHz";
+        }
+
         if (hasToken(jsonString, "\"band\":\"2.4GHz\"")) {
+            return "2.4GHz";
+        }
+
+        if (hasToken(jsonString, "\"b\":\"24\"")) {
             return "2.4GHz";
         }
 
@@ -125,11 +161,23 @@ class AlertParser {
             return "3.3GHz";
         }
 
+        if (hasToken(jsonString, "\"b\":\"33\"")) {
+            return "3.3GHz";
+        }
+
         if (hasToken(jsonString, "\"band\":\"5.8GHz\"")) {
             return "5.8GHz";
         }
 
+        if (hasToken(jsonString, "\"b\":\"58\"")) {
+            return "5.8GHz";
+        }
+
         if (hasToken(jsonString, "\"band\":\"MULTI\"")) {
+            return "MULTI";
+        }
+
+        if (hasToken(jsonString, "\"b\":\"M\"")) {
             return "MULTI";
         }
 
@@ -141,11 +189,23 @@ class AlertParser {
             return "FAR";
         }
 
+        if (hasToken(jsonString, "\"r\":\"F\"")) {
+            return "FAR";
+        }
+
         if (hasToken(jsonString, "\"distance\":\"MID\"")) {
             return "MID";
         }
 
+        if (hasToken(jsonString, "\"r\":\"M\"")) {
+            return "MID";
+        }
+
         if (hasToken(jsonString, "\"distance\":\"NEAR\"")) {
+            return "NEAR";
+        }
+
+        if (hasToken(jsonString, "\"r\":\"N\"")) {
             return "NEAR";
         }
 
@@ -179,6 +239,14 @@ class AlertParser {
             }
 
             if (hasToken(jsonString, "\"confidence\":" + value + "}")) {
+                return value;
+            }
+
+            if (hasToken(jsonString, "\"c\":" + value + ",")) {
+                return value;
+            }
+
+            if (hasToken(jsonString, "\"c\":" + value + "}")) {
                 return value;
             }
         }

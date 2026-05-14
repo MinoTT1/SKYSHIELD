@@ -1,8 +1,5 @@
 #include <Arduino.h>
-#include <BLE2902.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <BLEUtils.h>
+#include <NimBLEDevice.h>
 
 #include "MockAlertProvider.h"
 
@@ -15,62 +12,89 @@ const char* SKYSHIELD_SERVICE_UUID = "9f4d0001-7c31-4f9b-9a4b-8f4c0f000001";
 const char* ALERT_CHARACTERISTIC_UUID = "9f4d0002-7c31-4f9b-9a4b-8f4c0f000001";
 
 uint32_t lastAlertMs = 0;
+uint32_t bleConnectedAtMs = 0;
 uint32_t sequence = 1;
 bool bleClientConnected = false;
-BLECharacteristic* alertCharacteristic = nullptr;
+bool bleClientSubscribed = false;
+NimBLECharacteristic* alertCharacteristic = nullptr;
 
-class SkyShieldServerCallbacks : public BLEServerCallbacks {
+class SkyShieldServerCallbacks : public NimBLEServerCallbacks {
 public:
-    void onConnect(BLEServer* server) override {
+    void onConnect(NimBLEServer* server) override {
         (void)server;
         bleClientConnected = true;
+        bleClientSubscribed = false;
+        bleConnectedAtMs = millis();
         Serial.println("BLE client connected");
     }
 
-    void onDisconnect(BLEServer* server) override {
+    void onDisconnect(NimBLEServer* server) override {
         (void)server;
         bleClientConnected = false;
+        bleClientSubscribed = false;
         Serial.println("BLE client disconnected");
-        BLEDevice::startAdvertising();
+        NimBLEDevice::startAdvertising();
+    }
+};
+
+class SkyShieldAlertCallbacks : public NimBLECharacteristicCallbacks {
+public:
+    void onSubscribe(NimBLECharacteristic* characteristic, ble_gap_conn_desc* desc, uint16_t subValue) override {
+        (void)characteristic;
+        (void)desc;
+        bleClientSubscribed = subValue > 0;
+
+        if (bleClientSubscribed) {
+            Serial.println("BLE client subscribed");
+        } else {
+            Serial.println("BLE client unsubscribed");
+        }
     }
 };
 
 void initBle() {
-    BLEDevice::init(BLE_DEVICE_NAME);
-
-    BLEServer* server = BLEDevice::createServer();
+    NimBLEDevice::init(BLE_DEVICE_NAME);
+    NimBLEServer* server = NimBLEDevice::createServer();
     server->setCallbacks(new SkyShieldServerCallbacks());
 
-    BLEService* service = server->createService(SKYSHIELD_SERVICE_UUID);
+    NimBLEService* service = server->createService(SKYSHIELD_SERVICE_UUID);
 
     alertCharacteristic = service->createCharacteristic(
         ALERT_CHARACTERISTIC_UUID,
-        BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY
+        NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY
     );
-    alertCharacteristic->addDescriptor(new BLE2902());
+    alertCharacteristic->setCallbacks(new SkyShieldAlertCallbacks());
 
     service->start();
 
-    BLEAdvertising* advertising = BLEDevice::getAdvertising();
+    NimBLEAdvertising* advertising = NimBLEDevice::getAdvertising();
     advertising->addServiceUUID(SKYSHIELD_SERVICE_UUID);
     advertising->setScanResponse(true);
-    advertising->setMinPreferred(0x06);
-    advertising->setMinPreferred(0x12);
 
-    BLEDevice::startAdvertising();
+    NimBLEDevice::startAdvertising();
     Serial.println("BLE advertising as SKYSHIELD-BRIDGE");
 }
 
 void publishAlert(const SkyShieldAlert& alert) {
-    const String json = alertToJson(alert, sequence);
+    const String fullJson = alertToJson(alert, sequence);
+    const String bleJson = alertToBleJson(alert);
 
-    Serial.println(json);
+    Serial.print("SERIAL FULL: ");
+    Serial.println(fullJson);
+    Serial.print("BLE TX COMPACT: ");
+    Serial.println(bleJson);
 
     if (alertCharacteristic != nullptr) {
-        alertCharacteristic->setValue(json.c_str());
+        alertCharacteristic->setValue(
+            reinterpret_cast<uint8_t*>(const_cast<char*>(bleJson.c_str())),
+            bleJson.length()
+        );
+        Serial.print("BLE TX len=");
+        Serial.println(bleJson.length());
 
-        if (bleClientConnected) {
+        if (bleClientConnected && bleClientSubscribed && ((millis() - bleConnectedAtMs) >= 1000)) {
             alertCharacteristic->notify();
+            Serial.println("BLE notify sent");
         }
     }
 

@@ -2,7 +2,7 @@
 
 This folder contains the initial ESP32-S3 firmware scaffold for the SKYSHIELD RF telemetry bridge.
 
-The current firmware is an Arduino/PlatformIO-compatible simulated-alert prototype. It exposes simulated SKYSHIELD alert packets over Serial and a first BLE GATT notify characteristic. It does not implement real RF detection yet.
+The current firmware is an Arduino/PlatformIO-compatible simulated-alert prototype. It exposes simulated SKYSHIELD alert packets over Serial and a first NimBLE-based BLE GATT notify characteristic. It does not implement real RF detection yet.
 
 ## Purpose
 
@@ -22,6 +22,7 @@ Expected long-term responsibilities:
 - ESP32-S3 development board
 - PlatformIO
 - Arduino framework for ESP32
+- NimBLE-Arduino, installed automatically by PlatformIO from `platformio.ini`
 - USB serial monitor at `115200`
 
 For first hardware setup, use the step-by-step bring-up guide:
@@ -46,7 +47,7 @@ On boot, the firmware prints:
 SKYSHIELD ESP32 Bridge starting...
 ```
 
-Then every 4 seconds it rotates through compact JSON alerts over Serial and updates the BLE alert characteristic with the same payload:
+Then every 4 seconds it rotates through simulated alerts. Serial keeps the full debug payload:
 
 ```json
 {"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87,"bands":{"band_1_2":"LOW","band_2_4":"LOW","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":1}
@@ -55,6 +56,12 @@ Then every 4 seconds it rotates through compact JSON alerts over Serial and upda
 ```
 
 This simulated mode is intended to validate packet shape, freshness, and timing before real RF inputs are added.
+
+BLE notifications intentionally use a smaller Garmin-safe payload:
+
+```json
+{"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87}
+```
 
 ## BLE Server Role
 
@@ -66,7 +73,8 @@ Current BLE settings:
 - Service UUID: `9f4d0001-7c31-4f9b-9a4b-8f4c0f000001`
 - Alert characteristic UUID: `9f4d0002-7c31-4f9b-9a4b-8f4c0f000001`
 - Alert characteristic properties: `READ`, `NOTIFY`
-- Alert payload: compact canonical SKYSHIELD JSON, identical to the Serial payload
+- Alert payload: compact Garmin-safe SKYSHIELD JSON
+- BLE stack: NimBLE-Arduino
 
 The status and config characteristics described in `docs/ble-gatt-design.md` are reserved for a later firmware step.
 
@@ -94,10 +102,18 @@ Serial should also show connection events:
 
 ```text
 BLE client connected
+BLE client subscribed
+BLE TX len=78
+BLE notify sent
 BLE client disconnected
 ```
 
-The BLE payload and Serial payload should match for each alert sequence.
+Serial debug prints both payloads:
+
+```text
+SERIAL FULL: {"threat":"FPV",...,"bands":{...},"source":"ESP32_SIM","sequence":1}
+BLE TX: {"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87}
+```
 
 ## Future RF Source Inputs
 

@@ -16,6 +16,7 @@ const BLE_STATUS_FOUND = "FOUND";
 const BLE_STATUS_CONNECT = "CONNECT";
 const BLE_STATUS_SUBSCRIBE = "SUBSCRIBE";
 const BLE_STATUS_RX = "RX";
+const BLE_STATUS_SUB_WAIT = "NOTIFY WAIT";
 const BLE_DIAG_INIT = "BLE INIT";
 const BLE_DIAG_REG = "BLE REG";
 const BLE_DIAG_SCAN = "BLE SCAN";
@@ -24,7 +25,8 @@ const BLE_DIAG_CONN = "BLE CONN";
 const BLE_DIAG_SVC = "BLE SVC";
 const BLE_DIAG_CHAR = "BLE CHAR";
 const BLE_DIAG_SUB = "BLE SUB";
-const BLE_DIAG_RX = "BLE RX";
+const BLE_DIAG_SUB_WAIT = "NOTIFY WAIT";
+const BLE_DIAG_RX = "RX";
 const BLE_STAGE_SCAN = "SCAN";
 const BLE_STAGE_REG = "REG";
 const BLE_STAGE_FOUND = "FOUND";
@@ -40,7 +42,9 @@ const BLE_ERR_CONN = "ERR CONN";
 const BLE_ERR_SVC = "ERR SVC";
 const BLE_ERR_CHAR = "ERR CHAR";
 const BLE_ERR_SUB = "ERR SUB";
-const BLE_ERR_RX = "ERR RX";
+const BLE_ERR_RX = "NOTIFY ERR";
+const BLE_ERR_RX_TIMEOUT = "NOTIFY ERR";
+const BLE_ERR_DISC = "SIGNAL LOST";
 const BLE_ERR_PARSE = "ERR PARSE";
 const BLE_STAGE_TIMEOUT_MS = 20000;
 
@@ -67,6 +71,24 @@ class BleAlertSource extends AlertSource {
     var isConnecting;
     var isConnected;
     var isSubscribed;
+    var hasEverFoundPeripheral;
+    var hasEverConnected;
+    var hasEverSubscribed;
+    var _uptimeMs;
+    var _connectStartedAtMs;
+    var _connectedAtMs;
+    var _subscribeStartedAtMs;
+    var _subscribedAtMs;
+    var _disconnectedAtMs;
+    var lastSubscribeMs;
+    var lastRxMs;
+    var explicitDisconnectSeen;
+    var _lastRawPayload;
+    var _lastParseOk;
+    var _lastParsedSummary;
+    var _hasLatestAlert;
+    var _lastPayloadLength;
+    var _lastDirectParseResult;
 
     function initialize() {
         AlertSource.initialize();
@@ -92,6 +114,24 @@ class BleAlertSource extends AlertSource {
         isConnecting = false;
         isConnected = false;
         isSubscribed = false;
+        hasEverFoundPeripheral = false;
+        hasEverConnected = false;
+        hasEverSubscribed = false;
+        _uptimeMs = 0;
+        _connectStartedAtMs = 0;
+        _connectedAtMs = 0;
+        _subscribeStartedAtMs = 0;
+        _subscribedAtMs = 0;
+        _disconnectedAtMs = 0;
+        lastSubscribeMs = 0;
+        lastRxMs = 0;
+        explicitDisconnectSeen = false;
+        _lastRawPayload = "";
+        _lastParseOk = false;
+        _lastParsedSummary = "";
+        _hasLatestAlert = false;
+        _lastPayloadLength = 0;
+        _lastDirectParseResult = "";
     }
 
     function start() {
@@ -107,7 +147,7 @@ class BleAlertSource extends AlertSource {
             _delegate = new SkyShieldBleDelegate(self);
 
             if (_delegate == null) {
-                setBleError(BLE_STAGE_SCAN, "delegate creation failed");
+                setScanError("delegate creation failed");
                 return;
             }
 
@@ -118,7 +158,7 @@ class BleAlertSource extends AlertSource {
         } catch (ex) {
             System.println("SKYSHIELD BLE unavailable.");
             log("scan failed: " + ex);
-            setBleError(BLE_STAGE_SCAN, "BLE unavailable: " + ex);
+            setScanError("BLE unavailable: " + ex);
         }
     }
 
@@ -132,11 +172,12 @@ class BleAlertSource extends AlertSource {
         }
 
         setLifecycleFlags(false, false, false, false, "stop");
-        setBleState(BLE_STATE_DISCONNECTED, BLE_ERR_CONN, BLE_STATUS_OFF);
+        setBleState(BLE_STATE_DISCONNECTED, BLE_STATUS_OFF, BLE_STATUS_OFF);
         log("stopped");
     }
 
     function tick(elapsedMs) {
+        _uptimeMs += elapsedMs;
         _diagElapsedMs += elapsedMs;
 
         if ((_diagState == BLE_DIAG_SCAN) && (_diagElapsedMs >= BLE_STAGE_TIMEOUT_MS) && !_scanTimeoutLogged) {
@@ -144,12 +185,20 @@ class BleAlertSource extends AlertSource {
             log("scan timeout");
         }
 
+        if (isSubscribed && (lastRxMs == 0) && ((lastSubscribeMs > 0) && ((_uptimeMs - lastSubscribeMs) >= BLE_STAGE_TIMEOUT_MS)) && !_rxTimeoutLogged) {
+            _rxTimeoutLogged = true;
+            log("NOTIFY ERR watchdog timeout");
+            setRxTimeoutError("no notification callback within 20s after subscribe");
+            return;
+        }
+
         if (((_diagState == BLE_DIAG_CONN) || (_diagState == BLE_DIAG_SVC) || (_diagState == BLE_DIAG_CHAR) || (_diagState == BLE_DIAG_SUB)) &&
             (_diagElapsedMs >= BLE_STAGE_TIMEOUT_MS) && !_rxTimeoutLogged) {
             _rxTimeoutLogged = true;
 
             if (_diagState == BLE_DIAG_SUB) {
-                log("notification timeout after subscribe");
+                log("NOTIFY ERR timeout");
+                setRxTimeoutError("notification callback timeout after subscribe");
             } else {
                 setBleError(_lastBleStage, "BLE pipeline timeout before notifications");
             }
@@ -167,6 +216,48 @@ class BleAlertSource extends AlertSource {
 
         _hasUnreadAlert = false;
         return _latestAlert;
+    }
+
+    function getLatestAlert() {
+        if (!_enabled) {
+            return null;
+        }
+
+        if (!_hasLatestAlert) {
+            return null;
+        }
+
+        return _latestAlert;
+    }
+
+    function hasLatestAlert() {
+        return _hasLatestAlert;
+    }
+
+    function hasValidBleAlert() {
+        var hasAlert = _hasLatestAlert && (_latestAlert != null);
+        System.println("SKYSHIELD BLE hasValidBleAlert=" + boolText(hasAlert));
+        return hasAlert;
+    }
+
+    function getLastRawPayload() {
+        return _lastRawPayload;
+    }
+
+    function wasLastParseOk() {
+        return _lastParseOk;
+    }
+
+    function getLastParsedSummary() {
+        return _lastParsedSummary;
+    }
+
+    function getLastPayloadLength() {
+        return _lastPayloadLength;
+    }
+
+    function getLastDirectParseResult() {
+        return _lastDirectParseResult;
     }
 
     function getState() {
@@ -231,6 +322,11 @@ class BleAlertSource extends AlertSource {
             return;
         }
 
+        if (isSubscribed) {
+            log("scan start ignored, subscribed");
+            return;
+        }
+
         setLifecycleFlags(true, false, false, false, "scan start");
         setBleState(BLE_STATE_SCANNING, BLE_DIAG_SCAN, BLE_STATUS_SCAN);
         log("scan requested");
@@ -240,7 +336,7 @@ class BleAlertSource extends AlertSource {
         } catch (ex) {
             setLifecycleFlags(false, false, false, false, "scan start failed");
             log("scan failed: " + ex);
-            setBleError(BLE_STAGE_SCAN, "scan failed: " + ex);
+            setScanError("scan failed: " + ex);
         }
     }
 
@@ -261,6 +357,7 @@ class BleAlertSource extends AlertSource {
     }
 
     function handleProfileRegister(uuid, status) {
+        log("PROFILE callback entered");
         log("profile registered status=" + status);
 
         if (status == Ble.STATUS_SUCCESS) {
@@ -273,19 +370,24 @@ class BleAlertSource extends AlertSource {
     }
 
     function handleScanStateChange(scanState, status) {
+        log("SCAN callback entered");
         log("scan state=" + scanState + " status=" + status);
+
+        if (!canProcessScanCallback()) {
+            if (status != Ble.STATUS_SUCCESS) {
+                setScanError("scan callback status=" + status);
+            }
+            return;
+        }
 
         if (status != Ble.STATUS_SUCCESS) {
             log("scan failed: status=" + status);
 
-            if (isConnecting || isConnected) {
-                log("scan failure ignored after connect started");
-                return;
-            }
-
             if (isScanning) {
                 setLifecycleFlags(false, false, false, false, "scan failed callback");
-                setBleError(BLE_STAGE_SCAN, "scan failed status=" + status);
+                setScanError("scan failed status=" + status);
+            } else {
+                setScanError("scan failed while not scanning status=" + status);
             }
 
             return;
@@ -298,6 +400,7 @@ class BleAlertSource extends AlertSource {
     }
 
     function handleScanResults(scanResults) {
+        log("SCAN callback entered");
         var result = scanResults.next();
 
         while (result != null) {
@@ -305,6 +408,8 @@ class BleAlertSource extends AlertSource {
 
             if (isSkyShieldPeripheral(result)) {
                 log("BLE matched SKYSHIELD peripheral");
+                hasEverFoundPeripheral = true;
+                log("ever found peripheral");
                 setLifecycleFlags(false, false, false, false, "found peripheral");
                 stopScanForConnect();
                 setDiagnosticState(BLE_DIAG_FOUND, BLE_STATUS_FOUND);
@@ -395,6 +500,9 @@ class BleAlertSource extends AlertSource {
     }
 
     function connectToScanResult(scanResult) {
+        hasEverConnected = true;
+        _connectStartedAtMs = _uptimeMs;
+        log("ever connected");
         setLifecycleFlags(false, true, false, false, "connect start");
         setBleState(BLE_STATE_CONNECTING, BLE_DIAG_CONN, BLE_STATUS_CONNECT);
         log("BLE connecting");
@@ -416,19 +524,37 @@ class BleAlertSource extends AlertSource {
         _device = device;
 
         if (state == Ble.CONNECTION_STATE_CONNECTED) {
+            log("CONNECTED callback entered");
+            hasEverConnected = true;
+            _connectedAtMs = _uptimeMs;
             setLifecycleFlags(false, false, true, false, "connected");
             setBleState(BLE_STATE_CONNECTED, BLE_DIAG_CONN, BLE_STATUS_CONNECT);
+            log("onConnected");
             log("BLE connected");
+            logTiming("CONNECT", _connectStartedAtMs, _connectedAtMs);
             discoverAlertCharacteristic(device);
             return;
         }
 
+        _disconnectedAtMs = _uptimeMs;
+        explicitDisconnectSeen = true;
+        log("DISCONNECT callback entered");
+        log("onDisconnected state=" + state);
+        logDisconnectTiming();
         setLifecycleFlags(false, false, false, false, "disconnect");
-        setBleError(_lastBleStage, "disconnected state=" + state);
+
+        if (hasEverSubscribed || (_diagState == BLE_DIAG_SUB) || isSubscribed) {
+            setDisconnectError("disconnected state=" + state);
+        } else {
+            setBleError(BLE_STAGE_CONN, "disconnected state=" + state);
+        }
+
         _alertCharacteristic = null;
     }
 
     function discoverAlertCharacteristic(device) {
+        log("SERVICE callback entered");
+
         if (device == null) {
             setBleError(BLE_STAGE_SVC, "service discovery skipped, device null");
             return;
@@ -443,6 +569,7 @@ class BleAlertSource extends AlertSource {
 
         setDiagnosticState(BLE_DIAG_SVC, BLE_STATUS_CONNECT);
         log("service discovered");
+        log("CHAR callback entered");
 
         _alertCharacteristic = service.getCharacteristic(_alertCharacteristicUuid);
 
@@ -457,6 +584,10 @@ class BleAlertSource extends AlertSource {
     }
 
     function subscribeToAlertCharacteristic() {
+        hasEverSubscribed = true;
+        _subscribeStartedAtMs = _uptimeMs;
+        log("ever subscribed");
+
         if (_alertCharacteristic == null) {
             setBleError(BLE_STAGE_SUB, "subscribe skipped, characteristic null");
             return;
@@ -470,6 +601,8 @@ class BleAlertSource extends AlertSource {
         }
 
         try {
+            // Garmin calls onCharacteristicChanged() after notifications are enabled by writing [0x01,0x00] to CCCD 0x2902.
+            log("CCCD uuid=0x2902 value=[1,0]");
             descriptor.requestWrite([1, 0]b);
             setDiagnosticState(BLE_DIAG_SUB, BLE_STATUS_SUBSCRIBE);
             log("subscribe requested");
@@ -479,10 +612,25 @@ class BleAlertSource extends AlertSource {
     }
 
     function handleDescriptorWrite(descriptor, status) {
+        log("SUBSCRIBE callback entered");
+
+        if (!isAlertDescriptor(descriptor)) {
+            setBleError(BLE_STAGE_SUB, "descriptor write was not for alert CCCD");
+            return;
+        }
+
         if (status == Ble.STATUS_SUCCESS) {
+            hasEverSubscribed = true;
+            _subscribedAtMs = _uptimeMs;
+            lastSubscribeMs = _uptimeMs;
+            lastRxMs = 0;
             setLifecycleFlags(false, false, true, true, "subscribed");
-            setDiagnosticState(BLE_DIAG_SUB, BLE_STATUS_SUBSCRIBE);
+            setDiagnosticState(BLE_DIAG_SUB_WAIT, BLE_STATUS_SUB_WAIT);
+            log("onSubscribeSuccess");
             log("BLE subscribed");
+            log("subscribed waiting for notification callback");
+            logTiming("CONNECT_START_TO_SUBSCRIBE", _connectStartedAtMs, _subscribedAtMs);
+            logTiming("CONNECTED_TO_SUBSCRIBE", _connectedAtMs, _subscribedAtMs);
             return;
         }
 
@@ -490,18 +638,33 @@ class BleAlertSource extends AlertSource {
     }
 
     function handleCharacteristicChanged(characteristic, value) {
+        log("NOTIFICATION callback entered");
+
+        if (!isAlertCharacteristic(characteristic)) {
+            log("notification ignored for non-alert characteristic");
+            return;
+        }
+
+        lastRxMs = _uptimeMs;
         setLifecycleFlags(false, false, true, true, "rx packet");
         setDiagnosticState(BLE_DIAG_RX, BLE_STATUS_RX);
-        log("BLE RX packet");
+        log("onNotificationReceived");
+        log("BLE notification packet");
+        logTiming("SUBSCRIBE_TO_NOTIFICATION", _subscribedAtMs, _uptimeMs);
         onNotificationBytes(value);
     }
 
     function onNotificationBytes(bytes) {
-        System.println("SKYSHIELD BLE raw bytes length: " + byteLength(bytes));
+        _lastPayloadLength = byteLength(bytes);
+        System.println("SKYSHIELD BLE RX bytes len=" + _lastPayloadLength);
+        System.println("SKYSHIELD BLE RX len=" + _lastPayloadLength);
 
         var jsonString = bytesToUtf8String(bytes);
 
         if (jsonString == null) {
+            _lastRawPayload = "";
+            _lastDirectParseResult = "PARSE FAIL";
+            log("rx decode failure");
             setBleError(BLE_STAGE_RX, "packet decode failed");
             return;
         }
@@ -509,39 +672,295 @@ class BleAlertSource extends AlertSource {
         var cleanJsonString = cleanJsonPayload(jsonString);
 
         if ((cleanJsonString == null) || (cleanJsonString.length() == 0)) {
+            _lastRawPayload = "";
+            _lastDirectParseResult = "PARSE FAIL";
+            log("rx decode failure");
             setBleError(BLE_STAGE_RX, "packet cleanup failed");
             return;
         }
 
+        log("rx decode success");
         System.println("SKYSHIELD BLE raw payload: " + cleanJsonString);
+        System.println("SKYSHIELD BLE RX raw=" + cleanJsonString);
+        _lastRawPayload = cleanJsonString;
+        System.println("SKYSHIELD BLE lastRawPayload=" + _lastRawPayload);
+
+        if (setDirectCompactAlert(cleanJsonString)) {
+            return;
+        }
+
         onNotificationString(cleanJsonString);
+    }
+
+    function setDirectCompactAlert(jsonString) {
+        var threat = compactThreat(jsonString);
+        var severity = compactSeverity(jsonString);
+        var band = compactBand(jsonString);
+        var distance = compactDistance(jsonString);
+        var confidence = compactConfidence(jsonString);
+
+        if ((threat == null) || (severity == null) || (band == null) || (distance == null) || (confidence == null)) {
+            _lastDirectParseResult = "PARSE FAIL";
+            System.println("SKYSHIELD BLE direct map=" + _lastDirectParseResult);
+            log("BLE direct compact parse skipped");
+            return false;
+        }
+
+        _lastDirectParseResult = compactSummary(threat, severity, band, distance, confidence);
+        System.println("SKYSHIELD BLE direct map=" + _lastDirectParseResult);
+        _latestAlert = new AlertModel(
+            threat,
+            severity,
+            confidence,
+            band,
+            distance,
+            defaultBandsForBand(band),
+            null,
+            "BLE_DIRECT",
+            0
+        );
+        _hasLatestAlert = true;
+        _hasUnreadAlert = true;
+        _lastParseOk = true;
+        _lastParsedSummary = formatParsedSummary(_latestAlert);
+        setBleState(BLE_STATE_CONNECTED, BLE_DIAG_RX, BLE_STATUS_RX);
+        System.println("SKYSHIELD BLE lastParseOk=true");
+        System.println("SKYSHIELD BLE lastParsedSummary=" + _lastParsedSummary);
+        System.println("SKYSHIELD BLE DIRECT ALERT SET");
+        System.println("SKYSHIELD BLE hasLatestAlert=true");
+        log("BLE DIRECT ALERT SET");
+        return true;
+    }
+
+    function compactSummary(threat, severity, band, distance, confidence) {
+        return compactThreatCode(threat) + " " + compactSeverityCode(severity) + " " + compactBandCode(band) + " " + compactDistanceCode(distance) + " " + confidence;
+    }
+
+    function compactThreatCode(threat) {
+        if (threat == "FPV") {
+            return "F";
+        }
+
+        if (threat == "DJI") {
+            return "D";
+        }
+
+        return "U";
+    }
+
+    function compactSeverityCode(severity) {
+        if (severity == "LOW") {
+            return "L";
+        }
+
+        if (severity == "MEDIUM") {
+            return "M";
+        }
+
+        if (severity == "HIGH") {
+            return "H";
+        }
+
+        return "C";
+    }
+
+    function compactBandCode(band) {
+        if (band == "1.2GHz") {
+            return "12";
+        }
+
+        if (band == "2.4GHz") {
+            return "24";
+        }
+
+        if (band == "3.3GHz") {
+            return "33";
+        }
+
+        if (band == "5.8GHz") {
+            return "58";
+        }
+
+        return "M";
+    }
+
+    function compactDistanceCode(distance) {
+        if (distance == "FAR") {
+            return "F";
+        }
+
+        if (distance == "MID") {
+            return "M";
+        }
+
+        return "N";
+    }
+
+    function compactThreat(jsonString) {
+        if (hasToken(jsonString, "\"t\":\"F\"")) {
+            return "FPV";
+        }
+
+        if (hasToken(jsonString, "\"t\":\"D\"")) {
+            return "DJI";
+        }
+
+        if (hasToken(jsonString, "\"t\":\"U\"")) {
+            return "UNKNOWN";
+        }
+
+        return null;
+    }
+
+    function compactSeverity(jsonString) {
+        if (hasToken(jsonString, "\"s\":\"L\"")) {
+            return "LOW";
+        }
+
+        if (hasToken(jsonString, "\"s\":\"M\"")) {
+            return "MEDIUM";
+        }
+
+        if (hasToken(jsonString, "\"s\":\"H\"")) {
+            return "HIGH";
+        }
+
+        if (hasToken(jsonString, "\"s\":\"C\"")) {
+            return "CRITICAL";
+        }
+
+        return null;
+    }
+
+    function compactBand(jsonString) {
+        if (hasToken(jsonString, "\"b\":\"12\"")) {
+            return "1.2GHz";
+        }
+
+        if (hasToken(jsonString, "\"b\":\"24\"")) {
+            return "2.4GHz";
+        }
+
+        if (hasToken(jsonString, "\"b\":\"33\"")) {
+            return "3.3GHz";
+        }
+
+        if (hasToken(jsonString, "\"b\":\"58\"")) {
+            return "5.8GHz";
+        }
+
+        if (hasToken(jsonString, "\"b\":\"M\"")) {
+            return "MULTI";
+        }
+
+        return null;
+    }
+
+    function compactDistance(jsonString) {
+        if (hasToken(jsonString, "\"r\":\"F\"")) {
+            return "FAR";
+        }
+
+        if (hasToken(jsonString, "\"r\":\"M\"")) {
+            return "MID";
+        }
+
+        if (hasToken(jsonString, "\"r\":\"N\"")) {
+            return "NEAR";
+        }
+
+        return null;
+    }
+
+    function compactConfidence(jsonString) {
+        for (var value = 0; value <= 100; value += 1) {
+            if (hasToken(jsonString, "\"c\":" + value + ",")) {
+                return value;
+            }
+
+            if (hasToken(jsonString, "\"c\":" + value + "}")) {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    function defaultBandsForBand(primaryBand) {
+        return [
+            { :band => "1.2", :level => bandLevel(primaryBand, "1.2GHz") },
+            { :band => "2.4", :level => bandLevel(primaryBand, "2.4GHz") },
+            { :band => "3.3", :level => bandLevel(primaryBand, "3.3GHz") },
+            { :band => "5.8", :level => bandLevel(primaryBand, "5.8GHz") }
+        ];
+    }
+
+    function bandLevel(primaryBand, candidateBand) {
+        if (primaryBand == "MULTI") {
+            return "MED";
+        }
+
+        if (primaryBand == candidateBand) {
+            return "HIGH";
+        }
+
+        return "NONE";
+    }
+
+    function hasToken(jsonString, token) {
+        var index = jsonString.find(token);
+        return (index != null) && (index >= 0);
     }
 
     function onNotificationString(jsonString) {
         log("packet received: " + jsonString);
+        System.println("SKYSHIELD NOTIFY callback payload=" + jsonString);
 
         var parsedAlert = _parser.parse(jsonString);
 
         if (parsedAlert == null) {
+            _lastParseOk = false;
+            _lastParsedSummary = "";
+            System.println("SKYSHIELD BLE lastParseOk=false");
+            log("BLE parse failure");
             setBleError(BLE_STAGE_PARSE, "parser failure");
             return;
         }
 
         if (isFallbackAlert(parsedAlert)) {
             System.println("SKYSHIELD BLE parse fallback");
+            _lastParseOk = false;
+            _lastParsedSummary = "";
+            System.println("SKYSHIELD BLE lastParseOk=false");
+            log("BLE parse failure");
             setBleError(BLE_STAGE_PARSE, "parser failure: fallback alert returned");
             return;
         }
 
         _latestAlert = parsedAlert;
+        _hasLatestAlert = true;
         _hasUnreadAlert = true;
+        _lastParseOk = true;
+        _lastParsedSummary = formatParsedSummary(parsedAlert);
         setBleState(BLE_STATE_CONNECTED, BLE_DIAG_RX, BLE_STATUS_RX);
-        log("parser success");
+        System.println("SKYSHIELD BLE lastParseOk=true");
+        System.println("SKYSHIELD BLE lastParsedSummary=" + _lastParsedSummary);
+        System.println("SKYSHIELD BLE hasLatestAlert=true");
+        log("BLE parse success");
+        log("BLE latest alert updated");
+    }
+
+    function formatParsedSummary(alert) {
+        if (alert == null) {
+            return "";
+        }
+
+        return alert.threatType + " " + alert.riskLevel + " " + alert.confidencePercent;
     }
 
     function bytesToUtf8String(bytes) {
         try {
-            return StringUtil.convertEncodedString(
+            var decodedString = StringUtil.convertEncodedString(
                 bytes,
                 {
                     :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
@@ -549,11 +968,23 @@ class BleAlertSource extends AlertSource {
                     :encoding => StringUtil.CHAR_ENCODING_UTF8
                 }
             );
+
+            if (decodedString != null) {
+                return decodedString;
+            }
         } catch (ex) {
-            setBleError(BLE_STAGE_RX, "UTF-8 conversion failed: " + ex);
+            log("StringUtil UTF-8 conversion failed: " + ex);
         }
 
-        return null;
+        return bytesToAsciiString(bytes);
+    }
+
+    function bytesToAsciiString(bytes) {
+        if (bytes == null) {
+            return null;
+        }
+
+        return bytes.toString();
     }
 
     function cleanJsonPayload(decodedString) {
@@ -617,10 +1048,94 @@ class BleAlertSource extends AlertSource {
     }
 
     function setBleError(stage, message) {
+        if ((stage == BLE_STAGE_SCAN) || (stage == BLE_STAGE_REG)) {
+            setScanError(message);
+            return;
+        }
+
+        if (isPostSubscribeState() && ((stage != BLE_STAGE_RX) && (stage != BLE_STAGE_PARSE))) {
+            System.println("SKYSHIELD BLE: ignored post-subscribe " + stage + " error message=" + message);
+            return;
+        }
+
+        if (stage == BLE_STAGE_CONN) {
+            if (!explicitDisconnectSeen) {
+                System.println("SKYSHIELD BLE: ignored false ERR CONN message=" + message);
+                return;
+            }
+
+            if (isSubscribed || hasEverSubscribed) {
+                setDisconnectError(message);
+                return;
+            }
+        }
+
         _lastBleStage = stage;
         _state = BLE_STATE_SIGNAL_LOST;
         System.println("SKYSHIELD BLE ERROR stage=" + stage + " message=" + message);
         setDiagnosticState(errorLabelForStage(stage), errorLabelForStage(stage));
+    }
+
+    function setDisconnectError(message) {
+        _lastBleStage = BLE_STAGE_CONN;
+        _state = BLE_STATE_SIGNAL_LOST;
+        log("explicit disconnect after subscribe");
+        System.println("SKYSHIELD BLE ERROR stage=DISC message=" + message);
+        setDiagnosticState(BLE_ERR_DISC, BLE_ERR_DISC);
+    }
+
+    function setRxTimeoutError(message) {
+        _lastBleStage = BLE_STAGE_RX;
+        _state = BLE_STATE_SIGNAL_LOST;
+        System.println("SKYSHIELD BLE ERROR stage=NOTIFY message=" + message);
+        setDiagnosticState(BLE_ERR_RX_TIMEOUT, BLE_ERR_RX_TIMEOUT);
+    }
+
+    function isAlertDescriptor(descriptor) {
+        if (descriptor == null) {
+            return false;
+        }
+
+        try {
+            var characteristic = descriptor.getCharacteristic();
+            return isAlertCharacteristic(characteristic);
+        } catch (ex) {
+            log("descriptor characteristic check failed: " + ex);
+        }
+
+        return false;
+    }
+
+    function isAlertCharacteristic(characteristic) {
+        if (characteristic == null) {
+            return false;
+        }
+
+        try {
+            var uuid = characteristic.getUuid();
+
+            if (uuid == null) {
+                return false;
+            }
+
+            return uuid.equals(_alertCharacteristicUuid);
+        } catch (ex) {
+            log("characteristic UUID check failed: " + ex);
+        }
+
+        return false;
+    }
+
+    function setScanError(reason) {
+        if (!canSetScanError()) {
+            System.println("SKYSHIELD BLE: ignored stale ERR SCAN reason=" + reason);
+            return;
+        }
+
+        _lastBleStage = BLE_STAGE_SCAN;
+        _state = BLE_STATE_SIGNAL_LOST;
+        System.println("SKYSHIELD BLE ERROR stage=SCAN message=" + reason);
+        setDiagnosticState(BLE_ERR_SCAN, BLE_ERR_SCAN);
     }
 
     function stopScanForConnect() {
@@ -646,6 +1161,79 @@ class BleAlertSource extends AlertSource {
         }
 
         return "false";
+    }
+
+    function logTiming(label, startMs, endMs) {
+        log("timing " + label + " ms=" + (endMs - startMs));
+    }
+
+    function logDisconnectTiming() {
+        if (hasEverConnected) {
+            logTiming("CONNECT_TO_DISCONNECT", _connectStartedAtMs, _disconnectedAtMs);
+        }
+
+        if (hasEverSubscribed) {
+            logTiming("SUBSCRIBE_TO_DISCONNECT", _subscribedAtMs, _disconnectedAtMs);
+        }
+    }
+
+    function canProcessScanCallback() {
+        if (hasEverFoundPeripheral || hasEverConnected || hasEverSubscribed) {
+            return false;
+        }
+
+        if (isConnecting || isConnected || isSubscribed) {
+            return false;
+        }
+
+        if ((_diagState == BLE_DIAG_CONN) ||
+            (_diagState == BLE_DIAG_SVC) ||
+            (_diagState == BLE_DIAG_CHAR) ||
+            (_diagState == BLE_DIAG_SUB) ||
+            (_diagState == BLE_DIAG_SUB_WAIT) ||
+            (_diagState == BLE_DIAG_RX)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function isPostSubscribeState() {
+        if (isSubscribed) {
+            return true;
+        }
+
+        if (_diagState == BLE_DIAG_SUB_WAIT) {
+            return true;
+        }
+
+        if (_diagState == BLE_DIAG_RX) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function canSetScanError() {
+        if (hasEverFoundPeripheral || hasEverConnected || hasEverSubscribed) {
+            return false;
+        }
+
+        if (!canProcessScanCallback()) {
+            return false;
+        }
+
+        if ((_lastBleStage == BLE_STAGE_SCAN) || (_lastBleStage == BLE_STAGE_REG)) {
+            return true;
+        }
+
+        if ((_diagState == BLE_DIAG_INIT) ||
+            (_diagState == BLE_DIAG_REG) ||
+            (_diagState == BLE_DIAG_SCAN)) {
+            return true;
+        }
+
+        return false;
     }
 
     function updateLastBleStage(diagState) {
@@ -684,6 +1272,11 @@ class BleAlertSource extends AlertSource {
             return;
         }
 
+        if (diagState == BLE_DIAG_SUB_WAIT) {
+            _lastBleStage = BLE_STAGE_SUB;
+            return;
+        }
+
         if (diagState == BLE_DIAG_RX) {
             _lastBleStage = BLE_STAGE_RX;
         }
@@ -691,11 +1284,11 @@ class BleAlertSource extends AlertSource {
 
     function errorLabelForStage(stage) {
         if (stage == BLE_STAGE_SCAN) {
-            return BLE_ERR_SCAN;
+            return BLE_ERR_CONN;
         }
 
         if (stage == BLE_STAGE_REG) {
-            return BLE_ERR_SCAN;
+            return BLE_ERR_CONN;
         }
 
         if (stage == BLE_STAGE_FOUND) {
@@ -726,7 +1319,7 @@ class BleAlertSource extends AlertSource {
             return BLE_ERR_PARSE;
         }
 
-        return BLE_ERR_SCAN;
+        return BLE_ERR_CONN;
     }
 
     function log(message) {
@@ -767,26 +1360,32 @@ class SkyShieldBleDelegate extends Ble.BleDelegate {
     }
 
     function onProfileRegister(uuid, status) {
+        System.println("SKYSHIELD BLE: PROFILE delegate callback entered");
         _source.handleProfileRegister(uuid, status);
     }
 
     function onScanStateChange(scanState, status) {
+        System.println("SKYSHIELD BLE: SCAN delegate callback entered");
         _source.handleScanStateChange(scanState, status);
     }
 
     function onScanResults(scanResults) {
+        System.println("SKYSHIELD BLE: SCAN delegate callback entered");
         _source.handleScanResults(scanResults);
     }
 
     function onConnectedStateChanged(device, state) {
+        System.println("SKYSHIELD BLE: CONNECTED delegate callback entered");
         _source.handleConnectedStateChanged(device, state);
     }
 
     function onDescriptorWrite(descriptor, status) {
+        System.println("SKYSHIELD BLE: SUBSCRIBE delegate callback entered");
         _source.handleDescriptorWrite(descriptor, status);
     }
 
     function onCharacteristicChanged(characteristic, value) {
+        System.println("SKYSHIELD BLE: NOTIFICATION delegate callback entered");
         _source.handleCharacteristicChanged(characteristic, value);
     }
 }

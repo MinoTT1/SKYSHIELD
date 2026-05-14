@@ -14,6 +14,11 @@ struct SkyShieldAlert {
     const char* band_5_8;
 };
 
+inline const char* compactThreat(const char* threat);
+inline const char* compactSeverity(const char* severity);
+inline const char* compactBand(const char* band);
+inline const char* compactDistance(const char* distance);
+
 inline String alertToJson(const SkyShieldAlert& alert, uint32_t sequence) {
     String json = "{";
     json += "\"threat\":\"";
@@ -38,4 +43,80 @@ inline String alertToJson(const SkyShieldAlert& alert, uint32_t sequence) {
     json += sequence;
     json += "}";
     return json;
+}
+
+inline String alertToBleJson(const SkyShieldAlert& alert) {
+    String json = "{";
+    json += "\"t\":\"";
+    json += compactThreat(alert.threat);
+    json += "\",\"s\":\"";
+    json += compactSeverity(alert.severity);
+    json += "\",\"b\":\"";
+    json += compactBand(alert.band);
+    json += "\",\"r\":\"";
+    json += compactDistance(alert.distance);
+    json += "\",\"c\":";
+    json += alert.confidence;
+    json += "}";
+    return json;
+}
+
+inline const char* compactThreat(const char* threat) {
+    if (strcmp(threat, "FPV") == 0) {
+        return "F";
+    }
+
+    if (strcmp(threat, "DJI") == 0) {
+        return "D";
+    }
+
+    return "U";
+}
+
+inline const char* compactSeverity(const char* severity) {
+    if (strcmp(severity, "LOW") == 0) {
+        return "L";
+    }
+
+    if (strcmp(severity, "MEDIUM") == 0) {
+        return "M";
+    }
+
+    if (strcmp(severity, "HIGH") == 0) {
+        return "H";
+    }
+
+    return "C";
+}
+
+inline const char* compactBand(const char* band) {
+    if (strcmp(band, "1.2GHz") == 0) {
+        return "12";
+    }
+
+    if (strcmp(band, "2.4GHz") == 0) {
+        return "24";
+    }
+
+    if (strcmp(band, "3.3GHz") == 0) {
+        return "33";
+    }
+
+    if (strcmp(band, "5.8GHz") == 0) {
+        return "58";
+    }
+
+    return "M";
+}
+
+inline const char* compactDistance(const char* distance) {
+    if (strcmp(distance, "FAR") == 0) {
+        return "F";
+    }
+
+    if (strcmp(distance, "MID") == 0) {
+        return "M";
+    }
+
+    return "N";
 }

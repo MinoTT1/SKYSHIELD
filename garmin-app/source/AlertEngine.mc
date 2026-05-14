@@ -37,25 +37,44 @@ class AlertEngine {
 
     function tick(elapsedMs) {
         _bleSource.tick(elapsedMs);
+
+        if (_bleSource.hasLatestAlert()) {
+            _currentAlert = _bleSource.getLatestAlert();
+            setSource(ALERT_SOURCE_BLE);
+            System.println("SKYSHIELD AlertEngine using BLE alert=true");
+            return;
+        }
+
+        System.println("SKYSHIELD AlertEngine using BLE alert=false");
     }
 
     function getNextAlert() {
+        if (_bleSource.hasLatestAlert()) {
+            _currentAlert = _bleSource.getLatestAlert();
+            setSource(ALERT_SOURCE_BLE);
+            System.println("SKYSHIELD AlertEngine using BLE alert=true");
+            return _currentAlert;
+        }
+
         var bleAlert = _bleSource.getNextAlert();
 
         if (bleAlert != null) {
             _currentAlert = bleAlert;
             setSource(ALERT_SOURCE_BLE);
+            System.println("SKYSHIELD AlertEngine using BLE alert=true");
             return _currentAlert;
         }
 
         if (USE_MOCK_FALLBACK) {
             _currentAlert = _mockSource.getNextAlert();
             setSource(ALERT_SOURCE_MOCK);
+            System.println("SKYSHIELD AlertEngine using BLE alert=false");
             return _currentAlert;
         }
 
         _currentAlert = null;
         setSource(ALERT_SOURCE_NONE);
+        System.println("SKYSHIELD AlertEngine using BLE alert=false");
         return _currentAlert;
     }
 
@@ -75,6 +94,30 @@ class AlertEngine {
         return _currentSource;
     }
 
+    function getBleLastRawPayload() {
+        return _bleSource.getLastRawPayload();
+    }
+
+    function wasBleLastParseOk() {
+        return _bleSource.wasLastParseOk();
+    }
+
+    function getBleLastParsedSummary() {
+        return _bleSource.getLastParsedSummary();
+    }
+
+    function getBleLastPayloadLength() {
+        return _bleSource.getLastPayloadLength();
+    }
+
+    function getBleLastDirectParseResult() {
+        return _bleSource.getLastDirectParseResult();
+    }
+
+    function hasValidBleAlert() {
+        return _bleSource.hasValidBleAlert();
+    }
+
     function setSource(source) {
         if (_currentSource == source) {
             return;
@@ -86,6 +129,7 @@ class AlertEngine {
 
     function logSource() {
         System.println("SKYSHIELD source=" + _currentSource);
+        System.println("SKYSHIELD AlertEngine source=" + _currentSource);
     }
 
     function isHighUrgency(alert) {

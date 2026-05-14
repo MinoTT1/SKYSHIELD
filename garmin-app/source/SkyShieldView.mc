@@ -109,6 +109,7 @@ class SkyShieldView extends WatchUi.View {
         _criticalPulseElapsedMs += TIMER_INTERVAL_MS;
         _engine.tick(TIMER_INTERVAL_MS);
 
+        syncLiveBleAlert();
         updateCriticalPulse();
         updateAlertData();
         updateScreenCycle();
@@ -137,6 +138,10 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function updateAlertData() {
+        if (_engine.getCurrentSource() == ALERT_SOURCE_BLE) {
+            return;
+        }
+
         if (_alertElapsedMs >= MOCK_ALERT_ROTATION_MS) {
             _alertElapsedMs = 0;
             _packetAgeMs = 0;
@@ -146,6 +151,29 @@ class SkyShieldView extends WatchUi.View {
             triggerVibrationIfNeeded();
             showAlertForNewAlert();
         }
+    }
+
+    function syncLiveBleAlert() {
+        if (_engine.getCurrentSource() != ALERT_SOURCE_BLE) {
+            return;
+        }
+
+        var liveAlert = _engine.getActiveAlert();
+
+        if (liveAlert == null) {
+            return;
+        }
+
+        if (liveAlert == _alert) {
+            return;
+        }
+
+        _alert = liveAlert;
+        _packetAgeMs = 0;
+        updateTrackStability(_alert);
+        addAlertToHistory(_alert);
+        triggerVibrationIfNeeded();
+        showAlertForNewAlert();
     }
 
     function addAlertToHistory(alert) {
@@ -271,6 +299,11 @@ class SkyShieldView extends WatchUi.View {
         }
 
         if (_alert == null) {
+            if (_engine.getBleStatus() == BLE_STATUS_RX) {
+                drawRxNoModelDiagnostic(dc, width);
+                return;
+            }
+
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
             drawCentered(dc, width, 88, getSourceLabel(), Graphics.FONT_TINY);
             drawCentered(dc, width, 122, _formatter.formatTrackState("SCAN"), Graphics.FONT_TINY);
@@ -289,6 +322,32 @@ class SkyShieldView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, 96, "SKYSHIELD", Graphics.FONT_SMALL);
         drawCentered(dc, width, 132, "TACTICAL RF DETECTOR", Graphics.FONT_TINY);
+    }
+
+    function drawRxNoModelDiagnostic(dc, width) {
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, 66, "RX", Graphics.FONT_TINY);
+
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, 96, "LEN " + _engine.getBleLastPayloadLength(), Graphics.FONT_TINY);
+
+        drawCentered(dc, width, 126, "RAW " + truncatePayload(_engine.getBleLastRawPayload()), Graphics.FONT_TINY);
+
+        drawCentered(dc, width, 156, "MAP " + _engine.getBleLastDirectParseResult(), Graphics.FONT_TINY);
+
+        drawBleStatusFooter(dc, width);
+    }
+
+    function truncatePayload(payload) {
+        if (payload == null) {
+            return "";
+        }
+
+        if (payload.length() <= 18) {
+            return payload;
+        }
+
+        return payload.substring(0, 18);
     }
 
     function drawConnectionState(dc, width) {
@@ -331,6 +390,7 @@ class SkyShieldView extends WatchUi.View {
         var displaySeverity = _formatter.resolveSeverityForTrack(_alert, trackState);
 
         drawHealthMetadata(dc, width);
+        drawBleDataProof(dc, width);
         drawAlertBanner(dc, width, _formatter.formatSeverity(displaySeverity), displaySeverity);
         dc.setColor(getRiskColor(displaySeverity), Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _formatter.formatThreat(_alert.threatType), getAlertTitleFont());
@@ -348,6 +408,15 @@ class SkyShieldView extends WatchUi.View {
 
         drawActionState(dc, width, 214);
         drawBleStatusFooter(dc, width);
+    }
+
+    function drawBleDataProof(dc, width) {
+        if (_engine.getCurrentSource() != ALERT_SOURCE_BLE) {
+            return;
+        }
+
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, 64, "BLE DATA", Graphics.FONT_TINY);
     }
 
     function drawBleStatusFooter(dc, width) {
