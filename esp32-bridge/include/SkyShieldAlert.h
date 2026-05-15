@@ -61,6 +61,20 @@ inline String alertToBleJson(const SkyShieldAlert& alert) {
     return json;
 }
 
+inline String alertToBleSimple(const SkyShieldAlert& alert) {
+    String payload = "S1|";
+    payload += compactThreat(alert.threat);
+    payload += "|";
+    payload += compactSeverity(alert.severity);
+    payload += "|";
+    payload += compactBand(alert.band);
+    payload += "|";
+    payload += compactDistance(alert.distance);
+    payload += "|";
+    payload += alert.confidence;
+    return payload;
+}
+
 inline const char* compactThreat(const char* threat) {
     if (strcmp(threat, "FPV") == 0) {
         return "F";
@@ -106,7 +120,7 @@ inline const char* compactBand(const char* band) {
         return "58";
     }
 
-    return "M";
+    return "X";
 }
 
 inline const char* compactDistance(const char* distance) {

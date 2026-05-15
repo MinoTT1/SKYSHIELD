@@ -77,20 +77,20 @@ void initBle() {
 
 void publishAlert(const SkyShieldAlert& alert) {
     const String fullJson = alertToJson(alert, sequence);
-    const String bleJson = alertToBleJson(alert);
+    const String blePayload = alertToBleSimple(alert);
 
     Serial.print("SERIAL FULL: ");
     Serial.println(fullJson);
-    Serial.print("BLE TX COMPACT: ");
-    Serial.println(bleJson);
+    Serial.print("BLE TX SIMPLE: ");
+    Serial.println(blePayload);
 
     if (alertCharacteristic != nullptr) {
         alertCharacteristic->setValue(
-            reinterpret_cast<uint8_t*>(const_cast<char*>(bleJson.c_str())),
-            bleJson.length()
+            reinterpret_cast<uint8_t*>(const_cast<char*>(blePayload.c_str())),
+            blePayload.length()
         );
         Serial.print("BLE TX len=");
-        Serial.println(bleJson.length());
+        Serial.println(blePayload.length());
 
         if (bleClientConnected && bleClientSubscribed && ((millis() - bleConnectedAtMs) >= 1000)) {
             alertCharacteristic->notify();
