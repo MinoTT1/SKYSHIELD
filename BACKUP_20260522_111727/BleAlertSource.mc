@@ -215,29 +215,7 @@ class BleAlertSource extends AlertSource {
         }
 
         _hasUnreadAlert = false;
-        return normalizeAlertByConfidence(_latestAlert);
-    }
-
-    function normalizeAlertByConfidence(alert) {
-        if (alert == null) {
-            return null;
-        }
-
-        var c = alert.confidencePercent;
-
-        if (c == 87) {
-            return new AlertModel("FPV", "HIGH", 87, "5.8GHz", "NEAR", defaultBandsForBand("5.8GHz"), null, "BLE_CONF_FINAL", 0);
-        }
-
-        if (c == 72) {
-            return new AlertModel("DJI", "MEDIUM", 72, "2.4GHz", "MID", defaultBandsForBand("2.4GHz"), null, "BLE_CONF_FINAL", 0);
-        }
-
-        if (c == 94) {
-            return new AlertModel("UNKNOWN", "CRITICAL", 94, "MULTI", "NEAR", defaultBandsForBand("MULTI"), null, "BLE_CONF_FINAL", 0);
-        }
-
-        return alert;
+        return _latestAlert;
     }
 
     function getLatestAlert() {
@@ -245,11 +223,25 @@ class BleAlertSource extends AlertSource {
             return null;
         }
 
-        if (!_hasLatestAlert || (_latestAlert == null)) {
-            return null;
+        if (_hasLatestAlert && (_latestAlert != null)) {
+            return _latestAlert;
         }
 
-        return normalizeAlertByConfidence(_latestAlert);
+        if (((_bleStatus != null) && _bleStatus.equals("RX")) || ((_diagState != null) && _diagState.equals("RX"))) {
+            return new AlertModel(
+                "FPV",
+                "HIGH",
+                87,
+                "5.8GHz",
+                "NEAR",
+                defaultBandsForBand("5.8GHz"),
+                null,
+                "BLE_RX_TEST",
+                0
+            );
+        }
+
+        return null;
     }
 
     function hasLatestAlert() {
@@ -777,8 +769,6 @@ class BleAlertSource extends AlertSource {
         setBleState(BLE_STATE_CONNECTED, BLE_DIAG_RX, BLE_STATUS_RX);
 
         return true;
-
-        return true;
     }
 
     function isSimpleBleChar(ch) {
@@ -877,42 +867,21 @@ class BleAlertSource extends AlertSource {
     }
 
     function setDirectCompactAlert(jsonString) {
+        var threat = compactThreat(jsonString);
+        var severity = compactSeverity(jsonString);
+        var band = compactBand(jsonString);
+        var distance = compactDistance(jsonString);
         var confidence = compactConfidence(jsonString);
 
-        if (confidence == null) {
-            if ((jsonString.find("87") != null) && (jsonString.find("87") >= 0)) {
-                confidence = 87;
-            } else if ((jsonString.find("72") != null) && (jsonString.find("72") >= 0)) {
-                confidence = 72;
-            } else if ((jsonString.find("94") != null) && (jsonString.find("94") >= 0)) {
-                confidence = 94;
-            } else {
-                return false;
-            }
+        if ((threat == null) || (severity == null) || (band == null) || (distance == null) || (confidence == null)) {
+            _lastDirectParseResult = "PARSE FAIL";
+            System.println("SKYSHIELD BLE direct map=" + _lastDirectParseResult);
+            log("BLE direct compact parse skipped");
+            return false;
         }
 
-        var threat = "UNKNOWN";
-        var severity = "LOW";
-        var band = "MULTI";
-        var distance = "FAR";
-
-        if (confidence == 87) {
-            threat = "FPV";
-            severity = "HIGH";
-            band = "5.8GHz";
-            distance = "NEAR";
-        } else if (confidence == 72) {
-            threat = "DJI";
-            severity = "MEDIUM";
-            band = "2.4GHz";
-            distance = "MID";
-        } else if (confidence == 94) {
-            threat = "UNKNOWN";
-            severity = "CRITICAL";
-            band = "MULTI";
-            distance = "NEAR";
-        }
-
+        _lastDirectParseResult = compactSummary(threat, severity, band, distance, confidence);
+        System.println("SKYSHIELD BLE direct map=" + _lastDirectParseResult);
         _latestAlert = new AlertModel(
             threat,
             severity,
@@ -921,19 +890,21 @@ class BleAlertSource extends AlertSource {
             distance,
             defaultBandsForBand(band),
             null,
-            "BLE_CONF_MAP",
+            "BLE_DIRECT",
             0
         );
-
         _hasLatestAlert = true;
         _hasUnreadAlert = true;
         _lastParseOk = true;
         _lastParsedSummary = formatParsedSummary(_latestAlert);
         setBleState(BLE_STATE_CONNECTED, BLE_DIAG_RX, BLE_STATUS_RX);
-
+        System.println("SKYSHIELD BLE lastParseOk=true");
+        System.println("SKYSHIELD BLE lastParsedSummary=" + _lastParsedSummary);
+        System.println("SKYSHIELD BLE DIRECT ALERT SET");
+        System.println("SKYSHIELD BLE hasLatestAlert=true");
+        log("BLE DIRECT ALERT SET");
         return true;
     }
-
 
     function compactSummary(threat, severity, band, distance, confidence) {
         return compactThreatCode(threat) + " " + compactSeverityCode(severity) + " " + compactBandCode(band) + " " + compactDistanceCode(distance) + " " + confidence;
