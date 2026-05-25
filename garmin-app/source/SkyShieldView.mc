@@ -1,13 +1,17 @@
 import Toybox.Graphics;
+import Toybox.System;
 import Toybox.Timer;
 import Toybox.WatchUi;
 
-const SCREEN_ALERT = 0;
-const SCREEN_BANDS = 1;
+const UI_PHASE_ALERT = 0;
+const UI_PHASE_BANDS = 1;
+const UI_PHASE_IDLE = 2;
 const TIMER_INTERVAL_MS = 250;
 const SPLASH_DURATION_MS = 1000;
-const ALERT_DURATION_MS = 8000;
-const BANDS_DURATION_MS = 1500;
+const ALERT_DURATION_MS = 3000;
+const BANDS_DURATION_MS = 2000;
+const MONITOR_TIMEOUT_MS = 5000;
+const UI_CYCLE_MS = 5000;
 const MOCK_ALERT_ROTATION_MS = 4000;
 const CRITICAL_PULSE_MS = 750;
 const STALE_PACKET_MS = 10000;
@@ -16,6 +20,8 @@ const IDLE_PACKET_MS = 30000;
 class SkyShieldView extends WatchUi.View {
     var _engine;
     var _alert;
+    var _latestAlert;
+    var _displayAlert;
     var _settings;
     var _history;
     var _connectionState;
@@ -23,8 +29,6 @@ class SkyShieldView extends WatchUi.View {
     var _vibrationEngine;
     var _formatter;
     var _timer;
-    var _currentScreen;
-    var _screenElapsedMs;
     var _alertElapsedMs;
     var _packetAgeMs;
     var _splashElapsedMs;
@@ -34,6 +38,11 @@ class SkyShieldView extends WatchUi.View {
     var _trackKeys;
     var _trackCounts;
     var _activeTrackStability;
+    var _uiPhase;
+    var _rfSessionActive;
+    var _rfSessionStartedMs;
+    var _lastValidAlertMs;
+    var _uiCycleStartMs;
 
     function initialize() {
         View.initialize();
@@ -45,29 +54,40 @@ class SkyShieldView extends WatchUi.View {
         _vibrationEngine = new VibrationEngine(_settings);
         _formatter = new DisplayFormatter();
         _timer = null;
-        _currentScreen = SCREEN_ALERT;
-        _screenElapsedMs = 0;
+        _latestAlert = null;
+        _displayAlert = null;
         _alertElapsedMs = 0;
         _packetAgeMs = 0;
         _splashElapsedMs = 0;
         _criticalPulseElapsedMs = 0;
         _showSplash = true;
         _criticalPulseOn = true;
+        _uiPhase = UI_PHASE_IDLE;
+        _rfSessionActive = false;
+        _rfSessionStartedMs = 0;
+        _lastValidAlertMs = 0;
+        _uiCycleStartMs = 0;
         resetTrackStability();
     }
 
     function onShow() {
         _alert = _engine.getActiveAlert();
+        _latestAlert = _alert;
+        _displayAlert = null;
         resetTrackStability();
         updateTrackStability(_alert);
-        _currentScreen = SCREEN_ALERT;
-        _screenElapsedMs = 0;
         _alertElapsedMs = 0;
         _packetAgeMs = 0;
         _splashElapsedMs = 0;
         _criticalPulseElapsedMs = 0;
         _showSplash = true;
         _criticalPulseOn = true;
+        _uiPhase = UI_PHASE_IDLE;
+        _rfSessionActive = false;
+        _rfSessionStartedMs = 0;
+        _lastValidAlertMs = 0;
+        _uiCycleStartMs = 0;
+        _displayAlert = null;
         _connectionState.reset();
         addAlertToHistory(_alert);
         triggerVibrationIfNeeded();
@@ -93,9 +113,7 @@ class SkyShieldView extends WatchUi.View {
 
             if (_splashElapsedMs >= SPLASH_DURATION_MS) {
                 _splashElapsedMs = 0;
-                _screenElapsedMs = 0;
                 _showSplash = false;
-                _currentScreen = SCREEN_ALERT;
                 _engine.startBle();
             }
 
@@ -105,14 +123,12 @@ class SkyShieldView extends WatchUi.View {
 
         _alertElapsedMs += TIMER_INTERVAL_MS;
         updatePacketAge();
-        _screenElapsedMs += TIMER_INTERVAL_MS;
         _criticalPulseElapsedMs += TIMER_INTERVAL_MS;
         _engine.tick(TIMER_INTERVAL_MS);
 
         syncLiveBleAlert();
         updateCriticalPulse();
         updateAlertData();
-        updateScreenCycle();
 
         WatchUi.requestUpdate();
     }
@@ -131,10 +147,8 @@ class SkyShieldView extends WatchUi.View {
         _criticalPulseOn = true;
     }
 
-    function updateScreenCycle() {
-        if (_screenElapsedMs >= getCurrentScreenDurationMs()) {
-            advanceScreen();
-        }
+    function hasFreshAlert() {
+        return _rfSessionActive;
     }
 
     function updateAlertData() {
@@ -142,12 +156,14 @@ class SkyShieldView extends WatchUi.View {
 
         if (activeAlert != null) {
             if (activeAlert != _alert) {
+                var previousAlert = _alert;
                 _alert = activeAlert;
+                _latestAlert = activeAlert;
                 _packetAgeMs = 0;
                 updateTrackStability(_alert);
                 addAlertToHistory(_alert);
                 triggerVibrationIfNeeded();
-                showAlertForNewAlert();
+                handleAlertUpdate(previousAlert, _alert);
             }
 
             return;
@@ -162,10 +178,11 @@ class SkyShieldView extends WatchUi.View {
             _alertElapsedMs = 0;
             _packetAgeMs = 0;
             _alert = _engine.getNextAlert();
+            _latestAlert = _alert;
             updateTrackStability(_alert);
             addAlertToHistory(_alert);
             triggerVibrationIfNeeded();
-            showAlertForNewAlert();
+            handleAlertUpdate(null, _alert);
         }
     }
 
@@ -184,12 +201,77 @@ class SkyShieldView extends WatchUi.View {
             return;
         }
 
+        var previousAlert = _alert;
         _alert = liveAlert;
+        _latestAlert = liveAlert;
         _packetAgeMs = 0;
         updateTrackStability(_alert);
         addAlertToHistory(_alert);
         triggerVibrationIfNeeded();
-        showAlertForNewAlert();
+        handleAlertUpdate(previousAlert, _alert);
+    }
+
+    function handleAlertUpdate(previousAlert, newAlert) {
+        if (newAlert == null) {
+            return;
+        }
+
+        noteValidAlert(System.getTimer());
+    }
+
+    function noteValidAlert(now) {
+        _lastValidAlertMs = now;
+
+        if (!_rfSessionActive) {
+            _rfSessionActive = true;
+            _rfSessionStartedMs = now;
+            _uiCycleStartMs = now;
+            _displayAlert = _latestAlert;
+        }
+    }
+
+    function updateRfSessionState(now) {
+        if (_rfSessionActive && ((now - _lastValidAlertMs) > MONITOR_TIMEOUT_MS)) {
+            _rfSessionActive = false;
+            _uiPhase = UI_PHASE_IDLE;
+            _displayAlert = null;
+        }
+    }
+
+    function updateDisplayCycle(now) {
+        if (!_rfSessionActive) {
+            return;
+        }
+
+        if (_displayAlert == null) {
+            _displayAlert = _latestAlert;
+            _uiCycleStartMs = now;
+            return;
+        }
+
+        while ((now - _uiCycleStartMs) >= UI_CYCLE_MS) {
+            _uiCycleStartMs += UI_CYCLE_MS;
+
+            if (_latestAlert != null) {
+                _displayAlert = _latestAlert;
+            }
+        }
+    }
+
+    function getActiveSessionPhase(now) {
+        var elapsed = now - _uiCycleStartMs;
+
+        if (elapsed < 0) {
+            elapsed = 0;
+        }
+
+        elapsed = elapsed % UI_CYCLE_MS;
+
+        if (elapsed < ALERT_DURATION_MS) {
+            return UI_PHASE_ALERT;
+        }
+
+        return UI_PHASE_BANDS;
     }
 
     function addAlertToHistory(alert) {
@@ -271,40 +353,13 @@ class SkyShieldView extends WatchUi.View {
         }
     }
 
-    function advanceScreen() {
-        if (_currentScreen == SCREEN_ALERT) {
-            setCurrentScreen(SCREEN_BANDS);
-            return;
-        }
-
-        setCurrentScreen(SCREEN_ALERT);
-    }
-
-    function setCurrentScreen(screen) {
-        _currentScreen = screen;
-        _screenElapsedMs = 0;
-    }
-
-    function showAlertForNewAlert() {
-        if (_currentScreen == SCREEN_BANDS) {
-            setCurrentScreen(SCREEN_ALERT);
-        }
-    }
-
-    function getCurrentScreenDurationMs() {
-        if (_currentScreen == SCREEN_BANDS) {
-            return BANDS_DURATION_MS;
-        }
-
-        return ALERT_DURATION_MS;
-    }
-
     function triggerVibrationIfNeeded() {
         _vibrationEngine.triggerForAlert(_alert);
     }
 
     function onUpdate(dc) {
         var width = dc.getWidth();
+        var now = System.getTimer();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.clear();
@@ -316,12 +371,24 @@ class SkyShieldView extends WatchUi.View {
 
         var activeAlert = _engine.getActiveAlert();
 
-        if (activeAlert != null) {
+        if ((activeAlert != null) && (_alert == null)) {
             _alert = activeAlert;
-            if (_currentScreen == SCREEN_BANDS) {
+            _latestAlert = activeAlert;
+            noteValidAlert(now);
+        }
+
+        updateRfSessionState(now);
+        updateDisplayCycle(now);
+
+        if (_rfSessionActive && (_displayAlert != null)) {
+            _uiPhase = getActiveSessionPhase(now);
+
+            if (_uiPhase == UI_PHASE_ALERT) {
+                drawAlertScreen(dc, width);
+            } else if (_uiPhase == UI_PHASE_BANDS) {
                 drawBandsScreen(dc, width);
             } else {
-                drawAlertScreen(dc, width);
+                drawMonitorScreen(dc, width);
             }
 
             return;
@@ -338,10 +405,7 @@ class SkyShieldView extends WatchUi.View {
             return;
         }
 
-        dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, 88, diag, Graphics.FONT_TINY);
-        drawCentered(dc, width, 122, "NO DATA", Graphics.FONT_TINY);
-        drawBleStatusFooter(dc, width);
+        drawMonitorScreen(dc, width);
     }
 
     function drawSplashScreen(dc, width) {
@@ -422,7 +486,9 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function drawAlertScreen(dc, width) {
-        if (_alert == null) {
+        var alert = getDisplayAlert();
+
+        if (alert == null) {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             drawCentered(dc, width, 92, "NO DATA", Graphics.FONT_SMALL);
             drawBleStatusFooter(dc, width);
@@ -431,25 +497,41 @@ class SkyShieldView extends WatchUi.View {
 
         var y = 80;
         var trackState = getSystemHealthState();
-        var displaySeverity = _formatter.resolveSeverityForTrack(_alert, trackState);
+        var displaySeverity = _formatter.resolveSeverityForTrack(alert, trackState);
 
-        drawHealthMetadata(dc, width);
         drawAlertBanner(dc, width, _formatter.formatSeverity(displaySeverity), displaySeverity);
         dc.setColor(getRiskColor(displaySeverity), Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, _formatter.formatThreat(_alert.threatType), getAlertTitleFont());
+        drawCentered(dc, width, y, _formatter.formatThreat(alert.threatType), getAlertTitleFont());
         y += 27;
 
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, _formatter.formatConfidence(_alert.confidencePercent), Graphics.FONT_TINY);
         y += 27;
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, _formatter.formatBand(_alert.band), Graphics.FONT_TINY);
-        y += 27;
+        drawCentered(dc, width, y, _formatter.formatBand(alert.band), Graphics.FONT_TINY);
 
-        drawCentered(dc, width, y, _formatter.formatStrength(_alert.distanceLabel), Graphics.FONT_TINY);
+        drawActionState(dc, width, 214, alert);
+        drawBleStatusFooter(dc, width);
+    }
 
-        drawActionState(dc, width, 214);
+    function getDisplayAlert() {
+        if (_displayAlert != null) {
+            return _displayAlert;
+        }
+
+        return _alert;
+    }
+
+    function drawMonitorScreen(dc, width) {
+        if (_alert == null) {
+            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
+            drawCentered(dc, width, 104, "MONITOR", Graphics.FONT_SMALL);
+            drawBleStatusFooter(dc, width);
+            return;
+        }
+
+        dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, 104, "MONITOR", Graphics.FONT_SMALL);
+
         drawBleStatusFooter(dc, width);
     }
 
@@ -556,7 +638,9 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function drawBandsScreen(dc, width) {
-        if (_alert == null) {
+        var alert = getDisplayAlert();
+
+        if (alert == null) {
             drawBleStatusFooter(dc, width);
             return;
         }
@@ -569,8 +653,8 @@ class SkyShieldView extends WatchUi.View {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 
-        for (var i = 0; i < _alert.activeBands.size(); i += 1) {
-            var item = _alert.activeBands[i];
+        for (var i = 0; i < alert.activeBands.size(); i += 1) {
+            var item = alert.activeBands[i];
             drawCentered(dc, width, y, item[:band] + "  " + item[:level], Graphics.FONT_TINY);
             y += 28;
         }
@@ -600,6 +684,8 @@ class SkyShieldView extends WatchUi.View {
         var top = 50;
         var height = 19;
 
+        clearAlertBannerArea(dc, width, top, height);
+
         if ((riskLevel != null) && riskLevel.equals("CRITICAL")) {
             drawCriticalBanner(dc, width, label, margin, top, height);
             return;
@@ -611,6 +697,11 @@ class SkyShieldView extends WatchUi.View {
         }
 
         drawMediumBanner(dc, width, label, margin, top, height);
+    }
+
+    function clearAlertBannerArea(dc, width, top, height) {
+        dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
+        dc.fillRectangle(0, top - 6, width, height + 12);
     }
 
     function drawMediumBanner(dc, width, label, margin, top, height) {
@@ -666,8 +757,8 @@ class SkyShieldView extends WatchUi.View {
         return _formatter.formatBand(_alert.band);
     }
 
-    function drawActionState(dc, width, y) {
-        var action = _actionEngine.getAction(_alert, _connectionState);
+    function drawActionState(dc, width, y, alert) {
+        var action = _actionEngine.getAction(alert, _connectionState);
         var margin = 46;
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
