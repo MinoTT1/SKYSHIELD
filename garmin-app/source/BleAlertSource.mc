@@ -49,7 +49,6 @@ const BLE_ERR_PARSE = "ERR PARSE";
 const BLE_STAGE_TIMEOUT_MS = 20000;
 
 class BleAlertSource extends AlertSource {
-    var _parser;
     var _latestAlert;
     var _hasUnreadAlert;
     var _state;
@@ -92,7 +91,6 @@ class BleAlertSource extends AlertSource {
 
     function initialize() {
         AlertSource.initialize();
-        _parser = new AlertParser();
         _latestAlert = null;
         _hasUnreadAlert = false;
         _state = BLE_STATE_DISCONNECTED;
@@ -210,34 +208,8 @@ class BleAlertSource extends AlertSource {
             return null;
         }
 
-        if (!_hasUnreadAlert) {
-            return null;
-        }
-
         _hasUnreadAlert = false;
-        return normalizeAlertByConfidence(_latestAlert);
-    }
-
-    function normalizeAlertByConfidence(alert) {
-        if (alert == null) {
-            return null;
-        }
-
-        var c = alert.confidencePercent;
-
-        if (c == 87) {
-            return new AlertModel("FPV", "HIGH", 87, "5.8GHz", "NEAR", defaultBandsForBand("5.8GHz"), null, "BLE_CONF_FINAL", 0);
-        }
-
-        if (c == 72) {
-            return new AlertModel("DJI", "MEDIUM", 72, "2.4GHz", "MID", defaultBandsForBand("2.4GHz"), null, "BLE_CONF_FINAL", 0);
-        }
-
-        if (c == 94) {
-            return new AlertModel("UNKNOWN", "CRITICAL", 94, "MULTI", "NEAR", defaultBandsForBand("MULTI"), null, "BLE_CONF_FINAL", 0);
-        }
-
-        return alert;
+        return _latestAlert;
     }
 
     function getLatestAlert() {
@@ -249,11 +221,15 @@ class BleAlertSource extends AlertSource {
             return null;
         }
 
-        return normalizeAlertByConfidence(_latestAlert);
+        return _latestAlert;
     }
 
     function hasLatestAlert() {
-        return _hasLatestAlert;
+        return _hasLatestAlert && (_latestAlert != null);
+    }
+
+    function hasActiveBleAlert() {
+        return hasLatestAlert();
     }
 
     function hasValidBleAlert() {
@@ -679,83 +655,64 @@ class BleAlertSource extends AlertSource {
     function onNotificationBytes(bytes) {
         _lastPayloadLength = byteLength(bytes);
 
-        var payload = bytesToUtf8String(bytes);
-
-        if (payload == null) {
-            _lastRawPayload = "";
-            _lastDirectParseResult = "PARSE FAIL";
-            setBleError(BLE_STAGE_RX, "packet decode failed");
+        if ((bytes == null) || (bytes.size() < 6)) {
+            handleByteParseError("packet too short");
             return;
         }
 
-        var startIndex = payload.find("S1|");
+        var startIndex = findSimpleBytePayloadStart(bytes);
 
-        if ((startIndex != null) && (startIndex >= 0)) {
-            var simplePayload = payload.substring(startIndex, payload.length());
-            _lastRawPayload = simplePayload;
-
-            if (setSimpleBleAlert(simplePayload)) {
-                return;
-            }
-
-            _lastDirectParseResult = "PARSE FAIL";
-            setBleError(BLE_STAGE_RX, "simple payload parse failed");
+        if (startIndex < 0) {
+            handleByteParseError("S1 marker not found");
             return;
         }
 
-        _lastRawPayload = payload;
-        _lastDirectParseResult = "NO S1";
-        setBleError(BLE_STAGE_RX, "no simple payload marker");
-    }
+        // Format examples:
+        // S1|F|H|58|N|87
+        // S1|D|M|24|M|72
+        // S1|U|C|X|N|94
+        var threatStart = startIndex + 3;
+        var threatEnd = findPipeFrom(bytes, threatStart);
 
-    function extractSimplePayload(decodedString) {
-        if (decodedString == null) {
-            return null;
+        if ((threatEnd - threatStart) != 1) {
+            handleByteParseError("bad threat field");
+            return;
         }
 
-        var startIndex = decodedString.find("S1|");
+        var severityStart = threatEnd + 1;
+        var severityEnd = findPipeFrom(bytes, severityStart);
 
-        if ((startIndex == null) || (startIndex < 0)) {
-            return null;
+        if ((severityEnd - severityStart) != 1) {
+            handleByteParseError("bad severity field");
+            return;
         }
 
-        return decodedString.substring(startIndex, decodedString.length());
-    }
+        var bandStart = severityEnd + 1;
+        var bandEnd = findPipeFrom(bytes, bandStart);
 
-    
-    function setSimpleBleAlert(payload) {
-        if (payload == null) {
-            return false;
+        if (bandEnd <= bandStart) {
+            handleByteParseError("bad band field");
+            return;
         }
 
-        _lastRawPayload = payload;
+        var distanceStart = bandEnd + 1;
+        var distanceEnd = findPipeFrom(bytes, distanceStart);
 
-        var threat = "UNKNOWN";
-        var severity = "LOW";
-        var band = "MULTI";
-        var distance = "FAR";
-        var confidence = 0;
+        if ((distanceEnd - distanceStart) != 1) {
+            handleByteParseError("bad distance field");
+            return;
+        }
 
-        if ((payload.find("87") != null) && (payload.find("87") >= 0)) {
-            threat = "FPV";
-            severity = "HIGH";
-            band = "5.8GHz";
-            distance = "NEAR";
-            confidence = 87;
-        } else if ((payload.find("72") != null) && (payload.find("72") >= 0)) {
-            threat = "DJI";
-            severity = "MEDIUM";
-            band = "2.4GHz";
-            distance = "MID";
-            confidence = 72;
-        } else if ((payload.find("94") != null) && (payload.find("94") >= 0)) {
-            threat = "UNKNOWN";
-            severity = "CRITICAL";
-            band = "MULTI";
-            distance = "NEAR";
-            confidence = 94;
-        } else {
-            return false;
+        var confidenceStart = distanceEnd + 1;
+        var threat = threatFromByte(bytes[threatStart]);
+        var severity = severityFromByte(bytes[severityStart]);
+        var band = bandFromBytes(bytes, bandStart, bandEnd);
+        var distance = distanceFromByte(bytes[distanceStart]);
+        var confidence = confidenceFromBytes(bytes, confidenceStart);
+
+        if ((threat == null) || (severity == null) || (band == null) || (distance == null) || (confidence < 0)) {
+            handleByteParseError("field mapping failed");
+            return;
         }
 
         _latestAlert = new AlertModel(
@@ -766,7 +723,7 @@ class BleAlertSource extends AlertSource {
             distance,
             defaultBandsForBand(band),
             null,
-            "BLE_SIMPLE",
+            "BLE_BYTE_PARSE",
             0
         );
 
@@ -774,319 +731,125 @@ class BleAlertSource extends AlertSource {
         _hasUnreadAlert = true;
         _lastParseOk = true;
         _lastParsedSummary = formatParsedSummary(_latestAlert);
+        _lastDirectParseResult = formatParsedSummary(_latestAlert);
+        _lastRawPayload = "S1";
+        lastRxMs = _uptimeMs;
+        setLifecycleFlags(false, false, true, true, "byte rx alert");
         setBleState(BLE_STATE_CONNECTED, BLE_DIAG_RX, BLE_STATUS_RX);
+        System.println("SKYSHIELD BLE byte parse threat=" + threat + " severity=" + severity + " band=" + band + " distance=" + distance + " confidence=" + confidence);
 
-        return true;
-
-        return true;
+        return;
     }
 
-    function isSimpleBleChar(ch) {
-        var allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789|";
-        var match = allowed.find(ch);
-        return (match != null) && (match >= 0);
-    }
-
-    function getPipeField(text, targetIndex) {
-        if (text == null) {
-            return "";
-        }
-
-        var fieldIndex = 0;
-        var startIndex = 0;
+    function findSimpleBytePayloadStart(bytes) {
         var index = 0;
-        var textLength = text.length();
+        var maxIndex = bytes.size() - 2;
 
-        while (index < textLength) {
-            if (text.substring(index, index + 1) == "|") {
-                if (fieldIndex == targetIndex) {
-                    return text.substring(startIndex, index);
-                }
-
-                fieldIndex += 1;
-                startIndex = index + 1;
+        while (index < maxIndex) {
+            if ((bytes[index] == 83) && (bytes[index + 1] == 49) && (bytes[index + 2] == 124)) {
+                return index;
             }
 
             index += 1;
         }
 
-        if (fieldIndex == targetIndex) {
-            return text.substring(startIndex, textLength);
-        }
-
-        return "";
+        return -1;
     }
 
-    function simpleThreat(code) {
-        if (code == "F") { return "FPV"; }
-        if (code == "D") { return "DJI"; }
-        if (code == "U") { return "UNKNOWN"; }
-        return null;
-    }
+    function findPipeFrom(bytes, startIndex) {
+        var index = startIndex;
 
-    function simpleSeverity(code) {
-        if (code == "L") { return "LOW"; }
-        if (code == "M") { return "MEDIUM"; }
-        if (code == "H") { return "HIGH"; }
-        if (code == "C") { return "CRITICAL"; }
-        return null;
-    }
-
-    function simpleBand(code) {
-        if (code == "12") { return "1.2GHz"; }
-        if (code == "24") { return "2.4GHz"; }
-        if (code == "33") { return "3.3GHz"; }
-        if (code == "58") { return "5.8GHz"; }
-        if (code == "X") { return "MULTI"; }
-        return null;
-    }
-
-    function simpleDistance(code) {
-        if (code == "F") { return "FAR"; }
-        if (code == "M") { return "MID"; }
-        if (code == "N") { return "NEAR"; }
-        return null;
-    }
-
-    function simpleConfidence(code) {
-        if (code == null) {
-            return null;
-        }
-
-        var digits = "";
-        var index = 0;
-
-        while (index < code.length()) {
-            var ch = code.substring(index, index + 1);
-
-            if ((ch == "0") || (ch == "1") || (ch == "2") || (ch == "3") || (ch == "4") ||
-                (ch == "5") || (ch == "6") || (ch == "7") || (ch == "8") || (ch == "9")) {
-                digits += ch;
-            } else {
-                break;
+        while (index < bytes.size()) {
+            if (bytes[index] == 124) {
+                return index;
             }
 
             index += 1;
         }
 
-        if (digits.length() == 0) {
-            return null;
-        }
-
-        return digits.toNumber();
+        return -1;
     }
 
-    function setDirectCompactAlert(jsonString) {
-        var confidence = compactConfidence(jsonString);
-
-        if (confidence == null) {
-            if ((jsonString.find("87") != null) && (jsonString.find("87") >= 0)) {
-                confidence = 87;
-            } else if ((jsonString.find("72") != null) && (jsonString.find("72") >= 0)) {
-                confidence = 72;
-            } else if ((jsonString.find("94") != null) && (jsonString.find("94") >= 0)) {
-                confidence = 94;
-            } else {
-                return false;
-            }
-        }
-
-        var threat = "UNKNOWN";
-        var severity = "LOW";
-        var band = "MULTI";
-        var distance = "FAR";
-
-        if (confidence == 87) {
-            threat = "FPV";
-            severity = "HIGH";
-            band = "5.8GHz";
-            distance = "NEAR";
-        } else if (confidence == 72) {
-            threat = "DJI";
-            severity = "MEDIUM";
-            band = "2.4GHz";
-            distance = "MID";
-        } else if (confidence == 94) {
-            threat = "UNKNOWN";
-            severity = "CRITICAL";
-            band = "MULTI";
-            distance = "NEAR";
-        }
-
-        _latestAlert = new AlertModel(
-            threat,
-            severity,
-            confidence,
-            band,
-            distance,
-            defaultBandsForBand(band),
-            null,
-            "BLE_CONF_MAP",
-            0
-        );
-
-        _hasLatestAlert = true;
-        _hasUnreadAlert = true;
-        _lastParseOk = true;
-        _lastParsedSummary = formatParsedSummary(_latestAlert);
-        setBleState(BLE_STATE_CONNECTED, BLE_DIAG_RX, BLE_STATUS_RX);
-
-        return true;
-    }
-
-
-    function compactSummary(threat, severity, band, distance, confidence) {
-        return compactThreatCode(threat) + " " + compactSeverityCode(severity) + " " + compactBandCode(band) + " " + compactDistanceCode(distance) + " " + confidence;
-    }
-
-    function compactThreatCode(threat) {
-        if (threat == "FPV") {
-            return "F";
-        }
-
-        if (threat == "DJI") {
-            return "D";
-        }
-
-        return "U";
-    }
-
-    function compactSeverityCode(severity) {
-        if (severity == "LOW") {
-            return "L";
-        }
-
-        if (severity == "MEDIUM") {
-            return "M";
-        }
-
-        if (severity == "HIGH") {
-            return "H";
-        }
-
-        return "C";
-    }
-
-    function compactBandCode(band) {
-        if (band == "1.2GHz") {
-            return "12";
-        }
-
-        if (band == "2.4GHz") {
-            return "24";
-        }
-
-        if (band == "3.3GHz") {
-            return "33";
-        }
-
-        if (band == "5.8GHz") {
-            return "58";
-        }
-
-        return "M";
-    }
-
-    function compactDistanceCode(distance) {
-        if (distance == "FAR") {
-            return "F";
-        }
-
-        if (distance == "MID") {
-            return "M";
-        }
-
-        return "N";
-    }
-
-    function compactThreat(jsonString) {
-        if (hasToken(jsonString, "\"t\":\"F\"")) {
-            return "FPV";
-        }
-
-        if (hasToken(jsonString, "\"t\":\"D\"")) {
-            return "DJI";
-        }
-
-        if (hasToken(jsonString, "\"t\":\"U\"")) {
-            return "UNKNOWN";
-        }
-
+    function threatFromByte(code) {
+        if (code == 70) { return "FPV"; }
+        if (code == 68) { return "DJI"; }
+        if (code == 85) { return "UNKNOWN"; }
         return null;
     }
 
-    function compactSeverity(jsonString) {
-        if (hasToken(jsonString, "\"s\":\"L\"")) {
-            return "LOW";
-        }
-
-        if (hasToken(jsonString, "\"s\":\"M\"")) {
-            return "MEDIUM";
-        }
-
-        if (hasToken(jsonString, "\"s\":\"H\"")) {
-            return "HIGH";
-        }
-
-        if (hasToken(jsonString, "\"s\":\"C\"")) {
-            return "CRITICAL";
-        }
-
+    function severityFromByte(code) {
+        if (code == 72) { return "HIGH"; }
+        if (code == 77) { return "MEDIUM"; }
+        if (code == 67) { return "CRITICAL"; }
+        if (code == 76) { return "LOW"; }
         return null;
     }
 
-    function compactBand(jsonString) {
-        if (hasToken(jsonString, "\"b\":\"12\"")) {
-            return "1.2GHz";
-        }
+    function bandFromBytes(bytes, startIndex, endIndex) {
+        var fieldLength = endIndex - startIndex;
 
-        if (hasToken(jsonString, "\"b\":\"24\"")) {
-            return "2.4GHz";
-        }
-
-        if (hasToken(jsonString, "\"b\":\"33\"")) {
-            return "3.3GHz";
-        }
-
-        if (hasToken(jsonString, "\"b\":\"58\"")) {
-            return "5.8GHz";
-        }
-
-        if (hasToken(jsonString, "\"b\":\"M\"")) {
+        if ((fieldLength == 1) && (bytes[startIndex] == 88)) {
             return "MULTI";
         }
 
-        return null;
-    }
-
-    function compactDistance(jsonString) {
-        if (hasToken(jsonString, "\"r\":\"F\"")) {
-            return "FAR";
+        if (fieldLength != 2) {
+            return null;
         }
 
-        if (hasToken(jsonString, "\"r\":\"M\"")) {
-            return "MID";
-        }
+        var first = bytes[startIndex];
+        var second = bytes[startIndex + 1];
 
-        if (hasToken(jsonString, "\"r\":\"N\"")) {
-            return "NEAR";
-        }
+        if ((first == 53) && (second == 56)) { return "5.8GHz"; }
+        if ((first == 50) && (second == 52)) { return "2.4GHz"; }
+        if ((first == 51) && (second == 51)) { return "3.3GHz"; }
+        if ((first == 49) && (second == 50)) { return "1.2GHz"; }
 
         return null;
     }
 
-    function compactConfidence(jsonString) {
-        for (var value = 0; value <= 100; value += 1) {
-            if (hasToken(jsonString, "\"c\":" + value + ",")) {
-                return value;
+    function distanceFromByte(code) {
+        if (code == 78) { return "NEAR"; }
+        if (code == 77) { return "MID"; }
+        if (code == 70) { return "FAR"; }
+        return null;
+    }
+
+    function confidenceFromBytes(bytes, startIndex) {
+        var index = startIndex;
+        var confidence = 0;
+        var sawDigit = false;
+
+        while (index < bytes.size()) {
+            var value = bytes[index];
+
+            if ((value < 48) || (value > 57)) {
+                break;
             }
 
-            if (hasToken(jsonString, "\"c\":" + value + "}")) {
-                return value;
-            }
+            confidence = (confidence * 10) + (value - 48);
+            sawDigit = true;
+            index += 1;
         }
 
-        return null;
+        if (!sawDigit) {
+            return -1;
+        }
+
+        return confidence;
+    }
+
+    function handleByteParseError(reason) {
+        clearLatestAlert();
+        _lastParseOk = false;
+        _lastDirectParseResult = "ERR PARSE";
+        System.println("SKYSHIELD BLE byte parse error=" + reason);
+        setBleError(BLE_STAGE_RX, reason);
+    }
+
+    function clearLatestAlert() {
+        _latestAlert = null;
+        _hasLatestAlert = false;
+        _hasUnreadAlert = false;
     }
 
     function defaultBandsForBand(primaryBand) {
@@ -1099,27 +862,16 @@ class BleAlertSource extends AlertSource {
     }
 
     function bandLevel(primaryBand, candidateBand) {
-        if (primaryBand == "MULTI") {
+        if ((primaryBand != null) && primaryBand.equals("MULTI")) {
             return "MED";
         }
 
-        if (primaryBand == candidateBand) {
+        if ((primaryBand != null) && primaryBand.equals(candidateBand)) {
             return "HIGH";
         }
 
         return "NONE";
     }
-
-    function hasToken(jsonString, token) {
-        var index = jsonString.find(token);
-        return (index != null) && (index >= 0);
-    }
-
-    function onNotificationString(jsonString) {
-        log("legacy JSON notification ignored: " + jsonString);
-        return;
-    }
-
 
     function formatParsedSummary(alert) {
         if (alert == null) {
@@ -1156,38 +908,6 @@ class BleAlertSource extends AlertSource {
         }
 
         return bytes.toString();
-    }
-
-    function cleanJsonPayload(decodedString) {
-        var startIndex = decodedString.find("{");
-
-        if ((startIndex == null) || (startIndex < 0)) {
-            return "";
-        }
-
-        var endIndex = findLastIndex(decodedString, "}");
-
-        if ((endIndex == null) || (endIndex < startIndex)) {
-            return "";
-        }
-
-        return decodedString.substring(startIndex, endIndex + 1);
-    }
-
-    function findLastIndex(text, token) {
-        var index = 0;
-        var lastIndex = null;
-        var textLength = text.length();
-
-        while (index < textLength) {
-            if (text.substring(index, index + 1) == token) {
-                lastIndex = index;
-            }
-
-            index += 1;
-        }
-
-        return lastIndex;
     }
 
     function byteLength(bytes) {

@@ -32,6 +32,18 @@ class AlertEngine {
     }
 
     function getActiveAlert() {
+        if (_bleSource.hasLatestAlert()) {
+            _currentAlert = _bleSource.getLatestAlert();
+            setSource(ALERT_SOURCE_BLE);
+            return _currentAlert;
+        }
+
+        if ((_bleSource.getBleStatus().equals("RX")) && !_bleSource.wasLastParseOk()) {
+            _currentAlert = null;
+            setSource(ALERT_SOURCE_NONE);
+            return null;
+        }
+
         return _currentAlert;
     }
 
@@ -56,15 +68,6 @@ class AlertEngine {
             return _currentAlert;
         }
 
-        var bleAlert = _bleSource.getNextAlert();
-
-        if (bleAlert != null) {
-            _currentAlert = bleAlert;
-            setSource(ALERT_SOURCE_BLE);
-            System.println("SKYSHIELD AlertEngine using BLE alert=true");
-            return _currentAlert;
-        }
-
         if (USE_MOCK_FALLBACK) {
             _currentAlert = _mockSource.getNextAlert();
             setSource(ALERT_SOURCE_MOCK);
@@ -72,7 +75,6 @@ class AlertEngine {
             return _currentAlert;
         }
 
-        _currentAlert = null;
         setSource(ALERT_SOURCE_NONE);
         System.println("SKYSHIELD AlertEngine using BLE alert=false");
         return _currentAlert;
@@ -116,6 +118,10 @@ class AlertEngine {
 
     function hasValidBleAlert() {
         return _bleSource.hasValidBleAlert();
+    }
+
+    function hasBleAlert() {
+        return _bleSource.hasLatestAlert();
     }
 
     function getBleAlert() {

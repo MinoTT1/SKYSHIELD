@@ -83,11 +83,11 @@ class DisplayFormatter {
     }
 
     function formatThreat(threat) {
-        if (threat == "FPV") {
+        if ((threat != null) && threat.equals("FPV")) {
             return "FPV RF";
         }
 
-        if (threat == "DJI") {
+        if ((threat != null) && threat.equals("DJI")) {
             return "DJI RF";
         }
 
@@ -99,23 +99,23 @@ class DisplayFormatter {
     }
 
     function formatBand(band) {
-        if (band == "MULTI") {
+        if ((band != null) && band.equals("MULTI")) {
             return "MULTI RF";
         }
 
-        if (band == "1.2GHz") {
+        if ((band != null) && band.equals("1.2GHz")) {
             return "1.2GHz";
         }
 
-        if (band == "2.4GHz") {
+        if ((band != null) && band.equals("2.4GHz")) {
             return "2.4GHz";
         }
 
-        if (band == "3.3GHz") {
+        if ((band != null) && band.equals("3.3GHz")) {
             return "3.3GHz";
         }
 
-        if (band == "5.8GHz") {
+        if ((band != null) && band.equals("5.8GHz")) {
             return "5.8GHz";
         }
 
@@ -139,15 +139,15 @@ class DisplayFormatter {
     }
 
     function formatStrength(distance) {
-        if (distance == "NEAR") {
+        if ((distance != null) && distance.equals("NEAR")) {
             return "STRONG";
         }
 
-        if (distance == "MID") {
+        if ((distance != null) && distance.equals("MID")) {
             return "MODERATE";
         }
 
-        if (distance == "FAR") {
+        if ((distance != null) && distance.equals("FAR")) {
             return "WEAK";
         }
 
