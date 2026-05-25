@@ -15,11 +15,11 @@ class DisplayFormatter {
 
         var severity = alert.riskLevel;
 
-        if (severity == "CRITICAL") {
+        if ((severity != null) && severity.equals("CRITICAL")) {
             return "CRITICAL";
         }
 
-        if (severity == "HIGH") {
+        if ((severity != null) && severity.equals("HIGH")) {
             return "HIGH";
         }
 
@@ -51,7 +51,7 @@ class DisplayFormatter {
             return "MEDIUM";
         }
 
-        if (severity == "MEDIUM") {
+        if ((severity != null) && severity.equals("MEDIUM")) {
             return "MEDIUM";
         }
 
@@ -63,19 +63,19 @@ class DisplayFormatter {
     }
 
     function formatSeverity(severity) {
-        if (severity == "CRITICAL") {
+        if ((severity != null) && severity.equals("CRITICAL")) {
             return "ELEVATED";
         }
 
-        if (severity == "HIGH") {
+        if ((severity != null) && severity.equals("HIGH")) {
             return "HIGH";
         }
 
-        if (severity == "MEDIUM") {
+        if ((severity != null) && severity.equals("MEDIUM")) {
             return "MEDIUM";
         }
 
-        if (severity == "LOW") {
+        if ((severity != null) && severity.equals("LOW")) {
             return "LOW";
         }
 

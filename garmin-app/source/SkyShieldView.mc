@@ -118,7 +118,7 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function updateCriticalPulse() {
-        if ((_alert != null) && (_alert.riskLevel == "CRITICAL")) {
+        if ((_alert != null) && (_alert.riskLevel != null) && _alert.riskLevel.equals("CRITICAL")) {
             if (_criticalPulseElapsedMs >= CRITICAL_PULSE_MS) {
                 _criticalPulseElapsedMs = 0;
                 _criticalPulseOn = !_criticalPulseOn;
@@ -600,12 +600,12 @@ class SkyShieldView extends WatchUi.View {
         var top = 50;
         var height = 19;
 
-        if (riskLevel == "CRITICAL") {
+        if ((riskLevel != null) && riskLevel.equals("CRITICAL")) {
             drawCriticalBanner(dc, width, label, margin, top, height);
             return;
         }
 
-        if (riskLevel == "HIGH") {
+        if ((riskLevel != null) && riskLevel.equals("HIGH")) {
             drawHighBanner(dc, width, label, margin, top, height);
             return;
         }

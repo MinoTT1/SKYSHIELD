@@ -19,11 +19,11 @@ class VibrationEngine {
             return;
         }
 
-        if (alert.riskLevel == "MEDIUM") {
+        if ((alert.riskLevel != null) && alert.riskLevel.equals("MEDIUM")) {
             vibrateMedium();
-        } else if (alert.riskLevel == "HIGH") {
+        } else if ((alert.riskLevel != null) && alert.riskLevel.equals("HIGH")) {
             vibrateHigh();
-        } else if (alert.riskLevel == "CRITICAL") {
+        } else if ((alert.riskLevel != null) && alert.riskLevel.equals("CRITICAL")) {
             vibrateCritical();
         }
     }

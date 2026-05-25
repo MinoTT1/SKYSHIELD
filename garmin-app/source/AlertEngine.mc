@@ -148,6 +148,6 @@ class AlertEngine {
             return false;
         }
 
-        return (alert.riskLevel == "HIGH") || (alert.riskLevel == "CRITICAL");
+        return ((alert.riskLevel != null) && (alert.riskLevel.equals("HIGH") || alert.riskLevel.equals("CRITICAL")));
     }
 }
