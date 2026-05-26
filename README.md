@@ -2,7 +2,51 @@
 
 SKYSHIELD is a wearable RF situational awareness platform for field RF monitoring workflows. It connects simulated or external RF activity sources to a Garmin Enduro 2 wearable interface through an ESP32-S3 bridge.
 
-The system receives RF telemetry-style alert events, normalizes them into a shared protocol, and delivers concise RF awareness cues to a Garmin watch with clear text, confidence, freshness metadata, and vibration patterns.
+The system receives RF telemetry-style alert events, normalizes them into a compact BLE payload, and delivers concise RF awareness cues to a Garmin watch with clear text, deterministic screen flow, and vibration patterns.
+
+## Project Status
+
+The current MVP baseline is functional:
+
+- Garmin tactical HUD MVP is functional.
+- ESP32-to-Garmin BLE S2 payload pipeline works.
+- Garmin app renders live tactical alerts from BLE notifications.
+- The ALERT UI includes:
+  - drone classification top field
+  - RF threat type
+  - primary band
+  - signal strength
+  - left RF band activity
+  - right severity gauge
+  - `LIVE` / `RX` footer
+
+The current watch UI is an RF situational awareness HUD, not a validated drone detector or targeting system.
+
+## Architecture
+
+```text
+Drone Detector -> Middleware / ESP32 Bridge -> BLE S2 payload -> Garmin HUD
+```
+
+Responsibilities:
+
+Detector:
+
+- RF detection
+- vendor, protocol, or drone classification
+
+Middleware / ESP32:
+
+- telemetry normalization
+- payload generation
+- BLE transmission
+
+Garmin:
+
+- payload parsing
+- HUD rendering
+- haptics
+- deterministic ALERT/BANDS cycle
 
 ## Project Roles
 
@@ -12,6 +56,27 @@ The system receives RF telemetry-style alert events, normalizes them into a shar
 
 The Garmin watch does not perform RF detection. The ESP32-S3 does not replace specialized RF hardware. SKYSHIELD sits between RF telemetry sources and field operators.
 
+## Payload
+
+The current BLE baseline is documented in [PAYLOAD_SPEC.md](PAYLOAD_SPEC.md).
+
+Current wire format:
+
+```text
+S2|RF_TYPE|SEVERITY|BAND|STRENGTH|DRONE_CLASS
+```
+
+Examples:
+
+```text
+S2|F|H|58|N|FPV
+S2|D|M|24|M|MAVIC
+S2|U|C|X|N|UNKNOWN
+S2|D|M|24|M|AUTEL
+```
+
+The S2 payload intentionally does not include a confidence percentage. Drone classification comes from the upstream detector or middleware layer and is rendered as the top field on the Garmin ALERT screen.
+
 ## MVP Focus
 
 The first MVP uses simulated RF alerts rather than real RF sensing. It validates the protocol, BLE transport assumptions, packet freshness handling, Garmin HUD flow, and vibration behavior.
@@ -20,7 +85,7 @@ MVP alert fields:
 
 - Signal classification
 - RF activity level
-- Confidence score
+- Drone classification
 - Frequency band
 - Signal-strength category
 - Vibration pattern
@@ -84,6 +149,24 @@ SKYSHIELD/
     README.md
 ```
 
+## Build Instructions
+
+Garmin:
+
+```sh
+cd garmin-app
+"/Users/milankrcho/Library/Application Support/Garmin/ConnectIQ/Sdks/connectiq-sdk-mac-9.1.0-2026-03-09-6a872a80b/bin/monkeyc" -f monkey.jungle -o skyshield.prg -y ../developer_key
+```
+
+ESP32:
+
+Use VSCode PlatformIO:
+
+- open `esp32-bridge`
+- Build
+- Upload
+- Monitor
+
 ## Compatibility Targets
 
 Future RF source compatibility targets include:
@@ -95,6 +178,10 @@ Future RF source compatibility targets include:
 
 These targets are not part of the first simulated-alert MVP and require validation before any detection-performance claims.
 
-## Status
+## Notes
 
-Active prototype documentation, Garmin MVP scaffold, ESP32 simulated bridge scaffold, protocol examples, and replay tooling exist. Real RF sensing, BLE production integration, and detector adapter validation are not complete.
+- Confidence percentage was removed from the BLE S2 payload and Garmin ALERT screen intentionally.
+- Garmin must not invent fake telemetry.
+- No fake radar, fake direction, or fake confidence should be displayed.
+- Generated build files are ignored by git.
+- Real RF sensing and detector adapter validation are not complete.
