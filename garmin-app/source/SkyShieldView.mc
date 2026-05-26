@@ -495,22 +495,167 @@ class SkyShieldView extends WatchUi.View {
             return;
         }
 
-        var y = 80;
         var trackState = getSystemHealthState();
         var displaySeverity = _formatter.resolveSeverityForTrack(alert, trackState);
+        var severityLabel = _formatter.formatSeverity(displaySeverity);
+        var y = 94;
 
-        drawAlertBanner(dc, width, _formatter.formatSeverity(displaySeverity), displaySeverity);
+        drawAlertTopSeparator(dc, width);
+        drawDroneClassHeader(dc, width, alert);
+
         dc.setColor(getRiskColor(displaySeverity), Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _formatter.formatThreat(alert.threatType), getAlertTitleFont());
-        y += 27;
-
-        y += 27;
+        y += 35;
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _formatter.formatBand(alert.band), Graphics.FONT_TINY);
+        y += 31;
+
+        drawCentered(dc, width, y, _formatter.formatStrength(alert.distanceLabel), Graphics.FONT_TINY);
 
         drawActionState(dc, width, 214, alert);
         drawBleStatusFooter(dc, width);
+        drawAlertBandActivityMeter(dc, alert);
+        drawAlertSeverityMeter(dc, width, severityLabel);
+    }
+
+    function drawAlertTopSeparator(dc, width) {
+        var margin = 48;
+
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+        dc.drawLine(margin, 76, width - margin, 76);
+    }
+
+    function drawDroneClassHeader(dc, width, alert) {
+        var label = getDroneClassLabel(alert);
+        var font = Graphics.FONT_MEDIUM;
+        var y = 35;
+
+        if (label.equals("UNKNOWN")) {
+            font = Graphics.FONT_SMALL;
+            y = 39;
+        }
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, label, font);
+        drawCentered(dc, width + 2, y, label, font);
+    }
+
+    function getDroneClassLabel(alert) {
+        if ((alert == null) || (alert.droneClass == null) || alert.droneClass.equals("")) {
+            return "UNKNOWN";
+        }
+
+        return alert.droneClass;
+    }
+
+    function drawAlertBandActivityMeter(dc, alert) {
+        if ((alert == null) || (alert.activeBands == null)) {
+            return;
+        }
+
+        var labelX = 18;
+        var markerX = 43;
+
+        drawAlertBandActivityRow(dc, labelX, markerX, 92, alert, "1.2");
+        drawAlertBandActivityRow(dc, labelX, markerX, 114, alert, "2.4");
+        drawAlertBandActivityRow(dc, labelX, markerX, 136, alert, "3.3");
+        drawAlertBandActivityRow(dc, labelX, markerX, 158, alert, "5.8");
+    }
+
+    function drawAlertBandActivityRow(dc, labelX, markerX, y, alert, bandLabel) {
+        var level = getActiveBandLevel(alert, bandLabel);
+
+        if (isBandActive(level)) {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+            dc.drawText(labelX, y, Graphics.FONT_XTINY, bandLabel, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(labelX + 1, y, Graphics.FONT_XTINY, bandLabel, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.fillRectangle(markerX, y + 8, 3, 3);
+            return;
+        }
+
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+        dc.drawText(labelX, y, Graphics.FONT_XTINY, bandLabel, Graphics.TEXT_JUSTIFY_LEFT);
+    }
+
+    function getActiveBandLevel(alert, bandLabel) {
+        for (var i = 0; i < alert.activeBands.size(); i += 1) {
+            var item = alert.activeBands[i];
+
+            if ((item[:band] != null) && item[:band].equals(bandLabel)) {
+                return item[:level];
+            }
+        }
+
+        return null;
+    }
+
+    function isBandActive(level) {
+        if (level == null) {
+            return false;
+        }
+
+        if (level.equals("NONE")) {
+            return false;
+        }
+
+        if (level.equals("-")) {
+            return false;
+        }
+
+        if (level.equals("")) {
+            return false;
+        }
+
+        return level.equals("LOW") ||
+            level.equals("MED") ||
+            level.equals("MEDIUM") ||
+            level.equals("HIGH") ||
+            level.equals("ACTIVE");
+    }
+
+    function drawAlertSeverityMeter(dc, width, severityLabel) {
+        var labelX = width - 46;
+
+        drawSeverityMeterRow(dc, labelX, 92, "LOW", severityLabel);
+        drawSeverityMeterRow(dc, labelX, 114, "MED", severityLabel);
+        drawSeverityMeterRow(dc, labelX, 136, "HIGH", severityLabel);
+        drawSeverityMeterRow(dc, labelX, 158, "ELEV", severityLabel);
+    }
+
+    function drawSeverityMeterRow(dc, labelX, y, label, severityLabel) {
+        if (isSeverityMeterActive(label, severityLabel)) {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+            dc.drawText(labelX, y, Graphics.FONT_XTINY, label, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(labelX + 1, y, Graphics.FONT_XTINY, label, Graphics.TEXT_JUSTIFY_LEFT);
+        } else {
+            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
+            dc.drawText(labelX, y, Graphics.FONT_XTINY, label, Graphics.TEXT_JUSTIFY_LEFT);
+        }
+    }
+
+    function isSeverityMeterActive(label, severityLabel) {
+        if (severityLabel == null) {
+            return false;
+        }
+
+        if (label.equals("LOW") && severityLabel.equals("LOW")) {
+            return true;
+        }
+
+        if (label.equals("MED") && severityLabel.equals("MEDIUM")) {
+            return true;
+        }
+
+        if (label.equals("HIGH") && severityLabel.equals("HIGH")) {
+            return true;
+        }
+
+        if (label.equals("ELEV") && (severityLabel.equals("ELEVATED") || severityLabel.equals("CRITICAL"))) {
+            return true;
+        }
+
+        return false;
     }
 
     function getDisplayAlert() {
@@ -655,9 +800,17 @@ class SkyShieldView extends WatchUi.View {
 
         for (var i = 0; i < alert.activeBands.size(); i += 1) {
             var item = alert.activeBands[i];
-            drawCentered(dc, width, y, item[:band] + "  " + item[:level], Graphics.FONT_TINY);
+            drawCentered(dc, width, y, item[:band] + "  " + formatBandLevelForBandsScreen(alert, item[:level]), Graphics.FONT_TINY);
             y += 28;
         }
+    }
+
+    function formatBandLevelForBandsScreen(alert, level) {
+        if ((alert != null) && (alert.band != null) && alert.band.equals("MULTI")) {
+            return "ACTIVE";
+        }
+
+        return level;
     }
 
     function drawHistoryScreen(dc, width) {
@@ -691,11 +844,6 @@ class SkyShieldView extends WatchUi.View {
             return;
         }
 
-        if ((riskLevel != null) && riskLevel.equals("HIGH")) {
-            drawHighBanner(dc, width, label, margin, top, height);
-            return;
-        }
-
         drawMediumBanner(dc, width, label, margin, top, height);
     }
 
@@ -713,11 +861,7 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function drawHighBanner(dc, width, label, margin, top, height) {
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        dc.drawRectangle(margin, top, width - (margin * 2), height);
-        dc.drawRectangle(margin + 1, top + 1, width - (margin * 2) - 2, height - 2);
-
-        drawCentered(dc, width, top + 1, label, Graphics.FONT_SMALL);
+        drawMediumBanner(dc, width, label, margin, top, height);
     }
 
     function drawCriticalBanner(dc, width, label, margin, top, height) {
@@ -758,14 +902,13 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function drawActionState(dc, width, y, alert) {
-        var action = _actionEngine.getAction(alert, _connectionState);
         var margin = 46;
 
-        dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
         dc.drawLine(margin, y - 12, width - margin, y - 12);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y + 2, action, Graphics.FONT_TINY);
+        drawCentered(dc, width, y + 2, "LIVE", Graphics.FONT_TINY);
     }
 
     function hasAlertValue(value, expected) {

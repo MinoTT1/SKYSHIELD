@@ -10,6 +10,7 @@ class AlertModel {
     var directionLabel;
     var source;
     var sequence;
+    var droneClass;
 
     function initialize(threat, risk, confidence, primaryBand, distance, bands, directionValue, sourceLabel, sequenceNumber) {
         threatType = threat;
@@ -21,5 +22,6 @@ class AlertModel {
         directionLabel = directionValue;
         source = sourceLabel;
         sequence = sequenceNumber;
+        droneClass = "UNKNOWN";
     }
 }

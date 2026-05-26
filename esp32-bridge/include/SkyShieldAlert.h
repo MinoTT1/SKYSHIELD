@@ -12,6 +12,7 @@ struct SkyShieldAlert {
     const char* band_2_4;
     const char* band_3_3;
     const char* band_5_8;
+    const char* droneClass;
 };
 
 inline const char* compactThreat(const char* threat);
@@ -62,7 +63,7 @@ inline String alertToBleJson(const SkyShieldAlert& alert) {
 }
 
 inline String alertToBleSimple(const SkyShieldAlert& alert) {
-    String payload = "S1|";
+    String payload = "S2|";
     payload += compactThreat(alert.threat);
     payload += "|";
     payload += compactSeverity(alert.severity);
@@ -71,7 +72,7 @@ inline String alertToBleSimple(const SkyShieldAlert& alert) {
     payload += "|";
     payload += compactDistance(alert.distance);
     payload += "|";
-    payload += alert.confidence;
+    payload += alert.droneClass;
     return payload;
 }
 

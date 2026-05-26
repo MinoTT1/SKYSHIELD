@@ -23,7 +23,7 @@ private:
 };
 
 const SkyShieldAlert MockAlertProvider::ALERTS[MockAlertProvider::ALERT_COUNT] = {
-    { "FPV", "HIGH", "5.8GHz", "NEAR", 87, "LOW", "LOW", "MED", "HIGH" },
-    { "DJI", "MEDIUM", "2.4GHz", "MID", 72, "LOW", "MED", "MED", "LOW" },
-    { "UNKNOWN", "CRITICAL", "MULTI", "NEAR", 94, "HIGH", "MED", "MED", "HIGH" }
+    { "FPV", "HIGH", "5.8GHz", "NEAR", 87, "LOW", "LOW", "MED", "HIGH", "FPV" },
+    { "DJI", "MEDIUM", "2.4GHz", "MID", 72, "LOW", "MED", "MED", "LOW", "MAVIC" },
+    { "UNKNOWN", "CRITICAL", "MULTI", "NEAR", 94, "HIGH", "MED", "MED", "HIGH", "UNKNOWN" }
 };

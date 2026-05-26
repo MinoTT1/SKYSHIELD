@@ -68,59 +68,101 @@ _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_18_64_2
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_18_8_20_8_if_end:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 22 8 ]
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_8_28_8_if_stmt:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_12_22_72_begin:
         %tmp.14 = lgetv %alert;
-        symbol [ alert %tmp.14 22 12 17 ];
-        symbol [ riskLevel %tmp.15 22 18 27 ];
+        symbol [ alert %tmp.14 22 13 18 ];
+        symbol [ riskLevel %tmp.15 22 19 28 ];
         %tmp.15 = getv %tmp.14 :riskLevel;
-        %tmp.16 = "MEDIUM";
-        %tmp.17 = eq %tmp.15 %tmp.16;
+        %tmp.16 = null;
+        %tmp.17 = ne %tmp.15 %tmp.16;
         bf %tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_8_28_8_if_false;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_41_22_72_true:
+        %tmp.18 = lgetv %alert;
+        symbol [ alert %tmp.18 22 41 46 ];
+        symbol [ riskLevel %tmp.19 22 47 56 ];
+        %tmp.19 = getv %tmp.18 :riskLevel;
+        symbol [ equals %tmp.20 22 57 63 ];
+        %tmp.20 = getv function %tmp.19 :equals;
+        %tmp.21 = "MEDIUM";
+        %tmp.22 = invoke %tmp.19 %tmp.20(%tmp.21);
+        push %tmp.22;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_41_22_72_end:
+        %tmp.23 = phi [%tmp.17 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_12_22_72_begin] [%tmp.22 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_41_22_72_true] [%tmp.23 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_41_22_72_end];
+        bf %tmp.23 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_8_28_8_if_false;
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_8_28_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_41_24_8_start:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_75_24_8_start:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 23 12 ]
-        %tmp.18 = self;
-        symbol [ vibrateMedium %tmp.19 23 12 25 ];
-        %tmp.19 = getv function %tmp.18 :vibrateMedium;
-        invoke %tmp.18 %tmp.19();
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_41_24_8_stop:
+        %tmp.24 = self;
+        symbol [ vibrateMedium %tmp.25 23 12 25 ];
+        %tmp.25 = getv function %tmp.24 :vibrateMedium;
+        invoke %tmp.24 %tmp.25();
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_75_24_8_stop:
         goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_8_28_8_if_end;
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_22_8_28_8_if_false:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 24 15 ]
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_15_28_8_if_stmt:
-        %tmp.20 = lgetv %alert;
-        symbol [ alert %tmp.20 24 19 24 ];
-        symbol [ riskLevel %tmp.21 24 25 34 ];
-        %tmp.21 = getv %tmp.20 :riskLevel;
-        %tmp.22 = "HIGH";
-        %tmp.23 = eq %tmp.21 %tmp.22;
-        bf %tmp.23 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_15_28_8_if_false;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_19_24_77_begin:
+        %tmp.26 = lgetv %alert;
+        symbol [ alert %tmp.26 24 20 25 ];
+        symbol [ riskLevel %tmp.27 24 26 35 ];
+        %tmp.27 = getv %tmp.26 :riskLevel;
+        %tmp.28 = null;
+        %tmp.29 = ne %tmp.27 %tmp.28;
+        bf %tmp.29 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_15_28_8_if_false;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_48_24_77_true:
+        %tmp.30 = lgetv %alert;
+        symbol [ alert %tmp.30 24 48 53 ];
+        symbol [ riskLevel %tmp.31 24 54 63 ];
+        %tmp.31 = getv %tmp.30 :riskLevel;
+        symbol [ equals %tmp.32 24 64 70 ];
+        %tmp.32 = getv function %tmp.31 :equals;
+        %tmp.33 = "HIGH";
+        %tmp.34 = invoke %tmp.31 %tmp.32(%tmp.33);
+        push %tmp.34;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_48_24_77_end:
+        %tmp.35 = phi [%tmp.29 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_19_24_77_begin] [%tmp.34 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_48_24_77_true] [%tmp.35 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_48_24_77_end];
+        bf %tmp.35 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_15_28_8_if_false;
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_15_28_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_46_26_8_start:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_80_26_8_start:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 25 12 ]
-        %tmp.24 = self;
-        symbol [ vibrateHigh %tmp.25 25 12 23 ];
-        %tmp.25 = getv function %tmp.24 :vibrateHigh;
-        invoke %tmp.24 %tmp.25();
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_46_26_8_stop:
+        %tmp.36 = self;
+        symbol [ vibrateHigh %tmp.37 25 12 23 ];
+        %tmp.37 = getv function %tmp.36 :vibrateHigh;
+        invoke %tmp.36 %tmp.37();
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_80_26_8_stop:
         goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_15_28_8_if_end;
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_15_28_8_if_false:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 26 15 ]
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_15_28_8_if_stmt:
-        %tmp.26 = lgetv %alert;
-        symbol [ alert %tmp.26 26 19 24 ];
-        symbol [ riskLevel %tmp.27 26 25 34 ];
-        %tmp.27 = getv %tmp.26 :riskLevel;
-        %tmp.28 = "CRITICAL";
-        %tmp.29 = eq %tmp.27 %tmp.28;
-        bf %tmp.29 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_15_28_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_19_26_81_begin:
+        %tmp.38 = lgetv %alert;
+        symbol [ alert %tmp.38 26 20 25 ];
+        symbol [ riskLevel %tmp.39 26 26 35 ];
+        %tmp.39 = getv %tmp.38 :riskLevel;
+        %tmp.40 = null;
+        %tmp.41 = ne %tmp.39 %tmp.40;
+        bf %tmp.41 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_15_28_8_if_end;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_48_26_81_true:
+        %tmp.42 = lgetv %alert;
+        symbol [ alert %tmp.42 26 48 53 ];
+        symbol [ riskLevel %tmp.43 26 54 63 ];
+        %tmp.43 = getv %tmp.42 :riskLevel;
+        symbol [ equals %tmp.44 26 64 70 ];
+        %tmp.44 = getv function %tmp.43 :equals;
+        %tmp.45 = "CRITICAL";
+        %tmp.46 = invoke %tmp.43 %tmp.44(%tmp.45);
+        push %tmp.46;
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_48_26_81_end:
+        %tmp.47 = phi [%tmp.41 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_19_26_81_begin] [%tmp.46 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_48_26_81_true] [%tmp.47 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_48_26_81_end];
+        bf %tmp.47 @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_15_28_8_if_end;
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_15_28_8_if_true:
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_50_28_8_start:
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_84_28_8_start:
 [ "/Users/milankrcho/AI_WORK/SKYSHIELD/garmin-app/source/VibrationEngine.mc" 27 12 ]
-        %tmp.30 = self;
-        symbol [ vibrateCritical %tmp.31 27 12 27 ];
-        %tmp.31 = getv function %tmp.30 :vibrateCritical;
-        invoke %tmp.30 %tmp.31();
-_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_50_28_8_stop:
+        %tmp.48 = self;
+        symbol [ vibrateCritical %tmp.49 27 12 27 ];
+        %tmp.49 = getv function %tmp.48 :vibrateCritical;
+        invoke %tmp.48 %tmp.49();
+_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_84_28_8_stop:
         goto @_Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_15_28_8_if_end;
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_26_15_28_8_if_end:
 _Users_milankrcho_AI_WORK_SKYSHIELD_garmin_app_source_VibrationEngine_mc_24_15_28_8_if_end:

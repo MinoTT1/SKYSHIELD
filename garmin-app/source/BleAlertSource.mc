@@ -663,14 +663,14 @@ class BleAlertSource extends AlertSource {
         var startIndex = findSimpleBytePayloadStart(bytes);
 
         if (startIndex < 0) {
-            handleByteParseError("S1 marker not found");
+            handleByteParseError("S2 marker not found");
             return;
         }
 
         // Format examples:
-        // S1|F|H|58|N|87
-        // S1|D|M|24|M|72
-        // S1|U|C|X|N|94
+        // S2|F|H|58|N|FPV
+        // S2|D|M|24|M|MAVIC
+        // S2|U|C|X|N|UNKNOWN
         var threatStart = startIndex + 3;
         var threatEnd = findPipeFrom(bytes, threatStart);
 
@@ -703,12 +703,20 @@ class BleAlertSource extends AlertSource {
             return;
         }
 
-        var confidenceStart = distanceEnd + 1;
+        var finalFieldStart = distanceEnd + 1;
+        var isS2Payload = bytes[startIndex + 1] == 50;
         var threat = threatFromByte(bytes[threatStart]);
         var severity = severityFromByte(bytes[severityStart]);
         var band = bandFromBytes(bytes, bandStart, bandEnd);
         var distance = distanceFromByte(bytes[distanceStart]);
-        var confidence = confidenceFromBytes(bytes, confidenceStart);
+        var confidence = 0;
+        var droneClass = "UNKNOWN";
+
+        if (isS2Payload) {
+            droneClass = droneClassFromBytes(bytes, finalFieldStart);
+        } else {
+            confidence = confidenceFromBytes(bytes, finalFieldStart);
+        }
 
         if ((threat == null) || (severity == null) || (band == null) || (distance == null) || (confidence < 0)) {
             handleByteParseError("field mapping failed");
@@ -726,6 +734,7 @@ class BleAlertSource extends AlertSource {
             "BLE_BYTE_PARSE",
             0
         );
+        _latestAlert.droneClass = droneClass;
 
         _hasLatestAlert = true;
         _hasUnreadAlert = true;
@@ -736,7 +745,7 @@ class BleAlertSource extends AlertSource {
         lastRxMs = _uptimeMs;
         setLifecycleFlags(false, false, true, true, "byte rx alert");
         setBleState(BLE_STATE_CONNECTED, BLE_DIAG_RX, BLE_STATUS_RX);
-        System.println("SKYSHIELD BLE byte parse threat=" + threat + " severity=" + severity + " band=" + band + " distance=" + distance + " confidence=" + confidence);
+        System.println("SKYSHIELD BLE byte parse threat=" + threat + " severity=" + severity + " band=" + band + " distance=" + distance + " droneClass=" + droneClass);
 
         return;
     }
@@ -746,7 +755,7 @@ class BleAlertSource extends AlertSource {
         var maxIndex = bytes.size() - 2;
 
         while (index < maxIndex) {
-            if ((bytes[index] == 83) && (bytes[index + 1] == 49) && (bytes[index + 2] == 124)) {
+            if ((bytes[index] == 83) && ((bytes[index + 1] == 50) || (bytes[index + 1] == 49)) && (bytes[index + 2] == 124)) {
                 return index;
             }
 
@@ -836,6 +845,36 @@ class BleAlertSource extends AlertSource {
         }
 
         return confidence;
+    }
+
+    function droneClassFromBytes(bytes, startIndex) {
+        if (matchesBytes(bytes, startIndex, [70, 80, 86])) {
+            return "FPV";
+        }
+
+        if (matchesBytes(bytes, startIndex, [77, 65, 86, 73, 67])) {
+            return "MAVIC";
+        }
+
+        if (matchesBytes(bytes, startIndex, [65, 85, 84, 69, 76])) {
+            return "AUTEL";
+        }
+
+        return "UNKNOWN";
+    }
+
+    function matchesBytes(bytes, startIndex, expected) {
+        if ((startIndex + expected.size()) > bytes.size()) {
+            return false;
+        }
+
+        for (var i = 0; i < expected.size(); i += 1) {
+            if (bytes[startIndex + i] != expected[i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     function handleByteParseError(reason) {
