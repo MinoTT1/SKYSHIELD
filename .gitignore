@@ -21,3 +21,12 @@ __pycache__/
 
 # Logs
 *.log
+# Garmin Connect IQ generated files
+garmin-app/*.prg
+garmin-app/*.prg.debug.xml
+garmin-app/external-mir/
+
+# Local backups
+BACKUPS/
+BACKUP_*/
+BACKUP_GOOD_RX_*/
