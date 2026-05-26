@@ -15,10 +15,21 @@ struct SkyShieldAlert {
     const char* droneClass;
 };
 
+struct NormalizedAlert {
+    const char* rfType;
+    const char* severity;
+    const char* band;
+    const char* strength;
+    const char* droneClass;
+};
+
 inline const char* compactThreat(const char* threat);
 inline const char* compactSeverity(const char* severity);
 inline const char* compactBand(const char* band);
 inline const char* compactDistance(const char* distance);
+inline NormalizedAlert normalizeAlert(const SkyShieldAlert& alert);
+inline String alertToBleS2(const NormalizedAlert& alert);
+inline String normalizedAlertSummary(const NormalizedAlert& alert);
 
 inline String alertToJson(const SkyShieldAlert& alert, uint32_t sequence) {
     String json = "{";
@@ -63,17 +74,47 @@ inline String alertToBleJson(const SkyShieldAlert& alert) {
 }
 
 inline String alertToBleSimple(const SkyShieldAlert& alert) {
+    return alertToBleS2(normalizeAlert(alert));
+}
+
+inline NormalizedAlert normalizeAlert(const SkyShieldAlert& alert) {
+    NormalizedAlert normalized = {
+        compactThreat(alert.threat),
+        compactSeverity(alert.severity),
+        compactBand(alert.band),
+        compactDistance(alert.distance),
+        alert.droneClass
+    };
+
+    return normalized;
+}
+
+inline String alertToBleS2(const NormalizedAlert& alert) {
     String payload = "S2|";
-    payload += compactThreat(alert.threat);
+    payload += alert.rfType;
     payload += "|";
-    payload += compactSeverity(alert.severity);
+    payload += alert.severity;
     payload += "|";
-    payload += compactBand(alert.band);
+    payload += alert.band;
     payload += "|";
-    payload += compactDistance(alert.distance);
+    payload += alert.strength;
     payload += "|";
     payload += alert.droneClass;
     return payload;
+}
+
+inline String normalizedAlertSummary(const NormalizedAlert& alert) {
+    String summary = "rfType=";
+    summary += alert.rfType;
+    summary += " severity=";
+    summary += alert.severity;
+    summary += " band=";
+    summary += alert.band;
+    summary += " strength=";
+    summary += alert.strength;
+    summary += " droneClass=";
+    summary += alert.droneClass;
+    return summary;
 }
 
 inline const char* compactThreat(const char* threat) {

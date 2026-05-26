@@ -1,11 +1,14 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 
+#include "DetectorInputAdapter.h"
 #include "MockAlertProvider.h"
 
 namespace {
 MockAlertProvider mockAlerts;
+DetectorInputAdapter detectorInput;
 
+const bool MOCK_MODE = true;
 const uint32_t ALERT_INTERVAL_MS = 4000;
 const char* BLE_DEVICE_NAME = "SKYSHIELD-BRIDGE";
 const char* SKYSHIELD_SERVICE_UUID = "9f4d0001-7c31-4f9b-9a4b-8f4c0f000001";
@@ -17,6 +20,10 @@ uint32_t sequence = 1;
 bool bleClientConnected = false;
 bool bleClientSubscribed = false;
 NimBLECharacteristic* alertCharacteristic = nullptr;
+
+const char* modeLabel() {
+    return MOCK_MODE ? "MOCK" : "LIVE";
+}
 
 class SkyShieldServerCallbacks : public NimBLEServerCallbacks {
 public:
@@ -75,13 +82,12 @@ void initBle() {
     Serial.println("BLE advertising as SKYSHIELD-BRIDGE");
 }
 
-void publishAlert(const SkyShieldAlert& alert) {
-    const String fullJson = alertToJson(alert, sequence);
-    const String blePayload = alertToBleSimple(alert);
+void publishNormalizedAlert(const NormalizedAlert& alert) {
+    const String blePayload = alertToBleS2(alert);
 
-    Serial.print("SERIAL FULL: ");
-    Serial.println(fullJson);
-    Serial.print("BLE TX SIMPLE: ");
+    Serial.print("NORMALIZED ALERT: ");
+    Serial.println(normalizedAlertSummary(alert));
+    Serial.print("BLE TX S2: ");
     Serial.println(blePayload);
 
     if (alertCharacteristic != nullptr) {
@@ -100,6 +106,30 @@ void publishAlert(const SkyShieldAlert& alert) {
 
     sequence += 1;
 }
+
+void publishMockAlert(const SkyShieldAlert& alert) {
+    const String fullJson = alertToJson(alert, sequence);
+    const NormalizedAlert normalized = normalizeAlert(alert);
+
+    Serial.println("RAW DETECTOR: MOCK_PROVIDER");
+    Serial.print("SERIAL FULL: ");
+    Serial.println(fullJson);
+    publishNormalizedAlert(normalized);
+}
+
+void pollLiveDetector() {
+    NormalizedAlert alert;
+    String rawDetectorPayload;
+
+    if (!detectorInput.readAlert(alert, rawDetectorPayload)) {
+        Serial.println("LIVE mode active, waiting for detector input");
+        return;
+    }
+
+    Serial.print("RAW DETECTOR: ");
+    Serial.println(rawDetectorPayload);
+    publishNormalizedAlert(alert);
+}
 }
 
 void setup() {
@@ -107,8 +137,14 @@ void setup() {
     delay(250);
 
     Serial.println("SKYSHIELD ESP32 Bridge starting...");
+    Serial.print("MODE: ");
+    Serial.println(modeLabel());
     initBle();
-    publishAlert(mockAlerts.current());
+    if (MOCK_MODE) {
+        publishMockAlert(mockAlerts.current());
+    } else {
+        Serial.println("LIVE mode active, waiting for detector input");
+    }
     lastAlertMs = millis();
 }
 
@@ -117,6 +153,11 @@ void loop() {
 
     if (now - lastAlertMs >= ALERT_INTERVAL_MS) {
         lastAlertMs = now;
-        publishAlert(mockAlerts.next());
+
+        if (MOCK_MODE) {
+            publishMockAlert(mockAlerts.next());
+        } else {
+            pollLiveDetector();
+        }
     }
 }

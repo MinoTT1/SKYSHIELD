@@ -43,6 +43,9 @@ class SkyShieldView extends WatchUi.View {
     var _rfSessionStartedMs;
     var _lastValidAlertMs;
     var _uiCycleStartMs;
+    var _lastHapticCycleStartMs;
+    var _lastHapticSkipCycleStartMs;
+    var _lastHapticNonAlertCycleStartMs;
 
     function initialize() {
         View.initialize();
@@ -67,6 +70,9 @@ class SkyShieldView extends WatchUi.View {
         _rfSessionStartedMs = 0;
         _lastValidAlertMs = 0;
         _uiCycleStartMs = 0;
+        _lastHapticCycleStartMs = -1;
+        _lastHapticSkipCycleStartMs = -1;
+        _lastHapticNonAlertCycleStartMs = -1;
         resetTrackStability();
     }
 
@@ -87,10 +93,12 @@ class SkyShieldView extends WatchUi.View {
         _rfSessionStartedMs = 0;
         _lastValidAlertMs = 0;
         _uiCycleStartMs = 0;
+        _lastHapticCycleStartMs = -1;
+        _lastHapticSkipCycleStartMs = -1;
+        _lastHapticNonAlertCycleStartMs = -1;
         _displayAlert = null;
         _connectionState.reset();
         addAlertToHistory(_alert);
-        triggerVibrationIfNeeded();
 
         if (_timer == null) {
             _timer = new Timer.Timer();
@@ -162,7 +170,6 @@ class SkyShieldView extends WatchUi.View {
                 _packetAgeMs = 0;
                 updateTrackStability(_alert);
                 addAlertToHistory(_alert);
-                triggerVibrationIfNeeded();
                 handleAlertUpdate(previousAlert, _alert);
             }
 
@@ -181,7 +188,6 @@ class SkyShieldView extends WatchUi.View {
             _latestAlert = _alert;
             updateTrackStability(_alert);
             addAlertToHistory(_alert);
-            triggerVibrationIfNeeded();
             handleAlertUpdate(null, _alert);
         }
     }
@@ -207,7 +213,6 @@ class SkyShieldView extends WatchUi.View {
         _packetAgeMs = 0;
         updateTrackStability(_alert);
         addAlertToHistory(_alert);
-        triggerVibrationIfNeeded();
         handleAlertUpdate(previousAlert, _alert);
     }
 
@@ -235,6 +240,10 @@ class SkyShieldView extends WatchUi.View {
             _rfSessionActive = false;
             _uiPhase = UI_PHASE_IDLE;
             _displayAlert = null;
+            _vibrationEngine.reset();
+            _lastHapticCycleStartMs = -1;
+            _lastHapticSkipCycleStartMs = -1;
+            _lastHapticNonAlertCycleStartMs = -1;
         }
     }
 
@@ -353,8 +362,33 @@ class SkyShieldView extends WatchUi.View {
         }
     }
 
-    function triggerVibrationIfNeeded() {
-        _vibrationEngine.triggerForAlert(_alert);
+    function triggerAlertPhaseHapticIfNeeded(phase) {
+        if (phase != UI_PHASE_ALERT) {
+            if (_lastHapticNonAlertCycleStartMs != _uiCycleStartMs) {
+                _lastHapticNonAlertCycleStartMs = _uiCycleStartMs;
+                System.println("HAPTIC SKIP non-alert phase");
+            }
+
+            return;
+        }
+
+        if (_displayAlert == null) {
+            return;
+        }
+
+        if (_lastHapticCycleStartMs == _uiCycleStartMs) {
+            if (_lastHapticSkipCycleStartMs != _uiCycleStartMs) {
+                _lastHapticSkipCycleStartMs = _uiCycleStartMs;
+                System.println("HAPTIC SKIP already played for cycle");
+            }
+
+            return;
+        }
+
+        _lastHapticCycleStartMs = _uiCycleStartMs;
+        _lastHapticSkipCycleStartMs = -1;
+        System.println("HAPTIC ALERT_PHASE severity=" + _displayAlert.riskLevel);
+        _vibrationEngine.triggerForAlert(_displayAlert);
     }
 
     function onUpdate(dc) {
@@ -382,6 +416,7 @@ class SkyShieldView extends WatchUi.View {
 
         if (_rfSessionActive && (_displayAlert != null)) {
             _uiPhase = getActiveSessionPhase(now);
+            triggerAlertPhaseHapticIfNeeded(_uiPhase);
 
             if (_uiPhase == UI_PHASE_ALERT) {
                 drawAlertScreen(dc, width);
