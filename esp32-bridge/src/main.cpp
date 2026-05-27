@@ -8,7 +8,7 @@ namespace {
 MockAlertProvider mockAlerts;
 DetectorInputAdapter detectorInput;
 
-const bool MOCK_MODE = true;
+const bool MOCK_MODE = false;
 const bool PRIORITY_TEST_MODE = true;
 const uint32_t ALERT_INTERVAL_MS = 4000;
 const char* BLE_DEVICE_NAME = "SKYSHIELD-BRIDGE";
@@ -139,7 +139,7 @@ void pollLiveDetector() {
         return;
     }
 
-    Serial.print("RAW DETECTOR: ");
+    Serial.print("RAW DETECTOR SERIAL: ");
     Serial.println(rawDetectorPayload);
     publishNormalizedAlert(alert);
 }
