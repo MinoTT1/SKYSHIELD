@@ -47,6 +47,7 @@ class SkyShieldView extends WatchUi.View {
     var _rfSessionActive;
     var _rfSessionStartedMs;
     var _lastValidAlertMs;
+    var _lastObservedAlertActivityMs;
     var _uiCycleStartMs;
     var _lastHapticCycleStartMs;
     var _lastHapticSkipCycleStartMs;
@@ -75,6 +76,7 @@ class SkyShieldView extends WatchUi.View {
         _rfSessionActive = false;
         _rfSessionStartedMs = 0;
         _lastValidAlertMs = 0;
+        _lastObservedAlertActivityMs = 0;
         _uiCycleStartMs = 0;
         _lastHapticCycleStartMs = -1;
         _lastHapticSkipCycleStartMs = -1;
@@ -99,6 +101,7 @@ class SkyShieldView extends WatchUi.View {
         _rfSessionActive = false;
         _rfSessionStartedMs = 0;
         _lastValidAlertMs = 0;
+        _lastObservedAlertActivityMs = 0;
         _uiCycleStartMs = 0;
         _lastHapticCycleStartMs = -1;
         _lastHapticSkipCycleStartMs = -1;
@@ -171,6 +174,8 @@ class SkyShieldView extends WatchUi.View {
         var activeAlert = _engine.getActiveAlert();
 
         if (activeAlert != null) {
+            noteIncomingAlertActivity();
+
             if (activeAlert != _alert) {
                 var previousAlert = _alert;
                 _alert = activeAlert;
@@ -211,6 +216,8 @@ class SkyShieldView extends WatchUi.View {
             return;
         }
 
+        noteIncomingAlertActivity();
+
         if (liveAlert == _alert) {
             return;
         }
@@ -230,6 +237,21 @@ class SkyShieldView extends WatchUi.View {
         }
 
         noteValidAlert(System.getTimer());
+    }
+
+    function noteIncomingAlertActivity() {
+        var activityMs = _engine.getLastIncomingAlertMs();
+
+        if (activityMs <= 0) {
+            return;
+        }
+
+        if (activityMs <= _lastObservedAlertActivityMs) {
+            return;
+        }
+
+        _lastObservedAlertActivityMs = activityMs;
+        noteValidAlert(activityMs);
     }
 
     function noteValidAlert(now) {

@@ -9,6 +9,7 @@ MockAlertProvider mockAlerts;
 DetectorInputAdapter detectorInput;
 
 const bool MOCK_MODE = true;
+const bool PRIORITY_TEST_MODE = true;
 const uint32_t ALERT_INTERVAL_MS = 4000;
 const char* BLE_DEVICE_NAME = "SKYSHIELD-BRIDGE";
 const char* SKYSHIELD_SERVICE_UUID = "9f4d0001-7c31-4f9b-9a4b-8f4c0f000001";
@@ -16,6 +17,7 @@ const char* ALERT_CHARACTERISTIC_UUID = "9f4d0002-7c31-4f9b-9a4b-8f4c0f000001";
 
 uint32_t lastAlertMs = 0;
 uint32_t bleConnectedAtMs = 0;
+uint32_t mockStartedAtMs = 0;
 uint32_t sequence = 1;
 bool bleClientConnected = false;
 bool bleClientSubscribed = false;
@@ -117,6 +119,17 @@ void publishMockAlert(const SkyShieldAlert& alert) {
     publishNormalizedAlert(normalized);
 }
 
+void publishCurrentMockAlert(uint32_t now) {
+    if (PRIORITY_TEST_MODE) {
+        const uint32_t elapsedMs = now - mockStartedAtMs;
+        Serial.println(mockAlerts.priorityTestBlockLabel(elapsedMs));
+        publishMockAlert(mockAlerts.priorityTestAlert(elapsedMs));
+        return;
+    }
+
+    publishMockAlert(mockAlerts.next());
+}
+
 void pollLiveDetector() {
     NormalizedAlert alert;
     String rawDetectorPayload;
@@ -141,7 +154,15 @@ void setup() {
     Serial.println(modeLabel());
     initBle();
     if (MOCK_MODE) {
-        publishMockAlert(mockAlerts.current());
+        mockStartedAtMs = millis();
+
+        if (PRIORITY_TEST_MODE) {
+            Serial.println("PRIORITY TEST MODE: ON");
+            Serial.println(mockAlerts.priorityTestBlockLabel(0));
+            publishMockAlert(mockAlerts.priorityTestAlert(0));
+        } else {
+            publishMockAlert(mockAlerts.current());
+        }
     } else {
         Serial.println("LIVE mode active, waiting for detector input");
     }
@@ -155,7 +176,7 @@ void loop() {
         lastAlertMs = now;
 
         if (MOCK_MODE) {
-            publishMockAlert(mockAlerts.next());
+            publishCurrentMockAlert(now);
         } else {
             pollLiveDetector();
         }
