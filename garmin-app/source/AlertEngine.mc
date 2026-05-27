@@ -92,6 +92,22 @@ class AlertEngine {
         return _bleSource.getBleStatus();
     }
 
+    function getBleLastRxAgeMs() {
+        return _bleSource.getLastRxAgeMs();
+    }
+
+    function getBleBridgeActivityAgeMs() {
+        return _bleSource.getBridgeActivityAgeMs();
+    }
+
+    function isBleLinkAlive() {
+        return _bleSource.isLinkAlive();
+    }
+
+    function hasBleExplicitDisconnect() {
+        return _bleSource.hasExplicitDisconnect();
+    }
+
     function getCurrentSource() {
         return _currentSource;
     }

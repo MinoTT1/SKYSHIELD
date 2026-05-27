@@ -16,6 +16,11 @@ const MOCK_ALERT_ROTATION_MS = 4000;
 const CRITICAL_PULSE_MS = 750;
 const STALE_PACKET_MS = 10000;
 const IDLE_PACKET_MS = 30000;
+const LIVE_ALERT_MS = 5000;
+const LINK_LOST_MS = 15000;
+const OP_STATE_LIVE = "LIVE";
+const OP_STATE_MONITOR = "MONITOR";
+const OP_STATE_LINK_LOST = "LINK LOST";
 
 class SkyShieldView extends WatchUi.View {
     var _engine;
@@ -46,6 +51,7 @@ class SkyShieldView extends WatchUi.View {
     var _lastHapticCycleStartMs;
     var _lastHapticSkipCycleStartMs;
     var _lastHapticNonAlertCycleStartMs;
+    var _operationalState;
 
     function initialize() {
         View.initialize();
@@ -73,6 +79,7 @@ class SkyShieldView extends WatchUi.View {
         _lastHapticCycleStartMs = -1;
         _lastHapticSkipCycleStartMs = -1;
         _lastHapticNonAlertCycleStartMs = -1;
+        _operationalState = OP_STATE_LINK_LOST;
         resetTrackStability();
     }
 
@@ -96,6 +103,7 @@ class SkyShieldView extends WatchUi.View {
         _lastHapticCycleStartMs = -1;
         _lastHapticSkipCycleStartMs = -1;
         _lastHapticNonAlertCycleStartMs = -1;
+        _operationalState = OP_STATE_LINK_LOST;
         _displayAlert = null;
         _connectionState.reset();
         addAlertToHistory(_alert);
@@ -414,7 +422,15 @@ class SkyShieldView extends WatchUi.View {
         updateRfSessionState(now);
         updateDisplayCycle(now);
 
-        if (_rfSessionActive && (_displayAlert != null)) {
+        var operationalState = getOperationalState(now);
+        logOperationalState(operationalState);
+
+        if (operationalState.equals(OP_STATE_LINK_LOST)) {
+            drawLinkLostScreen(dc, width);
+            return;
+        }
+
+        if (operationalState.equals(OP_STATE_LIVE) && _rfSessionActive && (_displayAlert != null)) {
             _uiPhase = getActiveSessionPhase(now);
             triggerAlertPhaseHapticIfNeeded(_uiPhase);
 
@@ -441,6 +457,40 @@ class SkyShieldView extends WatchUi.View {
         }
 
         drawMonitorScreen(dc, width);
+    }
+
+    function getOperationalState(now) {
+        if ((_lastValidAlertMs > 0) && ((now - _lastValidAlertMs) <= LIVE_ALERT_MS)) {
+            return OP_STATE_LIVE;
+        }
+
+        if (_engine.hasBleExplicitDisconnect()) {
+            return OP_STATE_LINK_LOST;
+        }
+
+        if (_engine.isBleLinkAlive()) {
+            return OP_STATE_MONITOR;
+        }
+
+        if (_engine.getBleBridgeActivityAgeMs() > LINK_LOST_MS) {
+            return OP_STATE_LINK_LOST;
+        }
+
+        return OP_STATE_MONITOR;
+    }
+
+    function logOperationalState(state) {
+        if ((_operationalState != null) && _operationalState.equals(state)) {
+            return;
+        }
+
+        _operationalState = state;
+
+        if (state.equals(OP_STATE_LIVE)) {
+            System.println("STATE: RECOVERED FROM LINK LOST");
+        }
+
+        System.println("STATE: " + state);
     }
 
     function drawSplashScreen(dc, width) {
@@ -702,16 +752,15 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function drawMonitorScreen(dc, width) {
-        if (_alert == null) {
-            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-            drawCentered(dc, width, 104, "MONITOR", Graphics.FONT_SMALL);
-            drawBleStatusFooter(dc, width);
-            return;
-        }
-
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
         drawCentered(dc, width, 104, "MONITOR", Graphics.FONT_SMALL);
 
+        drawBleStatusFooter(dc, width);
+    }
+
+    function drawLinkLostScreen(dc, width) {
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, 104, "LINK LOST", Graphics.FONT_SMALL);
         drawBleStatusFooter(dc, width);
     }
 
@@ -726,7 +775,15 @@ class SkyShieldView extends WatchUi.View {
 
     function drawBleStatusFooter(dc, width) {
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, dc.getHeight() - 30, _engine.getBleStatus(), Graphics.FONT_TINY);
+        drawCentered(dc, width, dc.getHeight() - 30, getOperatorBleStatusLabel(), Graphics.FONT_TINY);
+    }
+
+    function getOperatorBleStatusLabel() {
+        if ((_operationalState != null) && _operationalState.equals(OP_STATE_LINK_LOST)) {
+            return "LINK LOST";
+        }
+
+        return "RX";
     }
 
     function drawHealthMetadata(dc, width) {

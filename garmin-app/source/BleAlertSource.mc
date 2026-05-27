@@ -79,6 +79,7 @@ class BleAlertSource extends AlertSource {
     var _subscribeStartedAtMs;
     var _subscribedAtMs;
     var _disconnectedAtMs;
+    var _lastBridgeActivityMs;
     var lastSubscribeMs;
     var lastRxMs;
     var explicitDisconnectSeen;
@@ -121,6 +122,7 @@ class BleAlertSource extends AlertSource {
         _subscribeStartedAtMs = 0;
         _subscribedAtMs = 0;
         _disconnectedAtMs = 0;
+        _lastBridgeActivityMs = 0;
         lastSubscribeMs = 0;
         lastRxMs = 0;
         explicitDisconnectSeen = false;
@@ -185,9 +187,7 @@ class BleAlertSource extends AlertSource {
 
         if (isSubscribed && (lastRxMs == 0) && ((lastSubscribeMs > 0) && ((_uptimeMs - lastSubscribeMs) >= BLE_STAGE_TIMEOUT_MS)) && !_rxTimeoutLogged) {
             _rxTimeoutLogged = true;
-            log("NOTIFY ERR watchdog timeout");
-            setRxTimeoutError("no notification callback within 20s after subscribe");
-            return;
+            log("subscribed with no detector alerts; staying MONITOR");
         }
 
         if (((_diagState == BLE_DIAG_CONN) || (_diagState == BLE_DIAG_SVC) || (_diagState == BLE_DIAG_CHAR) || (_diagState == BLE_DIAG_SUB)) &&
@@ -270,8 +270,46 @@ class BleAlertSource extends AlertSource {
         return _bleStatus;
     }
 
+    function getLastRxAgeMs() {
+        if (lastRxMs == 0) {
+            return _uptimeMs;
+        }
+
+        return _uptimeMs - lastRxMs;
+    }
+
+    function getBridgeActivityAgeMs() {
+        if (_lastBridgeActivityMs == 0) {
+            return _uptimeMs;
+        }
+
+        return _uptimeMs - _lastBridgeActivityMs;
+    }
+
     function hasConnection() {
         return _state == BLE_STATE_CONNECTED;
+    }
+
+    function isLinkAlive() {
+        if (explicitDisconnectSeen || _state == BLE_STATE_SIGNAL_LOST) {
+            return false;
+        }
+
+        return isConnected ||
+            isSubscribed ||
+            _state == BLE_STATE_CONNECTED ||
+            _diagState == BLE_DIAG_SUB ||
+            _diagState == BLE_DIAG_SUB_WAIT ||
+            _diagState == BLE_DIAG_RX;
+    }
+
+    function hasExplicitDisconnect() {
+        return explicitDisconnectSeen || _state == BLE_STATE_SIGNAL_LOST;
+    }
+
+    function markBridgeActivity(reason) {
+        _lastBridgeActivityMs = _uptimeMs;
+        log("bridge activity: " + reason);
     }
 
     function registerSkyShieldProfile() {
@@ -499,7 +537,9 @@ class BleAlertSource extends AlertSource {
 
     function connectToScanResult(scanResult) {
         hasEverConnected = true;
+        explicitDisconnectSeen = false;
         _connectStartedAtMs = _uptimeMs;
+        markBridgeActivity("connect start");
         log("ever connected");
         setLifecycleFlags(false, true, false, false, "connect start");
         setBleState(BLE_STATE_CONNECTING, BLE_DIAG_CONN, BLE_STATUS_CONNECT);
@@ -524,7 +564,9 @@ class BleAlertSource extends AlertSource {
         if (state == Ble.CONNECTION_STATE_CONNECTED) {
             log("CONNECTED callback entered");
             hasEverConnected = true;
+            explicitDisconnectSeen = false;
             _connectedAtMs = _uptimeMs;
+            markBridgeActivity("connected");
             setLifecycleFlags(false, false, true, false, "connected");
             setBleState(BLE_STATE_CONNECTED, BLE_DIAG_CONN, BLE_STATUS_CONNECT);
             log("onConnected");
@@ -566,6 +608,7 @@ class BleAlertSource extends AlertSource {
         }
 
         setDiagnosticState(BLE_DIAG_SVC, BLE_STATUS_CONNECT);
+        markBridgeActivity("service discovered");
         log("service discovered");
         log("CHAR callback entered");
 
@@ -577,6 +620,7 @@ class BleAlertSource extends AlertSource {
         }
 
         setDiagnosticState(BLE_DIAG_CHAR, BLE_STATUS_CONNECT);
+        markBridgeActivity("characteristic discovered");
         log("characteristic discovered");
         subscribeToAlertCharacteristic();
     }
@@ -584,6 +628,7 @@ class BleAlertSource extends AlertSource {
     function subscribeToAlertCharacteristic() {
         hasEverSubscribed = true;
         _subscribeStartedAtMs = _uptimeMs;
+        markBridgeActivity("subscribe start");
         log("ever subscribed");
 
         if (_alertCharacteristic == null) {
@@ -622,6 +667,7 @@ class BleAlertSource extends AlertSource {
             _subscribedAtMs = _uptimeMs;
             lastSubscribeMs = _uptimeMs;
             lastRxMs = 0;
+            markBridgeActivity("subscribed");
             setLifecycleFlags(false, false, true, true, "subscribed");
             setDiagnosticState(BLE_DIAG_SUB_WAIT, BLE_STATUS_SUB_WAIT);
             log("onSubscribeSuccess");
@@ -644,6 +690,7 @@ class BleAlertSource extends AlertSource {
         }
 
         lastRxMs = _uptimeMs;
+        markBridgeActivity("notification");
         setLifecycleFlags(false, false, true, true, "rx packet");
         setDiagnosticState(BLE_DIAG_RX, BLE_STATUS_RX);
         log("onNotificationReceived");
@@ -743,8 +790,11 @@ class BleAlertSource extends AlertSource {
         _lastDirectParseResult = formatParsedSummary(_latestAlert);
         _lastRawPayload = "S1";
         lastRxMs = _uptimeMs;
+        explicitDisconnectSeen = false;
+        markBridgeActivity("valid s2");
         setLifecycleFlags(false, false, true, true, "byte rx alert");
         setBleState(BLE_STATE_CONNECTED, BLE_DIAG_RX, BLE_STATUS_RX);
+        System.println("VALID S2 CLEARS LINK LOST");
         System.println("SKYSHIELD BLE byte parse threat=" + threat + " severity=" + severity + " band=" + band + " distance=" + distance + " droneClass=" + droneClass);
 
         return;
