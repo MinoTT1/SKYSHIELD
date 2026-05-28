@@ -18,6 +18,7 @@ const STALE_PACKET_MS = 10000;
 const IDLE_PACKET_MS = 30000;
 const LIVE_ALERT_MS = 5000;
 const LINK_LOST_MS = 15000;
+const MONITOR_PULSE_MS = 1500;
 const OP_STATE_LIVE = "LIVE";
 const OP_STATE_MONITOR = "MONITOR";
 const OP_STATE_LINK_LOST = "LINK LOST";
@@ -774,10 +775,61 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function drawMonitorScreen(dc, width) {
-        dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, 104, "MONITOR", Graphics.FONT_SMALL);
+        var batteryLabel = getBatteryLabel();
+
+        if (batteryLabel != null) {
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+            drawCentered(dc, width, 26, batteryLabel, Graphics.FONT_TINY);
+        }
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, 52, getClockLabel(), getMonitorClockFont());
+
+        if (isMonitorPulseOn()) {
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        } else {
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+        }
+
+        drawCentered(dc, width, 176, "MONITOR", Graphics.FONT_SMALL);
 
         drawBleStatusFooter(dc, width);
+    }
+
+    function getMonitorClockFont() {
+        return Graphics.FONT_NUMBER_HOT;
+    }
+
+    function isMonitorPulseOn() {
+        var phase = System.getTimer() % MONITOR_PULSE_MS;
+        return phase < (MONITOR_PULSE_MS / 2);
+    }
+
+    function getClockLabel() {
+        var clock = System.getClockTime();
+        return twoDigit(clock.hour) + ":" + twoDigit(clock.min);
+    }
+
+    function twoDigit(value) {
+        if (value < 10) {
+            return "0" + value;
+        }
+
+        return "" + value;
+    }
+
+    function getBatteryLabel() {
+        try {
+            var stats = System.getSystemStats();
+
+            if ((stats == null) || (stats.battery == null)) {
+                return null;
+            }
+
+            return "BAT " + stats.battery.format("%d") + "%";
+        } catch (ex) {
+            return null;
+        }
     }
 
     function drawLinkLostScreen(dc, width) {
