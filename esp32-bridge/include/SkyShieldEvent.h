@@ -11,6 +11,8 @@ struct SkyShieldEvent {
     const char* strength;
     const char* droneClass;
     const char* detectorSource;
+    const char* sourceDetector;
+    String rawPayload;
     int rssiDbm;
     uint32_t timestampMs;
 };
