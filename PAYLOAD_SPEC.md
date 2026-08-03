@@ -1,8 +1,21 @@
-# SKYSHIELD Payload Specification
+# SKYSHIELD Payload Specification (HISTORICAL — RETIRED)
+
+> **This format is retired and is no longer implemented anywhere in the codebase.**
+>
+> The pipe-delimited `S2` payload described below was replaced by a compact CBOR
+> encoding of `protocol/skyshield-alert.schema.json`. The current and only wire
+> specification is **[docs/wire-protocol.md](docs/wire-protocol.md)**.
+>
+> This file is kept for historical context only: it explains what the S2 field
+> letters meant, which is useful when reading pre-`protocol_version: 3` logs,
+> captures, or git history. Do not implement against it.
+>
+> Note in particular that S2 had no confidence, no timestamp and no version
+> field. Those omissions are exactly why it was replaced.
 
 ## Version
 
-Current BLE payload version:
+Retired BLE payload version:
 
 S2
 

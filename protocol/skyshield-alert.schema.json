@@ -1,11 +1,16 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://skyshield.local/protocol/skyshield-alert.schema.json",
-  "title": "SKYSHIELD BLE Alert Packet",
-  "description": "Canonical compact SKYSHIELD alert packet shared by ESP32 bridge and Garmin app.",
+  "title": "SKYSHIELD Alert",
+  "description": "Canonical semantic definition of a SKYSHIELD alert. This schema is the single source of truth for alert MEANING. The BLE wire format is a compact CBOR encoding of this same model, defined in docs/wire-protocol.md. JSON is used for documentation, fixtures, and tooling; CBOR is used on the wire. The two must always carry identical semantics.",
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "protocol_version",
+    "timestamp_ms",
+    "sequence",
+    "sensor_type",
+    "alert_kind",
     "threat",
     "severity",
     "band",
@@ -13,6 +18,44 @@
     "confidence"
   ],
   "properties": {
+    "protocol_version": {
+      "type": "integer",
+      "const": 3,
+      "description": "Wire/semantic contract version. Incremented on any breaking change to field meaning or CBOR key assignment. Version 3 is the first CBOR-based version; versions 1 and 2 were the retired pipe-delimited S1/S2 formats and are not accepted."
+    },
+    "timestamp_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Milliseconds since CORE (ESP32) boot, sampled when CORE finished normalizing the alert and immediately before BLE transmission. This is a MONOTONIC device-local clock, not wall-clock or Unix epoch: the bridge has no RTC or time sync. Consumers must not treat it as an absolute time."
+    },
+    "detector_latency_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optional. Milliseconds elapsed between CORE ingesting the raw detector line and CORE finishing normalization (timestamp_ms). Both endpoints are sampled from the same CORE clock, so this is an exact detector-to-CORE latency measurement with no clock-sync assumptions. Omitted when the alert did not originate from a detector line."
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonic packet counter from the bridge. Lets the watch detect duplicates and gaps."
+    },
+    "sensor_type": {
+      "type": "string",
+      "enum": [
+        "rf",
+        "acoustic",
+        "radar",
+        "contact"
+      ],
+      "description": "Physical sensing modality that produced this alert. Reserved for future multi-sensor fusion; only 'rf' is produced today."
+    },
+    "alert_kind": {
+      "type": "string",
+      "enum": [
+        "classified",
+        "contact"
+      ],
+      "description": "'classified' means the detector supplied usable threat/band/strength data. 'contact' is a FIRST-CLASS data-less detection: something was detected but the detector could not classify it. A contact alert legitimately carries threat=UNKNOWN, band=UNKNOWN and confidence=null. It is a valid operational state, NOT a parse failure or error fallback."
+    },
     "threat": {
       "type": "string",
       "enum": [
@@ -37,16 +80,33 @@
         "2.4GHz",
         "3.3GHz",
         "5.8GHz",
-        "MULTI"
-      ]
+        "MULTI",
+        "UNKNOWN"
+      ],
+      "description": "Primary frequency band. UNKNOWN is required so a contact alert can be expressed without inventing a band."
     },
     "distance": {
       "type": "string",
       "enum": [
         "FAR",
         "MID",
-        "NEAR"
-      ]
+        "NEAR",
+        "UNKNOWN"
+      ],
+      "description": "Legacy protocol term for coarse RF signal-strength category, NOT physical range. The Garmin HUD renders FAR as WEAK, MID as MODERATE, NEAR as STRONG. UNKNOWN is required for contact alerts."
+    },
+    "confidence": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Classification confidence percentage. MUST be null (not 0) when the detector supplies no confidence value, so that 'no data' is distinguishable from 'certainly not'. Contact alerts always carry null."
+    },
+    "drone_class": {
+      "type": "string",
+      "description": "Optional vendor/model classification from the detector, such as MAVIC, AUTEL, FPV or UNKNOWN. Supplied by the detector or middleware; the watch must never invent it."
     },
     "direction": {
       "type": "string",
@@ -56,16 +116,12 @@
         "RIGHT",
         "REAR"
       ],
-      "description": "Optional coarse bearing hint for future directional RF workflows."
-    },
-    "confidence": {
-      "type": "integer",
-      "minimum": 0,
-      "maximum": 100
+      "description": "Optional coarse bearing hint for future directional RF workflows. Experimental; not displayed on the HUD."
     },
     "bands": {
       "type": "object",
       "additionalProperties": false,
+      "description": "Optional per-band activity levels. Omitted entirely when the detector does not report per-band data. Consumers must render omitted band data as unknown rather than synthesizing it.",
       "properties": {
         "band_1_2": {
           "$ref": "#/$defs/bandStrength"
@@ -83,22 +139,17 @@
     },
     "source": {
       "type": "string",
-      "description": "Optional source label, such as ESP32_SIM or future detector adapter name."
-    },
-    "sequence": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "Optional monotonic packet sequence number from the bridge."
+      "description": "Optional source label identifying the producing adapter, such as TTSKW07, MOCK or SERIAL_INJECT."
     }
   },
   "$defs": {
     "bandStrength": {
       "type": "string",
       "enum": [
+        "NONE",
         "LOW",
         "MED",
-        "HIGH",
-        "NONE"
+        "HIGH"
       ]
     }
   }

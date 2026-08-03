@@ -1,4 +1,14 @@
-# BLE Protocol
+# BLE Protocol (HISTORICAL — superseded)
+
+> **The packet format described in this document is superseded.**
+>
+> The "Canonical Alert Packet" section below describes a plain-JSON payload that
+> was never actually implemented on the wire. The real, current wire format is a
+> compact CBOR encoding specified in
+> **[docs/wire-protocol.md](wire-protocol.md)**.
+>
+> The roles, delivery behavior, and reliability sections below remain accurate
+> and are still worth reading. The field list and JSON example are not.
 
 The MVP assumes the ESP32-S3 acts as a BLE server and the Garmin Enduro 2 Connect IQ app acts as a BLE client.
 

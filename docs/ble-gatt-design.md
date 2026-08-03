@@ -1,8 +1,14 @@
 # BLE GATT Design
 
-This document defines the planned BLE GATT integration between the ESP32-S3 SKYSHIELD Bridge and the Garmin watch app.
+This document defines the BLE GATT integration between the ESP32-S3 SKYSHIELD
+Bridge and the Garmin watch app. The service/characteristic layout below is
+current and accurate.
 
-No BLE implementation is included yet. This is the design contract for the next firmware and Garmin integration step.
+> **Payload format note:** the JSON example payloads in the "Alert
+> Characteristic" section below are superseded. The alert characteristic carries
+> compact CBOR as specified in **[docs/wire-protocol.md](wire-protocol.md)**.
+> The GATT structure, UUIDs, and the Status/Config characteristic designs are
+> unchanged.
 
 ## BLE Device
 

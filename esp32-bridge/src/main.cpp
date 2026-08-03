@@ -9,7 +9,7 @@ MockAlertProvider mockAlerts;
 DetectorInputAdapter detectorInput;
 
 const bool MOCK_MODE = false;
-const bool PRIORITY_TEST_MODE = true;
+const bool PRIORITY_TEST_MODE = false;
 const uint32_t ALERT_INTERVAL_MS = 4000;
 const char* BLE_DEVICE_NAME = "SKYSHIELD-BRIDGE";
 const char* SKYSHIELD_SERVICE_UUID = "9f4d0001-7c31-4f9b-9a4b-8f4c0f000001";
