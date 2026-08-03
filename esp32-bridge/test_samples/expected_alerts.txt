@@ -1,0 +1,41 @@
+# SKYSHIELD TTSKW07 contract fixture
+#
+# Expected result of parsing each line of ttskw07_raw_samples.txt with
+# TTSKW07Parser, encoding it with SkyShieldCodec, and decoding it back.
+# Asserted by tools/contract-test/contract_test.cpp.
+#
+# This file REPLACES expected_s2_payloads.txt, which described the retired S2
+# wire format and encoded four mappings that contradicted
+# docs/TTSKW07_INTEGRATION_PLAN.md. Those are corrected here and explained in
+# docs/TTSKW07_MAPPING.md:
+#
+#   1. confidence is null, never 0    - the detector reports none, and
+#                                       "CONF 0%" reads as "certainly not a
+#                                       threat" when the truth is "no idea"
+#   2. failed classification never    - old fixture escalated UNKNOWN to
+#      becomes CRITICAL                 CRITICAL; that is escalation on
+#                                       ignorance. CRITICAL is only reachable
+#                                       via the watch's track-persistence
+#                                       logic, never from one detector line
+#   3. AUTEL_EVO -> threat UNKNOWN    - old fixture claimed DJI, a false
+#      with the vendor in drone_class   vendor attribution
+#   4. DJI_O3 -> drone_class DJI_O3   - old fixture reported it as MAVIC
+#
+# The test uses deterministic inputs so the CBOR column is reproducible:
+#   timestamp_ms = 1000 + line_index
+#   sequence     = line_index + 1
+#
+# Format, pipe-delimited:
+#   INDEX|RESULT|KIND|THREAT|BAND|DISTANCE|SEVERITY|CONFIDENCE|DRONE_CLASS|SOURCE|CBOR_HEX
+#
+# RESULT is OK or SKIPPED. For SKIPPED rows the KIND column carries the parser
+# reason and every remaining column is "-". A SKIPPED line must emit no alert.
+# CONFIDENCE is the literal "null" when absent.
+#
+0|OK|classified|DJI|2.4GHz|MID|MEDIUM|null|DJI_MAVIC|TTSKW07|AC0103021903E803010400050006020701080209020AF60B69444A495F4D415649430F675454534B573037
+1|OK|classified|DJI|5.8GHz|NEAR|HIGH|null|DJI_O3|TTSKW07|AC0103021903E903020400050006020702080409030AF60B66444A495F4F330F675454534B573037
+2|OK|classified|FPV|5.8GHz|NEAR|HIGH|null|FPV_ANALOG|TTSKW07|AC0103021903EA03030400050006010702080409030AF60B6A4650565F414E414C4F470F675454534B573037
+3|OK|classified|UNKNOWN|2.4GHz|MID|MEDIUM|null|AUTEL_EVO|TTSKW07|AC0103021903EB03040400050006000701080209020AF60B69415554454C5F45564F0F675454534B573037
+4|OK|classified|UNKNOWN|MULTI|NEAR|HIGH|null|UNKNOWN|TTSKW07|AC0103021903EC03050400050006000702080509030AF60B67554E4B4E4F574E0F675454534B573037
+5|SKIPPED|NOT_A_DETECTION|-|-|-|-|-|-|-|-
+6|SKIPPED|NOT_A_DETECTION|-|-|-|-|-|-|-|-

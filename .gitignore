@@ -31,3 +31,6 @@ BACKUPS/
 BACKUP_*/
 BACKUP_GOOD_RX_*/
 BACKUPS_ISOLATED/
+
+# Contract test build output
+tools/contract-test/.build/

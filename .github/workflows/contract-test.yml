@@ -1,0 +1,53 @@
+name: contract test
+
+# Guards the SKYSHIELD alert contract on every change.
+#
+# Before protocol_version 3 there was no test tying the documented format to
+# the shipped one, and the two drifted apart unnoticed for months. This
+# workflow exists so that cannot happen silently again.
+#
+# It needs only a C++11 compiler and python3: no PlatformIO, no Connect IQ SDK,
+# no package index. Keeping it dependency-free is what keeps it running.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Runs the real parser, encoder and decoder against the captured detector
+      # samples, then cross-checks the same bytes with an independent CBOR
+      # decoder written from RFC 8949.
+      - name: Contract test and CBOR cross-check
+        run: ./tools/contract-test/run.sh
+
+      # Reintroduces each retired misleading mapping into a throwaway copy of
+      # the tree and requires the contract test to reject it. Without this, an
+      # assertion that can never fail would look exactly like one that passes.
+      - name: Verify guardrail assertions have teeth
+        run: ./tools/contract-test/verify_guardrail.sh
+
+  firmware-headers:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # The protocol headers must stay Arduino-free so the contract test can
+      # exercise the real code natively. Compiling them standalone catches an
+      # accidental <Arduino.h> or String dependency creeping back in.
+      - name: Compile protocol headers standalone
+        run: |
+          for header in SkyShieldProtocol.h SkyShieldCodec.h TTSKW07Parser.h; do
+            echo "==> ${header}"
+            printf '#include "%s"\nint main() { return 0; }\n' "${header}" > /tmp/check.cpp
+            g++ -std=c++11 -Wall -Wextra -Werror \
+              -I esp32-bridge/include -o /tmp/check /tmp/check.cpp
+          done

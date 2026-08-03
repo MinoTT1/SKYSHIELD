@@ -50,6 +50,43 @@ enum TTSKW07ParseResult : uint8_t {
     TTSKW07_MALFORMED = 2         // looks like ours but is not usable
 };
 
+// SKYSHIELD middleware severity policy for the TTSKW07.
+//
+// The detector reports no severity, but severity is a required wire field, so
+// SKYSHIELD derives one from the detector's own SIGNAL value. This is a
+// normalization policy, NOT a detector claim, and operator-facing material
+// must describe it that way. Full rationale in docs/TTSKW07_MAPPING.md.
+//
+// It is a named, swappable table rather than a hardcoded switch so the policy
+// can be tuned per deployment without editing parse logic, and so the contract
+// test can assert properties of it directly.
+//
+// INVARIANT: no entry may be SEVERITY_CRITICAL. Nothing in a single TTSKW07
+// line justifies the top severity. Escalation to CRITICAL is the watch's job,
+// based on track persistence and repetition -- evidence the bridge does not
+// have. The contract test enforces this invariant.
+struct TTSKW07SeverityPolicy {
+    Severity onNear;
+    Severity onMid;
+    Severity onFar;
+    Severity onUnknown;
+};
+
+static const TTSKW07SeverityPolicy TTSKW07_DEFAULT_SEVERITY_POLICY = {
+    SEVERITY_HIGH,    // NEAR  -> strong signal
+    SEVERITY_MEDIUM,  // MID
+    SEVERITY_LOW,     // FAR
+    SEVERITY_LOW      // signal unknown or absent
+};
+
+// True when the policy can never emit CRITICAL. Asserted by the contract test.
+inline bool ttskw07PolicyAvoidsCritical(const TTSKW07SeverityPolicy& policy) {
+    return (policy.onNear != SEVERITY_CRITICAL) &&
+           (policy.onMid != SEVERITY_CRITICAL) &&
+           (policy.onFar != SEVERITY_CRITICAL) &&
+           (policy.onUnknown != SEVERITY_CRITICAL);
+}
+
 inline const char* ttskw07ResultName(TTSKW07ParseResult result) {
     switch (result) {
         case TTSKW07_OK: return "OK";
@@ -213,13 +250,13 @@ inline Threat threatFromTypeToken(const char* token, size_t length) {
     return THREAT_UNKNOWN;
 }
 
-// SKYSHIELD middleware policy, NOT a detector claim. See the header comment.
-// Never returns CRITICAL.
-inline Severity severityFromSignal(Distance distance) {
+// Applies the configured severity policy. See TTSKW07SeverityPolicy.
+inline Severity severityFromSignal(Distance distance, const TTSKW07SeverityPolicy& policy) {
     switch (distance) {
-        case DISTANCE_NEAR: return SEVERITY_HIGH;
-        case DISTANCE_MID: return SEVERITY_MEDIUM;
-        default: return SEVERITY_LOW;
+        case DISTANCE_NEAR: return policy.onNear;
+        case DISTANCE_MID: return policy.onMid;
+        case DISTANCE_FAR: return policy.onFar;
+        default: return policy.onUnknown;
     }
 }
 
@@ -229,11 +266,13 @@ inline Severity severityFromSignal(Distance distance) {
 //
 // timestampMs and sequence are supplied by the caller; the parser does not
 // read a clock so it stays testable and side-effect free.
-inline TTSKW07ParseResult ttskw07ParseLine(const char* line,
-                                           uint32_t timestampMs,
-                                           uint32_t sequence,
-                                           Alert& alert,
-                                           TTSKW07Diagnostics& diagnostics) {
+inline TTSKW07ParseResult ttskw07ParseLine(
+        const char* line,
+        uint32_t timestampMs,
+        uint32_t sequence,
+        Alert& alert,
+        TTSKW07Diagnostics& diagnostics,
+        const TTSKW07SeverityPolicy& severityPolicy = TTSKW07_DEFAULT_SEVERITY_POLICY) {
     alertInit(alert);
     ttskw07DiagnosticsInit(diagnostics);
 
@@ -388,7 +427,7 @@ inline TTSKW07ParseResult ttskw07ParseLine(const char* line,
     alert.threat = threat;
     alert.band = band;
     alert.distance = distance;
-    alert.severity = detail::severityFromSignal(distance);
+    alert.severity = detail::severityFromSignal(distance, severityPolicy);
 
     // The TTSKW07 reports no confidence. Leave it absent (CBOR null) rather
     // than inventing a number.
