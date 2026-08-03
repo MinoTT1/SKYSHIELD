@@ -113,8 +113,9 @@ This has a direct consequence for latency measurement:
 
 ## Payload size and BLE MTU
 
-A typical classified alert encodes to roughly 40-48 bytes; a contact alert is
-around 24. Both exceed the 20-byte payload of an unnegotiated 23-byte ATT MTU,
+The two worked examples above measure 41 and 32 bytes respectively (verified by
+the contract test, which asserts these exact byte strings). Both exceed the
+20-byte usable payload of an unnegotiated 23-byte ATT MTU,
 so the bridge requests a larger MTU at startup (`NimBLEDevice::setMTU`).
 
 The encoder enforces a hard ceiling of `SKYSHIELD_MAX_PAYLOAD_BYTES` (currently
