@@ -39,28 +39,34 @@ pio device monitor -b 115200
 
 Adjust the `board` value in `platformio.ini` if using a different ESP32-S3 board.
 
-## Current Simulated Mode
+## Wire format
 
-On boot, the firmware prints:
+The BLE alert payload is compact CBOR, specified in
+[docs/wire-protocol.md](../docs/wire-protocol.md). The current
+`protocol_version` is **3**. The previous pipe-delimited `S2` format is retired.
+
+There is exactly one encoder: `include/SkyShieldCodec.h`. It is deliberately
+free of any Arduino dependency so the contract test can run it natively.
+
+## Modes
+
+`MOCK_MODE` and `PRIORITY_TEST_MODE` in `src/main.cpp` select behavior.
+
+`MOCK_MODE = true` rotates simulated alerts every 4 seconds, including a
+data-less contact alert so the no-classification HUD path stays exercised.
+
+`MOCK_MODE = false` (the default) runs **SERIAL_INJECT** mode. This is a bench
+test-injection harness, not live detector input: an operator types one of
+`FPV`, `MAVIC`, `AUTEL`, `UNKNOWN` or `CONTACT` into the serial console and the
+bridge emits the corresponding alert. It was previously mislabeled "LIVE",
+which implied it consumed real sensor data.
+
+Serial output per alert shows the decoded summary and the exact bytes sent:
 
 ```text
-SKYSHIELD ESP32 Bridge starting...
-```
-
-Then every 4 seconds it rotates through simulated alerts. Serial keeps the full debug payload:
-
-```json
-{"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87,"bands":{"band_1_2":"LOW","band_2_4":"LOW","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":1}
-{"threat":"DJI","severity":"MEDIUM","band":"2.4GHz","distance":"MID","confidence":72,"bands":{"band_1_2":"LOW","band_2_4":"MED","band_3_3":"MED","band_5_8":"LOW"},"source":"ESP32_SIM","sequence":2}
-{"threat":"UNKNOWN","severity":"CRITICAL","band":"MULTI","distance":"NEAR","confidence":94,"bands":{"band_1_2":"HIGH","band_2_4":"MED","band_3_3":"MED","band_5_8":"HIGH"},"source":"ESP32_SIM","sequence":3}
-```
-
-This simulated mode is intended to validate packet shape, freshness, and timing before real RF inputs are added.
-
-BLE notifications intentionally use a smaller Garmin-safe payload:
-
-```json
-{"threat":"FPV","severity":"HIGH","band":"5.8GHz","distance":"NEAR","confidence":87}
+ALERT kind=classified sensor=rf threat=FPV severity=HIGH band=5.8GHz strength=NEAR confidence=87 class=FPV seq=1 t=12840 detector_to_core=2ms
+BLE TX CBOR len=41 bytes=AD010302193228030104000500060107020804090 ...
+BLE notify sent
 ```
 
 ## BLE Server Role
