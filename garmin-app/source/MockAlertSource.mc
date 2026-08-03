@@ -1,23 +1,46 @@
-// Mock source for MVP development. It emits canonical SKYSHIELD JSON strings
-// and parses them through AlertParser, matching the future BLE data path.
+import Toybox.System;
+
+// Simulator/demo source. Only active when USE_MOCK_FALLBACK is true in
+// AlertEngine.mc; real BLE validation runs with it false.
+//
+// These are real CBOR packets produced by the ESP32 encoder
+// (esp32-bridge/include/SkyShieldCodec.h) and checked in as byte literals.
+// They are decoded through CborAlertDecoder -- the exact same decoder the BLE
+// path uses. Mock data must never take a shortcut around the real decoder;
+// that divergence is what let the previous protocol drift go unnoticed.
+//
+// Regenerate with: tools/contract-test/run.sh --emit-mocks
 class MockAlertSource extends AlertSource {
     var _alertIndex;
-    var _parser;
-    var _mockAlerts;
+    var _decoder;
+    var _mockPackets;
 
     function initialize() {
         AlertSource.initialize();
         _alertIndex = -1;
-        _parser = new AlertParser();
-        _mockAlerts = [
-            "{\"threat\":\"FPV\",\"severity\":\"HIGH\",\"band\":\"5.8GHz\",\"direction\":\"FRONT\",\"distance\":\"NEAR\",\"confidence\":87,\"bands\":{\"band_1_2\":\"LOW\",\"band_2_4\":\"LOW\",\"band_3_3\":\"MED\",\"band_5_8\":\"HIGH\"},\"source\":\"GARMIN_MOCK\",\"sequence\":1}",
-            "{\"threat\":\"DJI\",\"severity\":\"MEDIUM\",\"band\":\"2.4GHz\",\"direction\":\"LEFT\",\"distance\":\"MID\",\"confidence\":72,\"bands\":{\"band_1_2\":\"LOW\",\"band_2_4\":\"MED\",\"band_3_3\":\"MED\",\"band_5_8\":\"LOW\"},\"source\":\"GARMIN_MOCK\",\"sequence\":2}",
-            "{\"threat\":\"UNKNOWN\",\"severity\":\"CRITICAL\",\"band\":\"MULTI\",\"direction\":\"RIGHT\",\"distance\":\"NEAR\",\"confidence\":94,\"bands\":{\"band_1_2\":\"HIGH\",\"band_2_4\":\"MED\",\"band_3_3\":\"MED\",\"band_5_8\":\"HIGH\"},\"source\":\"GARMIN_MOCK\",\"sequence\":3}"
+        _decoder = new CborAlertDecoder();
+        _mockPackets = [
+            // FPV / HIGH / 5.8GHz / NEAR / conf 87
+            [0xAD, 0x01, 0x03, 0x02, 0x19, 0x0F, 0xA0, 0x03, 0x01, 0x04, 0x00, 0x05, 0x00, 0x06, 0x01, 0x07, 0x02, 0x08, 0x04, 0x09, 0x03, 0x0A, 0x18, 0x57, 0x0B, 0x63, 0x46, 0x50, 0x56, 0x0D, 0x84, 0x01, 0x01, 0x02, 0x03, 0x0F, 0x64, 0x4D, 0x4F, 0x43, 0x4B]b,
+            // DJI / MEDIUM / 2.4GHz / MID / conf 72
+            [0xAD, 0x01, 0x03, 0x02, 0x19, 0x1F, 0x40, 0x03, 0x02, 0x04, 0x00, 0x05, 0x00, 0x06, 0x02, 0x07, 0x01, 0x08, 0x02, 0x09, 0x02, 0x0A, 0x18, 0x48, 0x0B, 0x65, 0x4D, 0x41, 0x56, 0x49, 0x43, 0x0D, 0x84, 0x01, 0x02, 0x02, 0x01, 0x0F, 0x64, 0x4D, 0x4F, 0x43, 0x4B]b,
+            // UNKNOWN / CRITICAL / MULTI / NEAR / conf 94
+            [0xAD, 0x01, 0x03, 0x02, 0x19, 0x2E, 0xE0, 0x03, 0x03, 0x04, 0x00, 0x05, 0x00, 0x06, 0x00, 0x07, 0x03, 0x08, 0x05, 0x09, 0x03, 0x0A, 0x18, 0x5E, 0x0B, 0x67, 0x55, 0x4E, 0x4B, 0x4E, 0x4F, 0x57, 0x4E, 0x0D, 0x84, 0x03, 0x02, 0x02, 0x03, 0x0F, 0x64, 0x4D, 0x4F, 0x43, 0x4B]b,
+            // CONTACT: detected but unclassifiable, confidence null
+            [0xAB, 0x01, 0x03, 0x02, 0x19, 0x3E, 0x80, 0x03, 0x04, 0x04, 0x00, 0x05, 0x01, 0x06, 0x00, 0x07, 0x00, 0x08, 0x00, 0x09, 0x00, 0x0A, 0xF6, 0x0F, 0x64, 0x4D, 0x4F, 0x43, 0x4B]b
         ];
     }
 
     function getNextAlert() {
-        _alertIndex = (_alertIndex + 1) % 3;
-        return _parser.parse(_mockAlerts[_alertIndex]);
+        _alertIndex = (_alertIndex + 1) % _mockPackets.size();
+
+        var result = _decoder.decode(_mockPackets[_alertIndex]);
+
+        if (!result.isOk()) {
+            System.println("SKYSHIELD mock decode failed: " + result.status);
+            return null;
+        }
+
+        return result.alert;
     }
 }

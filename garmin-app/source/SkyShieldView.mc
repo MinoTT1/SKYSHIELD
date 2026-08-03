@@ -350,7 +350,9 @@ class SkyShieldView extends WatchUi.View {
 
         _trackCounts[slot] += 1;
 
-        if ((_trackCounts[slot] >= 2) && (alert.confidencePercent >= 90)) {
+        // LOCKED requires real high confidence. An alert with no confidence
+        // value floors to 0 here and can only ever reach STABLE.
+        if ((_trackCounts[slot] >= 2) && (alert.confidenceOrZero() >= 90)) {
             _activeTrackStability = "LOCKED";
             return;
         }
@@ -613,11 +615,18 @@ class SkyShieldView extends WatchUi.View {
 
         dc.setColor(getRiskColor(displaySeverity), Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _formatter.formatThreat(alert.threatType), getAlertTitleFont());
-        y += 35;
+        y += 33;
+
+        // Confidence sits directly under the classification so the operator
+        // reads "what" and "how sure" together. "--" when the detector gave
+        // no confidence value; never a fabricated 0%.
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, _formatter.formatConfidence(alert), Graphics.FONT_TINY);
+        y += 26;
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _formatter.formatBand(alert.band), Graphics.FONT_TINY);
-        y += 31;
+        y += 28;
 
         drawCentered(dc, width, y, _formatter.formatStrength(alert.distanceLabel), Graphics.FONT_TINY);
 
@@ -650,7 +659,17 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function getDroneClassLabel(alert) {
-        if ((alert == null) || (alert.droneClass == null) || alert.droneClass.equals("")) {
+        if (alert == null) {
+            return "UNKNOWN";
+        }
+
+        // A contact alert is a real detection the detector could not classify.
+        // Say that plainly instead of showing an invented class name.
+        if (alert.isContact()) {
+            return "CONTACT";
+        }
+
+        if ((alert.droneClass == null) || alert.droneClass.equals("")) {
             return "UNKNOWN";
         }
 
@@ -971,9 +990,12 @@ class SkyShieldView extends WatchUi.View {
         }
     }
 
+    // When the bridge sent no per-band detail the decoder marks every level
+    // UNKNOWN. Show that rather than synthesizing activity: the watch must not
+    // invent telemetry it was never given.
     function formatBandLevelForBandsScreen(alert, level) {
-        if ((alert != null) && (alert.band != null) && alert.band.equals("MULTI")) {
-            return "ACTIVE";
+        if ((alert != null) && !alert.hasBandDetail) {
+            return "--";
         }
 
         return level;

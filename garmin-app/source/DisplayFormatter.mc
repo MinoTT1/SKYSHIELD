@@ -23,7 +23,18 @@ class DisplayFormatter {
             return "HIGH";
         }
 
-        if ((alert.band == "MULTI") && (alert.confidencePercent >= 70)) {
+        // A contact alert carries no classification and no confidence. It must
+        // not be escalated by the confidence heuristics below -- there is
+        // nothing to be confident about. Report the severity the bridge sent.
+        if (alert.isContact()) {
+            return formatSeverityPassthrough(severity);
+        }
+
+        // Absent confidence floors to 0 for ranking, so a missing value can
+        // never trip an escalation threshold.
+        var confidence = alert.confidenceOrZero();
+
+        if ((alert.band == "MULTI") && (confidence >= 70)) {
             return "CRITICAL";
         }
 
@@ -35,7 +46,7 @@ class DisplayFormatter {
             return "HIGH";
         }
 
-        if ((alert.confidencePercent >= 90) && isStrongSignal(alert.distanceLabel)) {
+        if ((confidence >= 90) && isStrongSignal(alert.distanceLabel)) {
             if (alert.threatType == "UNKNOWN") {
                 return "CRITICAL";
             }
@@ -43,16 +54,29 @@ class DisplayFormatter {
             return "HIGH";
         }
 
-        if ((alert.threatType == "FPV") && (alert.confidencePercent >= 80)) {
+        if ((alert.threatType == "FPV") && (confidence >= 80)) {
             return "HIGH";
         }
 
-        if ((alert.threatType == "DJI") && (alert.confidencePercent >= 70)) {
+        if ((alert.threatType == "DJI") && (confidence >= 70)) {
             return "MEDIUM";
         }
 
         if ((severity != null) && severity.equals("MEDIUM")) {
             return "MEDIUM";
+        }
+
+        return "LOW";
+    }
+
+    function formatSeverityPassthrough(severity) {
+        if (severity == null) {
+            return "LOW";
+        }
+
+        if (severity.equals("CRITICAL") || severity.equals("HIGH") ||
+            severity.equals("MEDIUM") || severity.equals("LOW")) {
+            return severity;
         }
 
         return "LOW";
@@ -210,8 +234,25 @@ class DisplayFormatter {
         return "SCAN";
     }
 
-    function formatConfidence(confidence) {
-        return "CONF " + confidence + "%";
+    // Renders confidence for the HUD. A null confidence means the detector
+    // reported none; it must show as "--" and never as "0%", which would read
+    // as "certainly not a threat" when the truth is "we don't know".
+    function formatConfidence(alert) {
+        if ((alert == null) || !alert.hasConfidence()) {
+            return "CONF --";
+        }
+
+        return "CONF " + alert.confidencePercent + "%";
+    }
+
+    // Label for the classification line. Contact alerts say so explicitly
+    // rather than borrowing the UNKNOWN threat wording.
+    function formatAlertKind(alert) {
+        if ((alert != null) && alert.isContact()) {
+            return "CONTACT";
+        }
+
+        return "";
     }
 
     function hasValue(value, expected) {

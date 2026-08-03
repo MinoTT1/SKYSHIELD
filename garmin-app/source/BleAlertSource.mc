@@ -1,5 +1,4 @@
 using Toybox.BluetoothLowEnergy as Ble;
-using Toybox.StringUtil as StringUtil;
 import Toybox.System;
 
 const BLE_STATE_SCANNING = "SCANNING";
@@ -89,9 +88,13 @@ class BleAlertSource extends AlertSource {
     var _hasLatestAlert;
     var _lastPayloadLength;
     var _lastDirectParseResult;
+    var _decoder;
+    var _latency;
 
     function initialize() {
         AlertSource.initialize();
+        _decoder = new CborAlertDecoder();
+        _latency = new LatencyMonitor();
         _latestAlert = null;
         _hasUnreadAlert = false;
         _state = BLE_STATE_DISCONNECTED;
@@ -699,232 +702,75 @@ class BleAlertSource extends AlertSource {
         onNotificationBytes(value);
     }
 
+    // Decodes one BLE notification through CborAlertDecoder -- the single
+    // decoder on this platform. The previous hand-rolled S2 byte scanner that
+    // lived here is gone along with its format.
     function onNotificationBytes(bytes) {
         _lastPayloadLength = byteLength(bytes);
 
-        if ((bytes == null) || (bytes.size() < 6)) {
-            handleByteParseError("packet too short");
+        var result = _decoder.decode(bytes);
+
+        if (!result.isOk()) {
+            handleByteParseError(result.status);
             return;
         }
 
-        var startIndex = findSimpleBytePayloadStart(bytes);
-
-        if (startIndex < 0) {
-            handleByteParseError("S2 marker not found");
-            return;
-        }
-
-        // Format examples:
-        // S2|F|H|58|N|FPV
-        // S2|D|M|24|M|MAVIC
-        // S2|U|C|X|N|UNKNOWN
-        var threatStart = startIndex + 3;
-        var threatEnd = findPipeFrom(bytes, threatStart);
-
-        if ((threatEnd - threatStart) != 1) {
-            handleByteParseError("bad threat field");
-            return;
-        }
-
-        var severityStart = threatEnd + 1;
-        var severityEnd = findPipeFrom(bytes, severityStart);
-
-        if ((severityEnd - severityStart) != 1) {
-            handleByteParseError("bad severity field");
-            return;
-        }
-
-        var bandStart = severityEnd + 1;
-        var bandEnd = findPipeFrom(bytes, bandStart);
-
-        if (bandEnd <= bandStart) {
-            handleByteParseError("bad band field");
-            return;
-        }
-
-        var distanceStart = bandEnd + 1;
-        var distanceEnd = findPipeFrom(bytes, distanceStart);
-
-        if ((distanceEnd - distanceStart) != 1) {
-            handleByteParseError("bad distance field");
-            return;
-        }
-
-        var finalFieldStart = distanceEnd + 1;
-        var isS2Payload = bytes[startIndex + 1] == 50;
-        var threat = threatFromByte(bytes[threatStart]);
-        var severity = severityFromByte(bytes[severityStart]);
-        var band = bandFromBytes(bytes, bandStart, bandEnd);
-        var distance = distanceFromByte(bytes[distanceStart]);
-        var confidence = 0;
-        var droneClass = "UNKNOWN";
-
-        if (isS2Payload) {
-            droneClass = droneClassFromBytes(bytes, finalFieldStart);
-        } else {
-            confidence = confidenceFromBytes(bytes, finalFieldStart);
-        }
-
-        if ((threat == null) || (severity == null) || (band == null) || (distance == null) || (confidence < 0)) {
-            handleByteParseError("field mapping failed");
-            return;
-        }
-
-        _latestAlert = new AlertModel(
-            threat,
-            severity,
-            confidence,
-            band,
-            distance,
-            defaultBandsForBand(band),
-            null,
-            "BLE_BYTE_PARSE",
-            0
-        );
-        _latestAlert.droneClass = droneClass;
+        _latestAlert = result.alert;
+        recordLatencySample(_latestAlert);
 
         _hasLatestAlert = true;
         _hasUnreadAlert = true;
         _lastParseOk = true;
         _lastParsedSummary = formatParsedSummary(_latestAlert);
-        _lastDirectParseResult = formatParsedSummary(_latestAlert);
-        _lastRawPayload = "S1";
+        _lastDirectParseResult = _lastParsedSummary;
+        _lastRawPayload = describePayload(bytes);
         lastRxMs = _uptimeMs;
         explicitDisconnectSeen = false;
-        markBridgeActivity("valid s2");
-        setLifecycleFlags(false, false, true, true, "byte rx alert");
+        markBridgeActivity("valid alert");
+        setLifecycleFlags(false, false, true, true, "rx alert");
         setBleState(BLE_STATE_CONNECTED, BLE_DIAG_RX, BLE_STATUS_RX);
-        System.println("VALID S2 CLEARS LINK LOST");
-        System.println("SKYSHIELD BLE byte parse threat=" + threat + " severity=" + severity + " band=" + band + " distance=" + distance + " droneClass=" + droneClass);
-
-        return;
+        System.println("VALID ALERT CLEARS LINK LOST");
+        System.println("SKYSHIELD BLE decoded kind=" + _latestAlert.alertKind +
+            " threat=" + _latestAlert.threatType +
+            " severity=" + _latestAlert.riskLevel +
+            " band=" + _latestAlert.band +
+            " distance=" + _latestAlert.distanceLabel +
+            " confidence=" + formatConfidenceForLog(_latestAlert) +
+            " droneClass=" + _latestAlert.droneClass +
+            " seq=" + _latestAlert.sequence);
     }
 
-    function findSimpleBytePayloadStart(bytes) {
-        var index = 0;
-        var maxIndex = bytes.size() - 2;
-
-        while (index < maxIndex) {
-            if ((bytes[index] == 83) && ((bytes[index + 1] == 50) || (bytes[index + 1] == 49)) && (bytes[index + 2] == 124)) {
-                return index;
-            }
-
-            index += 1;
+    function formatConfidenceForLog(alert) {
+        if (!alert.hasConfidence()) {
+            return "none";
         }
 
-        return -1;
+        return alert.confidencePercent.toString();
     }
 
-    function findPipeFrom(bytes, startIndex) {
-        var index = startIndex;
-
-        while (index < bytes.size()) {
-            if (bytes[index] == 124) {
-                return index;
-            }
-
-            index += 1;
+    // Short hex preview of what actually arrived, for field debugging. The old
+    // code hardcoded this to "S1" regardless of the payload (Finding B-2).
+    function describePayload(bytes) {
+        if (bytes == null) {
+            return "<null>";
         }
 
-        return -1;
-    }
+        var preview = "";
+        var limit = bytes.size();
 
-    function threatFromByte(code) {
-        if (code == 70) { return "FPV"; }
-        if (code == 68) { return "DJI"; }
-        if (code == 85) { return "UNKNOWN"; }
-        return null;
-    }
-
-    function severityFromByte(code) {
-        if (code == 72) { return "HIGH"; }
-        if (code == 77) { return "MEDIUM"; }
-        if (code == 67) { return "CRITICAL"; }
-        if (code == 76) { return "LOW"; }
-        return null;
-    }
-
-    function bandFromBytes(bytes, startIndex, endIndex) {
-        var fieldLength = endIndex - startIndex;
-
-        if ((fieldLength == 1) && (bytes[startIndex] == 88)) {
-            return "MULTI";
+        if (limit > 12) {
+            limit = 12;
         }
 
-        if (fieldLength != 2) {
-            return null;
+        for (var i = 0; i < limit; i += 1) {
+            preview += (bytes[i] & 0xFF).format("%02X");
         }
 
-        var first = bytes[startIndex];
-        var second = bytes[startIndex + 1];
-
-        if ((first == 53) && (second == 56)) { return "5.8GHz"; }
-        if ((first == 50) && (second == 52)) { return "2.4GHz"; }
-        if ((first == 51) && (second == 51)) { return "3.3GHz"; }
-        if ((first == 49) && (second == 50)) { return "1.2GHz"; }
-
-        return null;
-    }
-
-    function distanceFromByte(code) {
-        if (code == 78) { return "NEAR"; }
-        if (code == 77) { return "MID"; }
-        if (code == 70) { return "FAR"; }
-        return null;
-    }
-
-    function confidenceFromBytes(bytes, startIndex) {
-        var index = startIndex;
-        var confidence = 0;
-        var sawDigit = false;
-
-        while (index < bytes.size()) {
-            var value = bytes[index];
-
-            if ((value < 48) || (value > 57)) {
-                break;
-            }
-
-            confidence = (confidence * 10) + (value - 48);
-            sawDigit = true;
-            index += 1;
+        if (bytes.size() > limit) {
+            preview += "..";
         }
 
-        if (!sawDigit) {
-            return -1;
-        }
-
-        return confidence;
-    }
-
-    function droneClassFromBytes(bytes, startIndex) {
-        if (matchesBytes(bytes, startIndex, [70, 80, 86])) {
-            return "FPV";
-        }
-
-        if (matchesBytes(bytes, startIndex, [77, 65, 86, 73, 67])) {
-            return "MAVIC";
-        }
-
-        if (matchesBytes(bytes, startIndex, [65, 85, 84, 69, 76])) {
-            return "AUTEL";
-        }
-
-        return "UNKNOWN";
-    }
-
-    function matchesBytes(bytes, startIndex, expected) {
-        if ((startIndex + expected.size()) > bytes.size()) {
-            return false;
-        }
-
-        for (var i = 0; i < expected.size(); i += 1) {
-            if (bytes[startIndex + i] != expected[i]) {
-                return false;
-            }
-        }
-
-        return true;
+        return preview + " (" + bytes.size() + "B)";
     }
 
     function handleByteParseError(reason) {
@@ -941,25 +787,19 @@ class BleAlertSource extends AlertSource {
         _hasUnreadAlert = false;
     }
 
-    function defaultBandsForBand(primaryBand) {
-        return [
-            { :band => "1.2", :level => bandLevel(primaryBand, "1.2GHz") },
-            { :band => "2.4", :level => bandLevel(primaryBand, "2.4GHz") },
-            { :band => "3.3", :level => bandLevel(primaryBand, "3.3GHz") },
-            { :band => "5.8", :level => bandLevel(primaryBand, "5.8GHz") }
-        ];
+    // Feeds the packet's CORE timestamp and our local receive time to the
+    // latency monitor. See docs/latency-measurement.md for why this is a
+    // baseline-relative measurement rather than an absolute one-way figure.
+    function recordLatencySample(alert) {
+        if (alert == null) {
+            return;
+        }
+
+        _latency.recordPacket(alert.timestampMs, _uptimeMs, alert.detectorLatencyMs, alert.sequence);
     }
 
-    function bandLevel(primaryBand, candidateBand) {
-        if ((primaryBand != null) && primaryBand.equals("MULTI")) {
-            return "MED";
-        }
-
-        if ((primaryBand != null) && primaryBand.equals(candidateBand)) {
-            return "HIGH";
-        }
-
-        return "NONE";
+    function getLatencyMonitor() {
+        return _latency;
     }
 
     function formatParsedSummary(alert) {
@@ -967,36 +807,13 @@ class BleAlertSource extends AlertSource {
             return "";
         }
 
-        return alert.threatType + " " + alert.riskLevel + " " + alert.confidencePercent;
-    }
+        var confidence = "--";
 
-    function bytesToUtf8String(bytes) {
-        try {
-            var decodedString = StringUtil.convertEncodedString(
-                bytes,
-                {
-                    :fromRepresentation => StringUtil.REPRESENTATION_BYTE_ARRAY,
-                    :toRepresentation => StringUtil.REPRESENTATION_STRING_PLAIN_TEXT,
-                    :encoding => StringUtil.CHAR_ENCODING_UTF8
-                }
-            );
-
-            if (decodedString != null) {
-                return decodedString;
-            }
-        } catch (ex) {
-            log("StringUtil UTF-8 conversion failed: " + ex);
+        if (alert.hasConfidence()) {
+            confidence = alert.confidencePercent.toString();
         }
 
-        return bytesToAsciiString(bytes);
-    }
-
-    function bytesToAsciiString(bytes) {
-        if (bytes == null) {
-            return null;
-        }
-
-        return bytes.toString();
+        return alert.threatType + " " + alert.riskLevel + " " + confidence;
     }
 
     function byteLength(bytes) {
@@ -1304,14 +1121,6 @@ class BleAlertSource extends AlertSource {
 
     function log(message) {
         System.println("SKYSHIELD BLE: " + message);
-    }
-
-    function isFallbackAlert(alert) {
-        return (alert.threatType == "UNKNOWN") &&
-            (alert.riskLevel == "LOW") &&
-            (alert.band == "MULTI") &&
-            (alert.distanceLabel == "FAR") &&
-            (alert.confidencePercent == 0);
     }
 
     function getDeviceName() {
