@@ -24,8 +24,11 @@ public:
         clear();
     }
 
+    // Non-blocking. Reads at most one complete line per call and stops as soon
+    // as one is ready, so a second line arriving in the same burst cannot
+    // overwrite an undelivered one. Callers drain by polling repeatedly.
     void poll() {
-        if (_input == nullptr) {
+        if ((_input == nullptr) || _lineReady) {
             return;
         }
 
@@ -34,6 +37,11 @@ public:
 
             if ((ch == '\n') || (ch == '\r')) {
                 commitLine();
+
+                if (_lineReady) {
+                    return;
+                }
+
                 continue;
             }
 

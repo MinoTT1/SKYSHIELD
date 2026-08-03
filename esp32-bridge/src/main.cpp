@@ -1,39 +1,80 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>
 
-#include "DetectorInputAdapter.h"
+#include "IDetectorAdapter.h"
 #include "MockAlertProvider.h"
+#include "SerialInjectAdapter.h"
 #include "SkyShieldCodec.h"
+#include "TTSKW07Adapter.h"
 
 namespace {
-MockAlertProvider mockAlerts;
-DetectorInputAdapter serialInject;
 
-const bool MOCK_MODE = false;
+// ---------------------------------------------------------------------------
+// Configuration
+// ---------------------------------------------------------------------------
+
+enum DetectorSelection : uint8_t {
+    // Live Tatusky TTSKW07 on a hardware UART.
+    DETECTOR_TTSKW07 = 0,
+    // Operator types alerts into the USB console. Bench only, not a detector.
+    DETECTOR_SERIAL_INJECT = 1,
+    // Rotating simulated alerts on a timer. Bench only.
+    DETECTOR_MOCK = 2
+};
+
+const DetectorSelection ACTIVE_DETECTOR = DETECTOR_SERIAL_INJECT;
+
+// TTSKW07 wiring. The USB CDC port is the debug console on the ESP32-S3, so
+// the detector gets its own UART.
+const int8_t TTSKW07_RX_PIN = 18;
+const int8_t TTSKW07_TX_PIN = 17;
+
 const bool PRIORITY_TEST_MODE = false;
-const uint32_t ALERT_INTERVAL_MS = 4000;
+const uint32_t MOCK_INTERVAL_MS = 4000;
+
 const char* BLE_DEVICE_NAME = "SKYSHIELD-BRIDGE";
 const char* SKYSHIELD_SERVICE_UUID = "9f4d0001-7c31-4f9b-9a4b-8f4c0f000001";
 const char* ALERT_CHARACTERISTIC_UUID = "9f4d0002-7c31-4f9b-9a4b-8f4c0f000001";
 
-// A CBOR alert is 29-45 bytes, which does not fit the 20-byte payload of an
-// unnegotiated 23-byte ATT MTU. Request headroom at startup. See
-// docs/wire-protocol.md.
+// A CBOR alert is 29-45 bytes and does not fit the 20-byte payload of an
+// unnegotiated 23-byte ATT MTU. See docs/wire-protocol.md.
 const uint16_t BLE_PREFERRED_MTU = 185;
 
-uint32_t lastAlertMs = 0;
-uint32_t bleConnectedAtMs = 0;
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+
+TTSKW07Adapter ttskw07Adapter(Serial1, TTSKW07_RX_PIN, TTSKW07_TX_PIN);
+SerialInjectAdapter serialInjectAdapter;
+MockAlertProvider mockAlerts;
+
+IDetectorAdapter* detector = nullptr;
+
+uint32_t lastMockMs = 0;
 uint32_t mockStartedAtMs = 0;
 uint32_t sequence = 1;
 bool bleClientConnected = false;
 bool bleClientSubscribed = false;
+uint32_t bleConnectedAtMs = 0;
 NimBLECharacteristic* alertCharacteristic = nullptr;
 
 uint8_t payloadBuffer[skyshield::MAX_PAYLOAD_BYTES];
 
-const char* modeLabel() {
-    return MOCK_MODE ? "MOCK" : "SERIAL_INJECT";
+bool usingMockProvider() {
+    return ACTIVE_DETECTOR == DETECTOR_MOCK;
 }
+
+const char* activeSourceLabel() {
+    if (usingMockProvider()) {
+        return "MOCK";
+    }
+
+    return (detector != nullptr) ? detector->name() : "NONE";
+}
+
+// ---------------------------------------------------------------------------
+// BLE
+// ---------------------------------------------------------------------------
 
 class SkyShieldServerCallbacks : public NimBLEServerCallbacks {
 public:
@@ -60,12 +101,7 @@ public:
         (void)characteristic;
         (void)desc;
         bleClientSubscribed = subValue > 0;
-
-        if (bleClientSubscribed) {
-            Serial.println("BLE client subscribed");
-        } else {
-            Serial.println("BLE client unsubscribed");
-        }
+        Serial.println(bleClientSubscribed ? "BLE client subscribed" : "BLE client unsubscribed");
     }
 };
 
@@ -93,6 +129,10 @@ void initBle() {
     NimBLEDevice::startAdvertising();
     Serial.println("BLE advertising as SKYSHIELD-BRIDGE");
 }
+
+// ---------------------------------------------------------------------------
+// Publishing
+// ---------------------------------------------------------------------------
 
 void printAlertSummary(const skyshield::Alert& alert) {
     using namespace skyshield;
@@ -150,7 +190,8 @@ void printPayloadHex(const uint8_t* payload, size_t length) {
 }
 
 // Encodes and transmits one alert. Refuses to transmit a packet that failed to
-// encode: a truncated CBOR map would decode to a plausible-but-wrong alert.
+// encode rather than sending a truncated map, which would decode to a
+// plausible-but-wrong alert.
 void publishAlert(const skyshield::Alert& alert) {
     printAlertSummary(alert);
 
@@ -167,55 +208,83 @@ void publishAlert(const skyshield::Alert& alert) {
         return;
     }
 
-    // setValue keeps the most recent alert readable, so a reconnecting watch
-    // can recover current state without waiting for the next notification.
+    // Keeps the most recent alert readable so a reconnecting watch can recover
+    // current state without waiting for the next notification.
     alertCharacteristic->setValue(payloadBuffer, length);
 
     if (bleClientConnected && bleClientSubscribed && ((millis() - bleConnectedAtMs) >= 1000)) {
         alertCharacteristic->notify();
-        Serial.println("BLE notify sent");
+
+        // Latency point (b): handed to the BLE stack. The watch records point
+        // (c) on receipt; see docs/latency-measurement.md for why the two
+        // clocks cannot be differenced directly.
+        Serial.print("BLE notify sent seq=");
+        Serial.print(alert.sequence);
+        Serial.print(" core_tx_ms=");
+        Serial.println(alert.timestampMs);
     }
 
     sequence += 1;
 }
 
-void publishCurrentMockAlert(uint32_t now) {
+void pollDetector() {
+    if (detector == nullptr) {
+        return;
+    }
+
+    skyshield::Alert alert;
+
+    if (detector->poll(sequence, alert)) {
+        publishAlert(alert);
+    }
+}
+
+void pollMockProvider(uint32_t now) {
+    if ((now - lastMockMs) < MOCK_INTERVAL_MS) {
+        return;
+    }
+
+    lastMockMs = now;
+
     skyshield::Alert alert;
 
     if (PRIORITY_TEST_MODE) {
         const uint32_t elapsedMs = now - mockStartedAtMs;
         Serial.println(mockAlerts.priorityTestBlockLabel(elapsedMs));
         mockAlerts.priorityTestAlert(elapsedMs, alert, millis(), sequence);
-        publishAlert(alert);
-        return;
+    } else {
+        mockAlerts.next(alert, millis(), sequence);
     }
 
-    mockAlerts.next(alert, millis(), sequence);
     publishAlert(alert);
 }
 
-void pollSerialInject() {
-    skyshield::Alert alert;
-    String rawPayload;
+void selectDetector() {
+    switch (ACTIVE_DETECTOR) {
+        case DETECTOR_TTSKW07:
+            detector = &ttskw07Adapter;
+            break;
 
-    // Latency point (a): the moment input was ingested.
-    const uint32_t ingestMs = millis();
+        case DETECTOR_SERIAL_INJECT:
+            detector = &serialInjectAdapter;
+            break;
 
-    if (!serialInject.readAlert(alert, rawPayload, ingestMs, sequence)) {
+        default:
+            detector = nullptr;  // mock provider is not a detector
+            break;
+    }
+
+    if (detector == nullptr) {
         return;
     }
 
-    Serial.print("RAW INJECT INPUT: ");
-    Serial.println(rawPayload);
-
-    // Latency point (b): normalization complete, about to transmit.
-    const uint32_t processedMs = millis();
-    alert.timestampMs = processedMs;
-    alert.hasDetectorLatency = true;
-    alert.detectorLatencyMs = processedMs - ingestMs;
-
-    publishAlert(alert);
+    if (!detector->begin()) {
+        Serial.print("DETECTOR FAILED TO START: ");
+        Serial.println(detector->name());
+        detector = nullptr;
+    }
 }
+
 }  // namespace
 
 void setup() {
@@ -223,15 +292,18 @@ void setup() {
     delay(250);
 
     Serial.println("SKYSHIELD ESP32 Bridge starting...");
-    Serial.print("MODE: ");
-    Serial.println(modeLabel());
     Serial.print("PROTOCOL VERSION: ");
     Serial.println(skyshield::PROTOCOL_VERSION);
 
     initBle();
+    selectDetector();
 
-    if (MOCK_MODE) {
+    Serial.print("ACTIVE SOURCE: ");
+    Serial.println(activeSourceLabel());
+
+    if (usingMockProvider()) {
         mockStartedAtMs = millis();
+        lastMockMs = millis();
 
         skyshield::Alert alert;
 
@@ -244,25 +316,17 @@ void setup() {
         }
 
         publishAlert(alert);
-    } else {
-        Serial.println("SERIAL_INJECT mode: type FPV, MAVIC, AUTEL, UNKNOWN or CONTACT");
     }
-
-    lastAlertMs = millis();
 }
 
 void loop() {
-    const uint32_t now = millis();
-
-    // Serial injection is checked every loop so an operator-typed alert is not
-    // delayed by the mock cadence.
-    if (!MOCK_MODE) {
-        pollSerialInject();
+    // Detectors are polled every iteration and must be non-blocking, so an
+    // alert is published as soon as its line arrives rather than waiting on a
+    // fixed cadence. Only the mock provider is timer-driven.
+    if (usingMockProvider()) {
+        pollMockProvider(millis());
         return;
     }
 
-    if (now - lastAlertMs >= ALERT_INTERVAL_MS) {
-        lastAlertMs = now;
-        publishCurrentMockAlert(now);
-    }
+    pollDetector();
 }
