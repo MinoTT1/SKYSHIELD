@@ -68,8 +68,21 @@ const uint16_t BLE_ATT_HEADER_BYTES = 3;
 // about 69 bytes, reached only if drone_class fills its 23-character capacity.
 const bool LOG_MTU_DIAGNOSTICS = true;
 
-uint16_t negotiatedMtu = 0;
 size_t largestPayloadSeen = 0;
+
+// The MTU is deliberately NOT cached. It used to be snapshotted into a
+// negotiatedMtu variable that both the connect callback and the MTU-exchange
+// callback wrote to, and the send path then trusted that snapshot. Any path
+// that left the snapshot stale -- callback ordering, a missed MTU event, or a
+// reconnect issuing a fresh connection handle -- made the send path compute
+// the usable payload from a dead value while the live link was fine.
+//
+// Instead we keep the connection handle and ask the stack for the MTU at the
+// moment we need it, so every reader gets the same live answer by construction.
+const uint16_t BLE_CONN_HANDLE_INVALID = 0xFFFF;
+
+NimBLEServer* bleServer = nullptr;
+uint16_t bleConnHandle = BLE_CONN_HANDLE_INVALID;
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
@@ -117,6 +130,22 @@ uint16_t usablePayloadBytes(uint16_t mtu) {
     return mtu - BLE_ATT_HEADER_BYTES;
 }
 
+// THE single source of truth for the ATT MTU. Reads the live value from the
+// stack for the currently connected client. Returns 0 when there is no usable
+// connection, which callers must treat as "unknown" rather than as a small
+// MTU, so an unknown value can never trigger a false size failure.
+uint16_t currentMtu() {
+    if ((bleServer == nullptr) || (bleConnHandle == BLE_CONN_HANDLE_INVALID)) {
+        return 0;
+    }
+
+    return bleServer->getPeerMTU(bleConnHandle);
+}
+
+uint16_t currentUsablePayloadBytes() {
+    return usablePayloadBytes(currentMtu());
+}
+
 class SkyShieldServerCallbacks : public NimBLEServerCallbacks {
 public:
     void onConnect(NimBLEServer* server) override {
@@ -125,46 +154,61 @@ public:
         Serial.println("BLE client connected");
     }
 
-    // Overload carrying the connection descriptor, so the MTU in force at
-    // connect time can be read before any negotiation callback arrives.
+    // Overload carrying the connection descriptor. NimBLE invokes both onConnect
+    // overloads, so this records the connection handle that every later MTU read
+    // depends on. A reconnect issues a new handle and this keeps it current.
     void onConnect(NimBLEServer* server, ble_gap_conn_desc* desc) override {
         markConnected();
-        Serial.println("BLE client connected");
 
-        if (!LOG_MTU_DIAGNOSTICS || (server == nullptr) || (desc == nullptr)) {
-            return;
+        if ((server != nullptr) && (desc != nullptr)) {
+            bleServer = server;
+            bleConnHandle = desc->conn_handle;
         }
-
-        const uint16_t mtu = server->getPeerMTU(desc->conn_handle);
-
-        // Often still the 23-byte default here: the central usually starts MTU
-        // exchange just after connecting, and onMTUChange reports the result.
-        Serial.print("MTU at connect: ");
-        Serial.print(mtu);
-        Serial.print(" (requested ");
-        Serial.print(BLE_PREFERRED_MTU);
-        Serial.println(")");
-
-        if (mtu > 0) {
-            negotiatedMtu = mtu;
-        }
-    }
-
-    void onMTUChange(uint16_t MTU, ble_gap_conn_desc* desc) override {
-        (void)desc;
-        negotiatedMtu = MTU;
 
         if (!LOG_MTU_DIAGNOSTICS) {
             return;
         }
 
+        // Reads the same live source the send path uses, so these two log lines
+        // cannot disagree. Usually still 23 here, because the central normally
+        // starts MTU exchange just after connecting.
+        Serial.print("MTU at connect: ");
+        Serial.print(currentMtu());
+        Serial.print(" (requested ");
+        Serial.print(BLE_PREFERRED_MTU);
+        Serial.println(")");
+    }
+
+    void onMTUChange(uint16_t MTU, ble_gap_conn_desc* desc) override {
+        // Refresh the handle from the event rather than assuming the connect
+        // callback already ran: this event can arrive first.
+        if (desc != nullptr) {
+            bleConnHandle = desc->conn_handle;
+        }
+
+        if (!LOG_MTU_DIAGNOSTICS) {
+            return;
+        }
+
+        const uint16_t live = currentMtu();
+
         Serial.print("MTU negotiated: ");
         Serial.println(MTU);
         Serial.print("MTU usable notification payload: ");
-        Serial.print(usablePayloadBytes(MTU));
+        Serial.print(usablePayloadBytes(live));
         Serial.println(" bytes");
 
-        if (MTU < BLE_PREFERRED_MTU) {
+        // The event value and the live read should agree. If they ever do not,
+        // the live value is authoritative and the discrepancy is worth seeing.
+        if (live != MTU) {
+            Serial.print("MTU NOTE: event reported ");
+            Serial.print(MTU);
+            Serial.print(" but the stack reports ");
+            Serial.print(live);
+            Serial.println("; using the stack value");
+        }
+
+        if ((live > 0) && (live < BLE_PREFERRED_MTU)) {
             Serial.print("MTU WARNING: peer granted less than the requested ");
             Serial.println(BLE_PREFERRED_MTU);
         }
@@ -176,7 +220,7 @@ public:
         (void)server;
         bleClientConnected = false;
         bleClientSubscribed = false;
-        negotiatedMtu = 0;
+        bleConnHandle = BLE_CONN_HANDLE_INVALID;
         Serial.println("BLE client disconnected");
         NimBLEDevice::startAdvertising();
     }
@@ -189,11 +233,13 @@ private:
     }
 
     void reportFitAgainstLargestSeen() {
-        if (largestPayloadSeen == 0) {
+        const uint16_t usable = currentUsablePayloadBytes();
+
+        // Says nothing when the MTU is unknown, so an unknown value cannot be
+        // mistaken for a failure.
+        if ((largestPayloadSeen == 0) || (usable == 0)) {
             return;
         }
-
-        const uint16_t usable = usablePayloadBytes(negotiatedMtu);
 
         Serial.print("MTU headroom: largest alert so far ");
         Serial.print(largestPayloadSeen);
@@ -223,6 +269,10 @@ void initBle() {
 
     NimBLEServer* server = NimBLEDevice::createServer();
     server->setCallbacks(new SkyShieldServerCallbacks());
+
+    // Available to currentMtu() even if a callback runs before the connect
+    // overload that would otherwise set it.
+    bleServer = server;
 
     NimBLEService* service = server->createService(SKYSHIELD_SERVICE_UUID);
 
@@ -315,16 +365,20 @@ void logPayloadSize(size_t length) {
     Serial.print(largestPayloadSeen);
     Serial.print(")");
 
-    if (negotiatedMtu == 0) {
-        // No MTU exchange has been observed yet, so assume the BLE default.
-        Serial.println(" [MTU not yet negotiated]");
+    // Live read at send time. This is the fix: the old code used a cached
+    // value that could still hold the pre-negotiation default while the link
+    // was already running at the negotiated MTU.
+    const uint16_t mtu = currentMtu();
+
+    if (mtu == 0) {
+        Serial.println(" [MTU unknown, no active connection]");
         return;
     }
 
-    const uint16_t usable = usablePayloadBytes(negotiatedMtu);
+    const uint16_t usable = usablePayloadBytes(mtu);
 
     Serial.print(" [MTU ");
-    Serial.print(negotiatedMtu);
+    Serial.print(mtu);
     Serial.print(", usable ");
     Serial.print(usable);
     Serial.println("]");
