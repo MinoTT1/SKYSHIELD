@@ -49,10 +49,24 @@ const uint16_t BLE_ATT_HEADER_BYTES = 3;
 // Seeing this at send time means negotiation never happened.
 const uint16_t BLE_DEFAULT_MTU = 23;
 
-// -------------------------- TEMPORARY MTU DIAGNOSTICS ----------------------
-// Bench instrumentation for the MTU sanity test. Serial-logging only: it does
-// not change what is transmitted. Remove once the negotiated MTU is confirmed
-// on real Enduro 2 hardware.
+// ----------------------------- MTU DIAGNOSTICS -----------------------------
+// Verbose bench instrumentation: the per-packet size line, the CBOR hex dump,
+// the pre-negotiation MTU snapshot and the headroom report. Serial-logging
+// only; it does not change what is transmitted.
+//
+// Off by default now that MTU 185 is confirmed on Enduro 2 hardware. The hex
+// dump alone is ~96 characters per alert, which on USB CDC is enough to crowd
+// out the lines that matter.
+//
+// Deliberately NOT gated by this flag, because they are what make a field
+// failure diagnosable:
+//   - "MTU negotiated" once per connection, and its absence when negotiation
+//     never happens
+//   - "MTU FAIL" when a payload exceeds the usable notification size
+//   - "MTU NOTE" when the event value and the stack disagree
+//   - connect/subscribe/disconnect lines carrying conn_handle
+//
+// Set to true for bring-up of a new watch model or a new detector.
 //
 // WORST-CASE TEST LINE. Of the captured TTSKW07 samples, this one produces the
 // largest CBOR payload, because drone_class is the only variable-length field
@@ -71,7 +85,7 @@ const uint16_t BLE_DEFAULT_MTU = 23;
 // form that fits, so a freshly booted board emits a few bytes less than one
 // that has been running for hours. Structural maximum for any detector is
 // about 69 bytes, reached only if drone_class fills its 23-character capacity.
-const bool LOG_MTU_DIAGNOSTICS = true;
+const bool LOG_MTU_DIAGNOSTICS = false;
 
 size_t largestPayloadSeen = 0;
 
@@ -92,7 +106,6 @@ uint16_t bleConnHandle = BLE_CONN_HANDLE_INVALID;
 // Set by onMTUChange. Proves whether the MTU exchange was actually observed,
 // as opposed to the link silently staying at the 23-byte default.
 bool mtuExchangeObserved = false;
-uint16_t mtuExchangeValue = 0;
 
 // How long to wait after subscribe for MTU negotiation to settle before
 // sending the first notification. The central normally drives the exchange
@@ -263,27 +276,26 @@ public:
         }
 
         mtuExchangeObserved = true;
-        mtuExchangeValue = MTU;
 
         const uint16_t live = currentMtu();
 
-        // Proof this callback fires at all. If it never appears in the log, the
-        // exchange is not happening and the link is stuck at the default.
-        logLine("MTU CALLBACK FIRED: event=%u live=%u handle=%u usable=%u",
-                MTU, live, bleConnHandle, usablePayloadBytes(live));
+        // Permanent, one line per connection. Confirms the exchange happened and
+        // records the payload budget the link actually has. Its ABSENCE from a
+        // log is the signal that negotiation never occurred, which is exactly
+        // how the stuck-at-23 fault was finally identified.
+        logLine("MTU negotiated: %u (usable %u) handle=%u",
+                live, usablePayloadBytes(live), bleConnHandle);
 
-        if (!LOG_MTU_DIAGNOSTICS) {
-            return;
-        }
-
-        logLine("MTU negotiated: %u", live);
-        logLine("MTU usable notification payload: %u bytes", usablePayloadBytes(live));
-
-        // The event value and the live read should agree. If they ever do not,
-        // the live value is authoritative and the discrepancy is worth seeing.
+        // The event value and the live read should agree. A disagreement means
+        // one of them is lying about the link, which is worth seeing even in a
+        // quiet build.
         if (live != MTU) {
             logLine("MTU NOTE: event reported %u but the stack reports %u; using the stack value",
                     MTU, live);
+        }
+
+        if (!LOG_MTU_DIAGNOSTICS) {
+            return;
         }
 
         if ((live > 0) && (live < BLE_PREFERRED_MTU)) {
@@ -300,7 +312,6 @@ public:
         bleClientSubscribed = false;
         bleConnHandle = BLE_CONN_HANDLE_INVALID;
         mtuExchangeObserved = false;
-        mtuExchangeValue = 0;
         bleSubscribedAtMs = 0;
         logLine("BLE client disconnected");
         NimBLEDevice::startAdvertising();
@@ -440,10 +451,6 @@ void printPayloadHex(const uint8_t* payload, size_t length) {
 // MTU so an oversized alert is visible on the console instead of failing
 // silently at the BLE layer.
 void logPayloadSize(size_t length) {
-    if (length > largestPayloadSeen) {
-        largestPayloadSeen = length;
-    }
-
     // Live read at send time, with the handle it was read from, so a wrong or
     // stale handle is visible rather than being inferred from a bare 23.
     const uint16_t mtu = currentMtu();
@@ -454,22 +461,39 @@ void logPayloadSize(size_t length) {
         return;
     }
 
-    const uint16_t usable = usablePayloadBytes(mtu);
-
     logLine("CBOR payload: %u bytes (largest so far %u) [MTU %u, usable %u, handle=%u, "
             "exchange_seen=%s]",
-            (unsigned)length, (unsigned)largestPayloadSeen, mtu, usable, bleConnHandle,
-            mtuExchangeObserved ? "yes" : "no");
+            (unsigned)length, (unsigned)largestPayloadSeen, mtu, usablePayloadBytes(mtu),
+            bleConnHandle, mtuExchangeObserved ? "yes" : "no");
+}
 
-    if (length > usable) {
-        logLine("MTU FAIL: payload exceeds usable notification size by %u bytes; "
-                "the watch will see a truncated or dropped packet",
-                (unsigned)(length - usable));
+// PERMANENT correctness guard, deliberately not behind LOG_MTU_DIAGNOSTICS.
+//
+// An oversized notification is silently truncated by the BLE stack and decodes
+// on the watch as a parse error with no indication of why. This is the one line
+// that explains it, so it must survive with diagnostics switched off. It costs
+// nothing when everything fits, because it only logs on failure.
+void warnIfPayloadExceedsMtu(size_t length) {
+    const uint16_t mtu = currentMtu();
 
-        if (!mtuExchangeObserved) {
-            logLine("MTU CAUSE: no MTU exchange was ever observed on this link, so it is "
-                    "still at the %u-byte default", (unsigned)mtu);
-        }
+    // Unknown MTU is not a failure and must never be reported as one.
+    if (mtu == 0) {
+        return;
+    }
+
+    const uint16_t usable = usablePayloadBytes(mtu);
+
+    if (length <= usable) {
+        return;
+    }
+
+    logLine("MTU FAIL: payload %u bytes exceeds usable notification size %u by %u; "
+            "the watch will see a truncated or dropped packet",
+            (unsigned)length, usable, (unsigned)(length - usable));
+
+    if (!mtuExchangeObserved) {
+        logLine("MTU CAUSE: no MTU exchange was observed on this link, so it is still "
+                "at the %u-byte default", (unsigned)mtu);
     }
 }
 
@@ -509,11 +533,16 @@ void publishAlert(const skyshield::Alert& alert) {
         return;
     }
 
-    printPayloadHex(payloadBuffer, length);
+    if (length > largestPayloadSeen) {
+        largestPayloadSeen = length;
+    }
 
     if (LOG_MTU_DIAGNOSTICS) {
+        printPayloadHex(payloadBuffer, length);
         logPayloadSize(length);
     }
+
+    warnIfPayloadExceedsMtu(length);
 
     if (alertCharacteristic == nullptr) {
         return;
