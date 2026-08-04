@@ -36,9 +36,41 @@ const char* BLE_DEVICE_NAME = "SKYSHIELD-BRIDGE";
 const char* SKYSHIELD_SERVICE_UUID = "9f4d0001-7c31-4f9b-9a4b-8f4c0f000001";
 const char* ALERT_CHARACTERISTIC_UUID = "9f4d0002-7c31-4f9b-9a4b-8f4c0f000001";
 
-// A CBOR alert is 29-45 bytes and does not fit the 20-byte payload of an
+// A CBOR alert is 29-56 bytes and does not fit the 20-byte payload of an
 // unnegotiated 23-byte ATT MTU. See docs/wire-protocol.md.
 const uint16_t BLE_PREFERRED_MTU = 185;
+
+// ATT header overhead on a notification: 1 opcode + 2 handle. The usable
+// payload is therefore MTU - 3.
+const uint16_t BLE_ATT_HEADER_BYTES = 3;
+
+// -------------------------- TEMPORARY MTU DIAGNOSTICS ----------------------
+// Bench instrumentation for the MTU sanity test. Serial-logging only: it does
+// not change what is transmitted. Remove once the negotiated MTU is confirmed
+// on real Enduro 2 hardware.
+//
+// WORST-CASE TEST LINE. Of the captured TTSKW07 samples, this one produces the
+// largest CBOR payload, because drone_class is the only variable-length field
+// and FPV_ANALOG is the longest value at 10 characters:
+//
+//   TTSKW07 TIME=00:00:09 TYPE=FPV_ANALOG BAND=5.8GHz FREQ_MHZ=5865 RSSI=-45DBM SIGNAL=NEAR
+//
+// Paste that into the serial console with ACTIVE_DETECTOR =
+// DETECTOR_SERIAL_INJECT. Expected encoded size:
+//
+//   49 bytes  typical, at roughly an hour of uptime
+//   56 bytes  absolute upper bound, once timestamp_ms, sequence and
+//             detector_latency_ms all reach 32-bit maximums
+//
+// Size grows with uptime because timestamp_ms is encoded in the shortest CBOR
+// form that fits, so a freshly booted board emits a few bytes less than one
+// that has been running for hours. Structural maximum for any detector is
+// about 69 bytes, reached only if drone_class fills its 23-character capacity.
+const bool LOG_MTU_DIAGNOSTICS = true;
+
+uint16_t negotiatedMtu = 0;
+size_t largestPayloadSeen = 0;
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // State
@@ -76,22 +108,102 @@ const char* activeSourceLabel() {
 // BLE
 // ---------------------------------------------------------------------------
 
+// Reports the usable notification payload for a given MTU, or 0 if unknown.
+uint16_t usablePayloadBytes(uint16_t mtu) {
+    if (mtu <= BLE_ATT_HEADER_BYTES) {
+        return 0;
+    }
+
+    return mtu - BLE_ATT_HEADER_BYTES;
+}
+
 class SkyShieldServerCallbacks : public NimBLEServerCallbacks {
 public:
     void onConnect(NimBLEServer* server) override {
         (void)server;
-        bleClientConnected = true;
-        bleClientSubscribed = false;
-        bleConnectedAtMs = millis();
+        markConnected();
         Serial.println("BLE client connected");
+    }
+
+    // Overload carrying the connection descriptor, so the MTU in force at
+    // connect time can be read before any negotiation callback arrives.
+    void onConnect(NimBLEServer* server, ble_gap_conn_desc* desc) override {
+        markConnected();
+        Serial.println("BLE client connected");
+
+        if (!LOG_MTU_DIAGNOSTICS || (server == nullptr) || (desc == nullptr)) {
+            return;
+        }
+
+        const uint16_t mtu = server->getPeerMTU(desc->conn_handle);
+
+        // Often still the 23-byte default here: the central usually starts MTU
+        // exchange just after connecting, and onMTUChange reports the result.
+        Serial.print("MTU at connect: ");
+        Serial.print(mtu);
+        Serial.print(" (requested ");
+        Serial.print(BLE_PREFERRED_MTU);
+        Serial.println(")");
+
+        if (mtu > 0) {
+            negotiatedMtu = mtu;
+        }
+    }
+
+    void onMTUChange(uint16_t MTU, ble_gap_conn_desc* desc) override {
+        (void)desc;
+        negotiatedMtu = MTU;
+
+        if (!LOG_MTU_DIAGNOSTICS) {
+            return;
+        }
+
+        Serial.print("MTU negotiated: ");
+        Serial.println(MTU);
+        Serial.print("MTU usable notification payload: ");
+        Serial.print(usablePayloadBytes(MTU));
+        Serial.println(" bytes");
+
+        if (MTU < BLE_PREFERRED_MTU) {
+            Serial.print("MTU WARNING: peer granted less than the requested ");
+            Serial.println(BLE_PREFERRED_MTU);
+        }
+
+        reportFitAgainstLargestSeen();
     }
 
     void onDisconnect(NimBLEServer* server) override {
         (void)server;
         bleClientConnected = false;
         bleClientSubscribed = false;
+        negotiatedMtu = 0;
         Serial.println("BLE client disconnected");
         NimBLEDevice::startAdvertising();
+    }
+
+private:
+    void markConnected() {
+        bleClientConnected = true;
+        bleClientSubscribed = false;
+        bleConnectedAtMs = millis();
+    }
+
+    void reportFitAgainstLargestSeen() {
+        if (largestPayloadSeen == 0) {
+            return;
+        }
+
+        const uint16_t usable = usablePayloadBytes(negotiatedMtu);
+
+        Serial.print("MTU headroom: largest alert so far ");
+        Serial.print(largestPayloadSeen);
+        Serial.print(" bytes vs ");
+        Serial.print(usable);
+        Serial.println(" usable");
+
+        if (largestPayloadSeen > usable) {
+            Serial.println("MTU FAIL: alerts already exceed the usable payload");
+        }
     }
 };
 
@@ -189,6 +301,41 @@ void printPayloadHex(const uint8_t* payload, size_t length) {
     Serial.println();
 }
 
+// TEMPORARY MTU DIAGNOSTIC. Reports the encoded size against the negotiated
+// MTU so an oversized alert is visible on the console instead of failing
+// silently at the BLE layer.
+void logPayloadSize(size_t length) {
+    if (length > largestPayloadSeen) {
+        largestPayloadSeen = length;
+    }
+
+    Serial.print("CBOR payload: ");
+    Serial.print(length);
+    Serial.print(" bytes (largest so far ");
+    Serial.print(largestPayloadSeen);
+    Serial.print(")");
+
+    if (negotiatedMtu == 0) {
+        // No MTU exchange has been observed yet, so assume the BLE default.
+        Serial.println(" [MTU not yet negotiated]");
+        return;
+    }
+
+    const uint16_t usable = usablePayloadBytes(negotiatedMtu);
+
+    Serial.print(" [MTU ");
+    Serial.print(negotiatedMtu);
+    Serial.print(", usable ");
+    Serial.print(usable);
+    Serial.println("]");
+
+    if (length > usable) {
+        Serial.print("MTU FAIL: payload exceeds usable notification size by ");
+        Serial.print(length - usable);
+        Serial.println(" bytes; the watch will see a truncated or dropped packet");
+    }
+}
+
 // Encodes and transmits one alert. Refuses to transmit a packet that failed to
 // encode rather than sending a truncated map, which would decode to a
 // plausible-but-wrong alert.
@@ -204,6 +351,10 @@ void publishAlert(const skyshield::Alert& alert) {
 
     printPayloadHex(payloadBuffer, length);
 
+    if (LOG_MTU_DIAGNOSTICS) {
+        logPayloadSize(length);
+    }
+
     if (alertCharacteristic == nullptr) {
         return;
     }
@@ -214,6 +365,10 @@ void publishAlert(const skyshield::Alert& alert) {
 
     if (bleClientConnected && bleClientSubscribed && ((millis() - bleConnectedAtMs) >= 1000)) {
         alertCharacteristic->notify();
+
+        Serial.print("notify sent: ");
+        Serial.print(length);
+        Serial.println(" bytes");
 
         // Latency point (b): handed to the BLE stack. The watch records point
         // (c) on receipt; see docs/latency-measurement.md for why the two
