@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>
+#include <stdarg.h>
 
 #include "IDetectorAdapter.h"
 #include "MockAlertProvider.h"
@@ -44,6 +45,10 @@ const uint16_t BLE_PREFERRED_MTU = 185;
 // payload is therefore MTU - 3.
 const uint16_t BLE_ATT_HEADER_BYTES = 3;
 
+// The BLE default ATT MTU before any exchange: 23, giving 20 usable bytes.
+// Seeing this at send time means negotiation never happened.
+const uint16_t BLE_DEFAULT_MTU = 23;
+
 // -------------------------- TEMPORARY MTU DIAGNOSTICS ----------------------
 // Bench instrumentation for the MTU sanity test. Serial-logging only: it does
 // not change what is transmitted. Remove once the negotiated MTU is confirmed
@@ -83,6 +88,57 @@ const uint16_t BLE_CONN_HANDLE_INVALID = 0xFFFF;
 
 NimBLEServer* bleServer = nullptr;
 uint16_t bleConnHandle = BLE_CONN_HANDLE_INVALID;
+
+// Set by onMTUChange. Proves whether the MTU exchange was actually observed,
+// as opposed to the link silently staying at the 23-byte default.
+bool mtuExchangeObserved = false;
+uint16_t mtuExchangeValue = 0;
+
+// How long to wait after subscribe for MTU negotiation to settle before
+// sending the first notification. The central normally drives the exchange
+// immediately after connecting; sending before it completes would push the
+// first alert out at the default MTU.
+const uint32_t MTU_SETTLE_WAIT_MS = 1500;
+
+uint32_t bleSubscribedAtMs = 0;
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Serial logging
+// ---------------------------------------------------------------------------
+//
+// The board runs USB CDC serial (ARDUINO_USB_CDC_ON_BOOT=1). Emitting a line
+// as a sequence of Serial.print() calls let the CDC TX buffer overrun, which
+// DROPS bytes rather than blocking, producing spliced fragments like
+// "BLE c23185" in the log. Diagnostics that cannot be read are worse than
+// none: a corrupted line was misread as a successful MTU negotiation.
+//
+// Every line is now formatted into one buffer and written with a single
+// println followed by flush. The mutex keeps the NimBLE host task and the
+// Arduino loop task from writing at the same time, and flush throttles the
+// producer so the CDC buffer cannot overrun.
+
+SemaphoreHandle_t logMutex = nullptr;
+
+void logLine(const char* format, ...) {
+    char buffer[192];
+
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    if (logMutex != nullptr) {
+        xSemaphoreTake(logMutex, portMAX_DELAY);
+    }
+
+    Serial.println(buffer);
+    Serial.flush();
+
+    if (logMutex != nullptr) {
+        xSemaphoreGive(logMutex);
+    }
+}
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
@@ -146,17 +202,37 @@ uint16_t currentUsablePayloadBytes() {
     return usablePayloadBytes(currentMtu());
 }
 
+// Asks the peer to raise the ATT MTU.
+//
+// MTU exchange is normally driven by the central, and a central that never
+// initiates one leaves the link at the 23-byte default forever. Either side
+// may send the request, so the bridge asks rather than waiting indefinitely.
+// Harmless if the peer already exchanged: NimBLE reports BLE_HS_EALREADY.
+void requestMtuExchange() {
+    if (bleConnHandle == BLE_CONN_HANDLE_INVALID) {
+        return;
+    }
+
+    const int status = ble_gattc_exchange_mtu(bleConnHandle, nullptr, nullptr);
+
+    if (status == 0) {
+        logLine("MTU exchange requested by bridge on handle %u", bleConnHandle);
+        return;
+    }
+
+    logLine("MTU exchange request returned %d (already exchanged or unsupported)", status);
+}
+
 class SkyShieldServerCallbacks : public NimBLEServerCallbacks {
 public:
+    // NimBLE invokes both onConnect overloads. This one has no connection
+    // descriptor, so it only marks state; the descriptor overload owns the
+    // handle and the MTU logging.
     void onConnect(NimBLEServer* server) override {
         (void)server;
         markConnected();
-        Serial.println("BLE client connected");
     }
 
-    // Overload carrying the connection descriptor. NimBLE invokes both onConnect
-    // overloads, so this records the connection handle that every later MTU read
-    // depends on. A reconnect issues a new handle and this keeps it current.
     void onConnect(NimBLEServer* server, ble_gap_conn_desc* desc) override {
         markConnected();
 
@@ -165,18 +241,18 @@ public:
             bleConnHandle = desc->conn_handle;
         }
 
-        if (!LOG_MTU_DIAGNOSTICS) {
-            return;
+        logLine("BLE client connected, conn_handle=%u", bleConnHandle);
+
+        if (LOG_MTU_DIAGNOSTICS) {
+            // Reads the same live source the send path uses, so these two lines
+            // cannot disagree. Normally still 23 here, because MTU exchange has
+            // not happened yet at connect time.
+            logLine("MTU at connect: %u (requested %u) handle=%u",
+                    currentMtu(), BLE_PREFERRED_MTU, bleConnHandle);
         }
 
-        // Reads the same live source the send path uses, so these two log lines
-        // cannot disagree. Usually still 23 here, because the central normally
-        // starts MTU exchange just after connecting.
-        Serial.print("MTU at connect: ");
-        Serial.print(currentMtu());
-        Serial.print(" (requested ");
-        Serial.print(BLE_PREFERRED_MTU);
-        Serial.println(")");
+        // Do not wait on the central to start the exchange.
+        requestMtuExchange();
     }
 
     void onMTUChange(uint16_t MTU, ble_gap_conn_desc* desc) override {
@@ -186,31 +262,33 @@ public:
             bleConnHandle = desc->conn_handle;
         }
 
+        mtuExchangeObserved = true;
+        mtuExchangeValue = MTU;
+
+        const uint16_t live = currentMtu();
+
+        // Proof this callback fires at all. If it never appears in the log, the
+        // exchange is not happening and the link is stuck at the default.
+        logLine("MTU CALLBACK FIRED: event=%u live=%u handle=%u usable=%u",
+                MTU, live, bleConnHandle, usablePayloadBytes(live));
+
         if (!LOG_MTU_DIAGNOSTICS) {
             return;
         }
 
-        const uint16_t live = currentMtu();
-
-        Serial.print("MTU negotiated: ");
-        Serial.println(MTU);
-        Serial.print("MTU usable notification payload: ");
-        Serial.print(usablePayloadBytes(live));
-        Serial.println(" bytes");
+        logLine("MTU negotiated: %u", live);
+        logLine("MTU usable notification payload: %u bytes", usablePayloadBytes(live));
 
         // The event value and the live read should agree. If they ever do not,
         // the live value is authoritative and the discrepancy is worth seeing.
         if (live != MTU) {
-            Serial.print("MTU NOTE: event reported ");
-            Serial.print(MTU);
-            Serial.print(" but the stack reports ");
-            Serial.print(live);
-            Serial.println("; using the stack value");
+            logLine("MTU NOTE: event reported %u but the stack reports %u; using the stack value",
+                    MTU, live);
         }
 
         if ((live > 0) && (live < BLE_PREFERRED_MTU)) {
-            Serial.print("MTU WARNING: peer granted less than the requested ");
-            Serial.println(BLE_PREFERRED_MTU);
+            logLine("MTU WARNING: peer granted %u, less than the requested %u",
+                    live, BLE_PREFERRED_MTU);
         }
 
         reportFitAgainstLargestSeen();
@@ -221,7 +299,10 @@ public:
         bleClientConnected = false;
         bleClientSubscribed = false;
         bleConnHandle = BLE_CONN_HANDLE_INVALID;
-        Serial.println("BLE client disconnected");
+        mtuExchangeObserved = false;
+        mtuExchangeValue = 0;
+        bleSubscribedAtMs = 0;
+        logLine("BLE client disconnected");
         NimBLEDevice::startAdvertising();
     }
 
@@ -230,6 +311,7 @@ private:
         bleClientConnected = true;
         bleClientSubscribed = false;
         bleConnectedAtMs = millis();
+        bleSubscribedAtMs = 0;
     }
 
     void reportFitAgainstLargestSeen() {
@@ -241,14 +323,11 @@ private:
             return;
         }
 
-        Serial.print("MTU headroom: largest alert so far ");
-        Serial.print(largestPayloadSeen);
-        Serial.print(" bytes vs ");
-        Serial.print(usable);
-        Serial.println(" usable");
+        logLine("MTU headroom: largest alert so far %u bytes vs %u usable",
+                (unsigned)largestPayloadSeen, usable);
 
         if (largestPayloadSeen > usable) {
-            Serial.println("MTU FAIL: alerts already exceed the usable payload");
+            logLine("MTU FAIL: alerts already exceed the usable payload");
         }
     }
 };
@@ -257,9 +336,26 @@ class SkyShieldAlertCallbacks : public NimBLECharacteristicCallbacks {
 public:
     void onSubscribe(NimBLECharacteristic* characteristic, ble_gap_conn_desc* desc, uint16_t subValue) override {
         (void)characteristic;
-        (void)desc;
         bleClientSubscribed = subValue > 0;
-        Serial.println(bleClientSubscribed ? "BLE client subscribed" : "BLE client unsubscribed");
+
+        // Subscribe carries a valid descriptor, so use it as a backstop for the
+        // handle in case the connect overload was missed.
+        if ((desc != nullptr) && (bleConnHandle == BLE_CONN_HANDLE_INVALID)) {
+            bleConnHandle = desc->conn_handle;
+        }
+
+        if (!bleClientSubscribed) {
+            logLine("BLE client unsubscribed");
+            return;
+        }
+
+        bleSubscribedAtMs = millis();
+
+        logLine("BLE client subscribed, conn_handle=%u mtu=%u",
+                (desc != nullptr) ? desc->conn_handle : bleConnHandle, currentMtu());
+
+        // Last chance to raise the MTU before notifications start flowing.
+        requestMtuExchange();
     }
 };
 
@@ -289,7 +385,7 @@ void initBle() {
     advertising->setScanResponse(true);
 
     NimBLEDevice::startAdvertising();
-    Serial.println("BLE advertising as SKYSHIELD-BRIDGE");
+    logLine("BLE advertising as SKYSHIELD-BRIDGE");
 }
 
 // ---------------------------------------------------------------------------
@@ -299,56 +395,45 @@ void initBle() {
 void printAlertSummary(const skyshield::Alert& alert) {
     using namespace skyshield;
 
-    Serial.print("ALERT kind=");
-    Serial.print(alertKindName(alert.alertKind));
-    Serial.print(" sensor=");
-    Serial.print(sensorTypeName(alert.sensorType));
-    Serial.print(" threat=");
-    Serial.print(threatName(alert.threat));
-    Serial.print(" severity=");
-    Serial.print(severityName(alert.severity));
-    Serial.print(" band=");
-    Serial.print(bandName(alert.band));
-    Serial.print(" strength=");
-    Serial.print(distanceName(alert.distance));
-    Serial.print(" confidence=");
+    char confidence[8];
 
     if (alert.hasConfidence) {
-        Serial.print(alert.confidence);
+        snprintf(confidence, sizeof(confidence), "%u", alert.confidence);
     } else {
-        Serial.print("none");
+        snprintf(confidence, sizeof(confidence), "none");
     }
 
-    Serial.print(" class=");
-    Serial.print(alert.hasDroneClass ? alert.droneClass : "-");
-    Serial.print(" seq=");
-    Serial.print(alert.sequence);
-    Serial.print(" t=");
-    Serial.print(alert.timestampMs);
+    char latency[24];
 
     if (alert.hasDetectorLatency) {
-        Serial.print(" detector_to_core=");
-        Serial.print(alert.detectorLatencyMs);
-        Serial.print("ms");
+        snprintf(latency, sizeof(latency), " detector_to_core=%ums",
+                 (unsigned)alert.detectorLatencyMs);
+    } else {
+        latency[0] = '\0';
     }
 
-    Serial.println();
+    logLine("ALERT kind=%s sensor=%s threat=%s severity=%s band=%s strength=%s "
+            "confidence=%s class=%s seq=%u t=%u%s",
+            alertKindName(alert.alertKind), sensorTypeName(alert.sensorType),
+            threatName(alert.threat), severityName(alert.severity),
+            bandName(alert.band), distanceName(alert.distance), confidence,
+            alert.hasDroneClass ? alert.droneClass : "-",
+            (unsigned)alert.sequence, (unsigned)alert.timestampMs, latency);
 }
 
 void printPayloadHex(const uint8_t* payload, size_t length) {
-    Serial.print("BLE TX CBOR len=");
-    Serial.print(length);
-    Serial.print(" bytes=");
+    // Built as one string: MAX_PAYLOAD_BYTES is 180, so the hex fits well
+    // inside the line buffer and cannot be split across CDC writes.
+    char hex[(skyshield::MAX_PAYLOAD_BYTES * 2) + 1];
+    size_t offset = 0;
 
-    for (size_t i = 0; i < length; i += 1) {
-        if (payload[i] < 0x10) {
-            Serial.print('0');
-        }
-
-        Serial.print(payload[i], HEX);
+    for (size_t i = 0; (i < length) && ((offset + 2) < sizeof(hex)); i += 1) {
+        offset += snprintf(&hex[offset], sizeof(hex) - offset, "%02X", payload[i]);
     }
 
-    Serial.println();
+    hex[offset] = '\0';
+
+    logLine("BLE TX CBOR len=%u bytes=%s", (unsigned)length, hex);
 }
 
 // TEMPORARY MTU DIAGNOSTIC. Reports the encoded size against the negotiated
@@ -359,35 +444,56 @@ void logPayloadSize(size_t length) {
         largestPayloadSeen = length;
     }
 
-    Serial.print("CBOR payload: ");
-    Serial.print(length);
-    Serial.print(" bytes (largest so far ");
-    Serial.print(largestPayloadSeen);
-    Serial.print(")");
-
-    // Live read at send time. This is the fix: the old code used a cached
-    // value that could still hold the pre-negotiation default while the link
-    // was already running at the negotiated MTU.
+    // Live read at send time, with the handle it was read from, so a wrong or
+    // stale handle is visible rather than being inferred from a bare 23.
     const uint16_t mtu = currentMtu();
 
     if (mtu == 0) {
-        Serial.println(" [MTU unknown, no active connection]");
+        logLine("CBOR payload: %u bytes (largest so far %u) [MTU unknown, no active connection]",
+                (unsigned)length, (unsigned)largestPayloadSeen);
         return;
     }
 
     const uint16_t usable = usablePayloadBytes(mtu);
 
-    Serial.print(" [MTU ");
-    Serial.print(mtu);
-    Serial.print(", usable ");
-    Serial.print(usable);
-    Serial.println("]");
+    logLine("CBOR payload: %u bytes (largest so far %u) [MTU %u, usable %u, handle=%u, "
+            "exchange_seen=%s]",
+            (unsigned)length, (unsigned)largestPayloadSeen, mtu, usable, bleConnHandle,
+            mtuExchangeObserved ? "yes" : "no");
 
     if (length > usable) {
-        Serial.print("MTU FAIL: payload exceeds usable notification size by ");
-        Serial.print(length - usable);
-        Serial.println(" bytes; the watch will see a truncated or dropped packet");
+        logLine("MTU FAIL: payload exceeds usable notification size by %u bytes; "
+                "the watch will see a truncated or dropped packet",
+                (unsigned)(length - usable));
+
+        if (!mtuExchangeObserved) {
+            logLine("MTU CAUSE: no MTU exchange was ever observed on this link, so it is "
+                    "still at the %u-byte default", (unsigned)mtu);
+        }
     }
+}
+
+// True once the MTU is settled, or once waiting for it has timed out.
+//
+// The central drives MTU exchange, so the first notification must not race
+// ahead of it: a notify sent before the exchange completes goes out at the
+// default MTU and is truncated regardless of what is negotiated a moment
+// later. After the timeout it sends anyway, because silently never sending
+// would be a worse failure than a visible oversized one.
+bool mtuSettledOrTimedOut() {
+    if (mtuExchangeObserved) {
+        return true;
+    }
+
+    if (currentMtu() > BLE_DEFAULT_MTU) {
+        return true;
+    }
+
+    if (bleSubscribedAtMs == 0) {
+        return false;
+    }
+
+    return (millis() - bleSubscribedAtMs) >= MTU_SETTLE_WAIT_MS;
 }
 
 // Encodes and transmits one alert. Refuses to transmit a packet that failed to
@@ -399,7 +505,7 @@ void publishAlert(const skyshield::Alert& alert) {
     const size_t length = skyshield::encodeAlert(alert, payloadBuffer, sizeof(payloadBuffer));
 
     if (length == 0) {
-        Serial.println("ENCODE FAILED: alert not transmitted");
+        logLine("ENCODE FAILED: alert not transmitted");
         return;
     }
 
@@ -417,21 +523,25 @@ void publishAlert(const skyshield::Alert& alert) {
     // current state without waiting for the next notification.
     alertCharacteristic->setValue(payloadBuffer, length);
 
-    if (bleClientConnected && bleClientSubscribed && ((millis() - bleConnectedAtMs) >= 1000)) {
-        alertCharacteristic->notify();
-
-        Serial.print("notify sent: ");
-        Serial.print(length);
-        Serial.println(" bytes");
-
-        // Latency point (b): handed to the BLE stack. The watch records point
-        // (c) on receipt; see docs/latency-measurement.md for why the two
-        // clocks cannot be differenced directly.
-        Serial.print("BLE notify sent seq=");
-        Serial.print(alert.sequence);
-        Serial.print(" core_tx_ms=");
-        Serial.println(alert.timestampMs);
+    if (!bleClientConnected || !bleClientSubscribed) {
+        sequence += 1;
+        return;
     }
+
+    if (!mtuSettledOrTimedOut()) {
+        logLine("notify deferred: waiting for MTU exchange (currently %u)", currentMtu());
+        return;  // keep the sequence number so the retry reuses it
+    }
+
+    alertCharacteristic->notify();
+
+    logLine("notify sent: %u bytes", (unsigned)length);
+
+    // Latency point (b): handed to the BLE stack. The watch records point (c)
+    // on receipt; see docs/latency-measurement.md for why the two clocks
+    // cannot be differenced directly.
+    logLine("BLE notify sent seq=%u core_tx_ms=%u",
+            (unsigned)alert.sequence, (unsigned)alert.timestampMs);
 
     sequence += 1;
 }
@@ -459,7 +569,7 @@ void pollMockProvider(uint32_t now) {
 
     if (PRIORITY_TEST_MODE) {
         const uint32_t elapsedMs = now - mockStartedAtMs;
-        Serial.println(mockAlerts.priorityTestBlockLabel(elapsedMs));
+        logLine("%s", mockAlerts.priorityTestBlockLabel(elapsedMs));
         mockAlerts.priorityTestAlert(elapsedMs, alert, millis(), sequence);
     } else {
         mockAlerts.next(alert, millis(), sequence);
@@ -488,8 +598,7 @@ void selectDetector() {
     }
 
     if (!detector->begin()) {
-        Serial.print("DETECTOR FAILED TO START: ");
-        Serial.println(detector->name());
+        logLine("DETECTOR FAILED TO START: %s", detector->name());
         detector = nullptr;
     }
 }
@@ -498,17 +607,21 @@ void selectDetector() {
 
 void setup() {
     Serial.begin(115200);
-    delay(250);
 
-    Serial.println("SKYSHIELD ESP32 Bridge starting...");
-    Serial.print("PROTOCOL VERSION: ");
-    Serial.println(skyshield::PROTOCOL_VERSION);
+    // USB CDC needs a moment before the host is ready; without it the first
+    // lines are lost.
+    delay(400);
+
+    // Created before the first logLine so no output is unserialized.
+    logMutex = xSemaphoreCreateMutex();
+
+    logLine("SKYSHIELD ESP32 Bridge starting...");
+    logLine("PROTOCOL VERSION: %u", (unsigned)skyshield::PROTOCOL_VERSION);
 
     initBle();
     selectDetector();
 
-    Serial.print("ACTIVE SOURCE: ");
-    Serial.println(activeSourceLabel());
+    logLine("ACTIVE SOURCE: %s", activeSourceLabel());
 
     if (usingMockProvider()) {
         mockStartedAtMs = millis();
@@ -517,8 +630,8 @@ void setup() {
         skyshield::Alert alert;
 
         if (PRIORITY_TEST_MODE) {
-            Serial.println("PRIORITY TEST MODE: ON");
-            Serial.println(mockAlerts.priorityTestBlockLabel(0));
+            logLine("PRIORITY TEST MODE: ON");
+            logLine("%s", mockAlerts.priorityTestBlockLabel(0));
             mockAlerts.priorityTestAlert(0, alert, millis(), sequence);
         } else {
             mockAlerts.current(alert, millis(), sequence);
