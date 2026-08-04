@@ -67,10 +67,18 @@ public:
         Serial.print("SERIAL_INJECT input: ");
         Serial.println(line);
 
-        const uint32_t processedMs = millis();
-        alert.timestampMs = processedMs;
-        alert.hasDetectorLatency = true;
-        alert.detectorLatencyMs = processedMs - ingestMs;
+        alert.timestampMs = millis();
+
+        // Deliberately leaves detector_latency_ms ABSENT.
+        //
+        // There is no detector here: the "ingest" moment is when a human
+        // finished typing into a console, so the delta measures the parser and
+        // nothing else. Reporting it as a detector latency would put a real
+        // number in a field that means something it did not measure, and it
+        // would read as a suspiciously excellent 0ms. Absent is the honest
+        // value; segment A is only measurable with a physically connected
+        // detector. See docs/latency-measurement.md.
+        alert.hasDetectorLatency = false;
 
         return true;
     }

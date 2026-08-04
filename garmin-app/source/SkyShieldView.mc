@@ -605,6 +605,12 @@ class SkyShieldView extends WatchUi.View {
             return;
         }
 
+        // Latency point (d): this alert is being drawn. Closes the
+        // receive-to-render segment on the watch clock. The monitor ignores
+        // repeat renders of the same packet, so calling this from the draw path
+        // is safe. See docs/latency-measurement.md.
+        noteAlertRendered(alert);
+
         var trackState = getSystemHealthState();
         var displaySeverity = _formatter.resolveSeverityForTrack(alert, trackState);
         var severityLabel = _formatter.formatSeverity(displaySeverity);
@@ -783,6 +789,21 @@ class SkyShieldView extends WatchUi.View {
         }
 
         return false;
+    }
+
+    // Reports the moment an alert reached the screen. Only alerts that arrived
+    // over BLE are timed: a mock alert has no receive event, so timing it would
+    // invent a measurement.
+    function noteAlertRendered(alert) {
+        if ((alert == null) || (_engine.getCurrentSource() != ALERT_SOURCE_BLE)) {
+            return;
+        }
+
+        var monitor = _engine.getLatencyMonitor();
+
+        if (monitor != null) {
+            monitor.recordRendered(alert.sequence, System.getTimer());
+        }
     }
 
     function getDisplayAlert() {

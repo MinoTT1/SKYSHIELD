@@ -87,6 +87,25 @@ const uint16_t BLE_DEFAULT_MTU = 23;
 // about 69 bytes, reached only if drone_class fills its 23-character capacity.
 const bool LOG_MTU_DIAGNOSTICS = false;
 
+// --------------------------- LATENCY INSTRUMENTATION -----------------------
+// Reports the bridge-side segments of the alert path. Every number printed is
+// a measured delta between two millis() reads on THIS device's clock; nothing
+// is estimated, defaulted or inferred.
+//
+// Segments, using the naming in docs/latency-measurement.md:
+//
+//   A  detector -> core   raw line in hand until normalization finished.
+//                         Measured by the adapter and carried as
+//                         detector_latency_ms. Only meaningful with a
+//                         physically connected detector; reported as "n/a"
+//                         when the source did not measure it.
+//   B  core -> BLE TX     normalization finished until handed to notify().
+//   A+B                   total time the alert spent inside the bridge.
+//
+// Segment C (BLE TX -> watch) is NOT reported here and cannot be: it spans two
+// unsynchronized clocks. See docs/latency-measurement.md.
+const bool LOG_LATENCY = true;
+
 size_t largestPayloadSeen = 0;
 
 // The MTU is deliberately NOT cached. It used to be snapshotted into a
@@ -520,13 +539,64 @@ bool mtuSettledOrTimedOut() {
     return (millis() - bleSubscribedAtMs) >= MTU_SETTLE_WAIT_MS;
 }
 
+// Reports the bridge-side latency segments for one alert.
+//
+// Both endpoints of every value printed here come from this device's millis()
+// clock, so each is a valid measured duration. Nothing is estimated. Segment A
+// is printed as "n/a" rather than 0 when the source did not measure an ingest
+// moment, because a source with no detector has no detector latency.
+void logAlertLatency(const skyshield::Alert& alert, uint32_t normalizedMs, uint32_t txMs) {
+    if (!LOG_LATENCY) {
+        return;
+    }
+
+    // Unsigned arithmetic, so a millis() wrap at ~49.7 days still yields the
+    // correct elapsed time.
+    const uint32_t segmentB = txMs - normalizedMs;
+
+    if (alert.hasDetectorLatency) {
+        logLine("LATENCY seq=%u A_detector_to_core=%ums B_core_to_tx=%ums "
+                "A+B_in_bridge=%ums [single ESP32 clock, measured]",
+                (unsigned)alert.sequence, (unsigned)alert.detectorLatencyMs,
+                (unsigned)segmentB, (unsigned)(alert.detectorLatencyMs + segmentB));
+    } else {
+        logLine("LATENCY seq=%u A_detector_to_core=n/a (source '%s' has no detector ingest) "
+                "B_core_to_tx=%ums [single ESP32 clock, measured]",
+                (unsigned)alert.sequence, activeSourceLabel(), (unsigned)segmentB);
+    }
+
+    // Stated explicitly every time so the absence of a number for C is read as
+    // "not measurable this way" rather than as an oversight.
+    logLine("LATENCY seq=%u C_tx_to_watch=unmeasured (cross-clock) core_tx_ms=%u",
+            (unsigned)alert.sequence, (unsigned)txMs);
+}
+
 // Encodes and transmits one alert. Refuses to transmit a packet that failed to
 // encode rather than sending a truncated map, which would decode to a
 // plausible-but-wrong alert.
 void publishAlert(const skyshield::Alert& alert) {
     printAlertSummary(alert);
 
-    const size_t length = skyshield::encodeAlert(alert, payloadBuffer, sizeof(payloadBuffer));
+    const bool notifyPossible =
+        (alertCharacteristic != nullptr) && bleClientConnected && bleClientSubscribed;
+
+    // Checked BEFORE stamping t_tx. Deferring after the stamp would ship a
+    // timestamp up to MTU_SETTLE_WAIT_MS stale and corrupt the measurement.
+    if (notifyPossible && !mtuSettledOrTimedOut()) {
+        logLine("notify deferred: waiting for MTU exchange (currently %u)", currentMtu());
+        return;
+    }
+
+    // Latency point (b): normalization is done and the alert is about to go on
+    // the wire. timestamp_ms carries this moment, which is what
+    // docs/wire-protocol.md specifies ("immediately before BLE transmission")
+    // and what the watch needs in order to reason about segment C at all.
+    skyshield::Alert txAlert = alert;
+    const uint32_t normalizedMs = alert.timestampMs;
+    const uint32_t txMs = millis();
+    txAlert.timestampMs = txMs;
+
+    const size_t length = skyshield::encodeAlert(txAlert, payloadBuffer, sizeof(payloadBuffer));
 
     if (length == 0) {
         logLine("ENCODE FAILED: alert not transmitted");
@@ -552,25 +622,15 @@ void publishAlert(const skyshield::Alert& alert) {
     // current state without waiting for the next notification.
     alertCharacteristic->setValue(payloadBuffer, length);
 
-    if (!bleClientConnected || !bleClientSubscribed) {
+    if (!notifyPossible) {
         sequence += 1;
         return;
-    }
-
-    if (!mtuSettledOrTimedOut()) {
-        logLine("notify deferred: waiting for MTU exchange (currently %u)", currentMtu());
-        return;  // keep the sequence number so the retry reuses it
     }
 
     alertCharacteristic->notify();
 
     logLine("notify sent: %u bytes", (unsigned)length);
-
-    // Latency point (b): handed to the BLE stack. The watch records point (c)
-    // on receipt; see docs/latency-measurement.md for why the two clocks
-    // cannot be differenced directly.
-    logLine("BLE notify sent seq=%u core_tx_ms=%u",
-            (unsigned)alert.sequence, (unsigned)alert.timestampMs);
+    logAlertLatency(txAlert, normalizedMs, txMs);
 
     sequence += 1;
 }

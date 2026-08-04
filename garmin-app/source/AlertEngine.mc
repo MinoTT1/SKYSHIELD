@@ -99,6 +99,10 @@ class AlertEngine {
         return _currentAlert;
     }
 
+    function getLatencyMonitor() {
+        return _bleSource.getLatencyMonitor();
+    }
+
     function getBleState() {
         return _bleSource.getState();
     }

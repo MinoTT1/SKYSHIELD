@@ -31,6 +31,15 @@ class LatencyMonitor {
     var _lastSequence;
     var _droppedPackets;
 
+    // Receive-to-render tracking. Both endpoints are watch-clock reads, so the
+    // difference is a genuine single-clock duration, unlike anything involving
+    // the CORE timestamp.
+    var _lastRxMs;
+    var _lastRxSequence;
+    var _renderedSequence;
+    var _lastRenderMs;
+    var _worstRenderMs;
+
     function initialize() {
         reset();
     }
@@ -44,6 +53,11 @@ class LatencyMonitor {
         _worstDetectorLatencyMs = null;
         _lastSequence = null;
         _droppedPackets = 0;
+        _lastRxMs = null;
+        _lastRxSequence = null;
+        _renderedSequence = null;
+        _lastRenderMs = null;
+        _worstRenderMs = null;
     }
 
     // coreTimestampMs: timestamp_ms from the packet (CORE clock)
@@ -53,6 +67,10 @@ class LatencyMonitor {
         _sampleCount += 1;
 
         trackSequenceGap(sequence);
+
+        // Kept so the render callback can close segment D on the watch clock.
+        _lastRxMs = localRxMs;
+        _lastRxSequence = sequence;
 
         _lastDetectorLatencyMs = detectorLatencyMs;
 
@@ -120,6 +138,58 @@ class LatencyMonitor {
             " detector_to_core=" + detectorText +
             " samples=" + _sampleCount +
             " dropped=" + _droppedPackets);
+    }
+
+    // Segment D: notification received -> alert actually drawn on the HUD.
+    //
+    // Both endpoints come from System.getTimer(), so this is a VALID measured
+    // duration, in contrast to anything spanning the CORE clock. It captures
+    // the decode plus the wait for the next render tick.
+    //
+    // Called from the draw path, which runs several times a second, so it
+    // records only the first render of each packet. A later redraw of the same
+    // alert is not a new delivery and would understate nothing but pollute the
+    // sample set.
+    function recordRendered(sequence, shownMs) {
+        if ((_lastRxMs == null) || (sequence == null)) {
+            return;
+        }
+
+        // Only close the timing for the packet we actually timed on receive.
+        if (_lastRxSequence != sequence) {
+            return;
+        }
+
+        if ((_renderedSequence != null) && (_renderedSequence == sequence)) {
+            return;
+        }
+
+        _renderedSequence = sequence;
+        _lastRenderMs = shownMs - _lastRxMs;
+
+        if (_lastRenderMs < 0) {
+            // Cannot happen with a monotonic timer; refuse to report a negative
+            // duration rather than printing nonsense.
+            _lastRenderMs = null;
+            return;
+        }
+
+        if ((_worstRenderMs == null) || (_lastRenderMs > _worstRenderMs)) {
+            _worstRenderMs = _lastRenderMs;
+        }
+
+        System.println("LATENCY seq=" + sequence +
+            " D_rx_to_shown=" + _lastRenderMs + "ms" +
+            " worst=" + _worstRenderMs + "ms" +
+            " [single watch clock, measured]");
+    }
+
+    function getRenderLatencyMs() {
+        return _lastRenderMs;
+    }
+
+    function getWorstRenderLatencyMs() {
+        return _worstRenderMs;
     }
 
     // Transport latency above the session baseline, in ms. Null until the
