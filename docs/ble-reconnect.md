@@ -147,6 +147,66 @@ That part always worked. What did not work was step 3 ever becoming true again,
 because the watch never reconnected. It now clears on the CONNECTED callback and
 the HUD returns to `MONITOR`, then `LIVE` on the next decoded alert.
 
+## Link-state haptics
+
+Link loss must be **felt**, not just displayed. The premise of the product is
+that the operator trusts vibration instead of watching the screen, so a silent
+link loss is the worst available failure: the operator believes they are covered
+while actually receiving nothing.
+
+### Why a rhythm, not an intensity
+
+Every threat pattern is a **single pulse** varying only in strength and
+duration:
+
+| Severity | Pulse |
+|---|---|
+| LOW | 55 strength, 90ms |
+| MEDIUM | 70, 140ms |
+| HIGH | 90, 190ms |
+| CRITICAL | 100, 320ms |
+
+Link events are therefore **multi-pulse rhythms**, so they differ structurally
+rather than by degree. A rhythm is recognisable through a sleeve, in motion,
+under stress; a slightly stronger buzz is not, and "stronger" on a threat scale
+would read as "bigger threat" — the opposite of the intended meaning.
+
+| Event | Pattern | Reads as |
+|---|---|---|
+| **LINK LOST** | 80/220ms → gap 160ms → 45/380ms | descending, fading out |
+| **LINK RESTORED** | 35/120ms → gap 90ms → 60/200ms | ascending, gentler |
+
+LINK LOST descends: firm, pause, weaker-but-longer. Falling intensity reads as
+something going away. LINK RESTORED is the mirror — quieter, rising, and shorter
+overall, so it cannot be mistaken for an alert.
+
+### Firing rules
+
+- **Once per drop.** Edge-triggered on the state transition, not the state, so
+  holding LINK LOST for 30 seconds buzzes once, not 120 times at the 4Hz render
+  rate.
+- **Only on a real BLE drop.** `getOperationalState()` can also reach LINK LOST
+  from a bridge-activity timeout, which is softer and often self-correcting.
+  Buzzing on that would train the operator to ignore the signal that matters,
+  so it is gated on `hasBleExplicitDisconnect()`.
+- **No false positive at startup.** `_operationalState` initialises to
+  LINK LOST, so the first healthy state is technically a LINK-LOST-to-MONITOR
+  transition. LINK RESTORED only fires if a loss was actually announced.
+- **Symmetric.** A loss the operator was never told about produces no recovery
+  buzz either.
+
+### No collision with threat suppression
+
+Link events use `_lastSystemEvent`, a namespace entirely separate from the
+threat fingerprint. `playSystemEvent()` never reads or writes `_lastAlertKey`,
+`_lastSeverityPriority` or `_lastVibrationMs`, and is deliberately **not**
+subject to the threat cooldown: a drop is exactly the moment the operator must
+be told, and suppressing it because a threat buzzed two seconds ago would hide
+the one event meaning "you are no longer covered".
+
+`VibrationEngine.reset()` clears threat state only. It runs when an RF session
+ends, which says nothing about the link, so it must not re-arm a link buzz.
+
 ## Verifying on hardware
 
 Watch the bridge serial log throughout. Watch-side lines are visible in the
@@ -179,6 +239,17 @@ Connect IQ simulator console or via `monkeydo` on device.
 4. Confirm it settles into a working link, the bridge session counter increments
    once per connection, and there is no wedged state.
 5. Confirm the backoff returns to 1000ms after the next successful alert.
+
+### Test 3b — link haptics
+
+1. With a live link, put the watch on your wrist and **look away**.
+2. Walk out of range.
+3. You should feel the **descending double-buzz** (firm, pause, softer-longer)
+   once, and only once, no matter how long you stay out of range.
+4. Walk back into range.
+5. You should feel the **ascending gentler double-buzz**.
+6. Confirm neither is mistakable for a threat pulse: trigger a threat alert and
+   compare — threats are a single buzz, link events are two-part rhythms.
 
 ### Test 4 — operator view
 

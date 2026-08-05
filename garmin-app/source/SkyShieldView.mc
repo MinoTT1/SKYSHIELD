@@ -509,6 +509,7 @@ class SkyShieldView extends WatchUi.View {
             return;
         }
 
+        var previous = _operationalState;
         _operationalState = state;
 
         if (state.equals(OP_STATE_LIVE)) {
@@ -516,6 +517,41 @@ class SkyShieldView extends WatchUi.View {
         }
 
         System.println("STATE: " + state);
+
+        handleLinkStateHaptic(previous, state);
+    }
+
+    // Link loss must be FELT, not just displayed.
+    //
+    // The whole premise of this product is that the operator trusts vibration
+    // instead of watching the screen. A silent link loss is therefore the worst
+    // failure mode available: the operator believes they are covered while
+    // actually receiving nothing. So entering LINK LOST buzzes.
+    //
+    // Only a REAL BLE drop qualifies. getOperationalState() can also reach
+    // LINK LOST from a bridge-activity timeout, which is a softer and often
+    // self-correcting condition; buzzing on that would train the operator to
+    // ignore the one signal that matters. hasBleExplicitDisconnect() is set by
+    // the actual disconnect callback.
+    function handleLinkStateHaptic(previous, state) {
+        if (previous == null) {
+            return;   // app start is not a transition
+        }
+
+        if (state.equals(OP_STATE_LINK_LOST)) {
+            if (_engine.hasBleExplicitDisconnect()) {
+                _vibrationEngine.triggerLinkLost();
+            } else {
+                System.println("HAPTIC SYSTEM skipped: LINK LOST from timeout, not a BLE drop");
+            }
+
+            return;
+        }
+
+        // Leaving LINK LOST for any working state means coverage is back.
+        if (previous.equals(OP_STATE_LINK_LOST)) {
+            _vibrationEngine.triggerLinkRestored();
+        }
     }
 
     function drawSplashScreen(dc, width) {
