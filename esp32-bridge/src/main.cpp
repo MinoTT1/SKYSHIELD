@@ -126,6 +126,11 @@ uint16_t bleConnHandle = BLE_CONN_HANDLE_INVALID;
 // as opposed to the link silently staying at the 23-byte default.
 bool mtuExchangeObserved = false;
 
+// Counts connections since boot. A disconnect/reconnect is normal operation on
+// this product, so each session is numbered in the log to make it obvious which
+// connection a later line belongs to.
+uint32_t bleSessionCount = 0;
+
 // How long to wait after subscribe for MTU negotiation to settle before
 // sending the first notification. The central normally drives the exchange
 // immediately after connecting; sending before it completes would push the
@@ -273,7 +278,10 @@ public:
             bleConnHandle = desc->conn_handle;
         }
 
-        logLine("BLE client connected, conn_handle=%u", bleConnHandle);
+        bleSessionCount += 1;
+
+        logLine("BLE client connected (session %u, conn_handle=%u)",
+                (unsigned)bleSessionCount, bleConnHandle);
 
         if (LOG_MTU_DIAGNOSTICS) {
             // Reads the same live source the send path uses, so these two lines
@@ -302,8 +310,8 @@ public:
         // records the payload budget the link actually has. Its ABSENCE from a
         // log is the signal that negotiation never occurred, which is exactly
         // how the stuck-at-23 fault was finally identified.
-        logLine("MTU negotiated: %u (usable %u) handle=%u",
-                live, usablePayloadBytes(live), bleConnHandle);
+        logLine("MTU negotiated: %u (usable %u) handle=%u session=%u",
+                live, usablePayloadBytes(live), bleConnHandle, (unsigned)bleSessionCount);
 
         // The event value and the live read should agree. A disagreement means
         // one of them is lying about the link, which is worth seeing even in a
@@ -327,16 +335,66 @@ public:
 
     void onDisconnect(NimBLEServer* server) override {
         (void)server;
-        bleClientConnected = false;
-        bleClientSubscribed = false;
-        bleConnHandle = BLE_CONN_HANDLE_INVALID;
-        mtuExchangeObserved = false;
-        bleSubscribedAtMs = 0;
-        logLine("BLE client disconnected");
-        NimBLEDevice::startAdvertising();
+        handleDisconnect(-1);
+    }
+
+    // Overload carrying the descriptor, so the connection handle is available.
+    // Overriding both keeps this symmetric with onConnect: relying on a single
+    // overload would leave a stale handle behind if the stack only invoked the
+    // other one.
+    void onDisconnect(NimBLEServer* server, ble_gap_conn_desc* desc) override {
+        (void)server;
+        handleDisconnect((desc != nullptr) ? static_cast<int>(desc->conn_handle) : -1);
     }
 
 private:
+    // Idempotent: NimBLE invokes both disconnect overloads, and the second call
+    // must not double-log or re-advertise.
+    void handleDisconnect(int handle) {
+        if (!bleClientConnected && (bleConnHandle == BLE_CONN_HANDLE_INVALID)) {
+            return;
+        }
+
+        logLine("BLE client disconnected (session %u, handle=%d, mtu_was_negotiated=%s)",
+                (unsigned)bleSessionCount, handle, mtuExchangeObserved ? "yes" : "no");
+
+        bleClientConnected = false;
+        bleClientSubscribed = false;
+
+        // Cleared so currentMtu() cannot read a dead connection. A stale handle
+        // here would make the send path compute the payload budget from the
+        // wrong link, which is the failure this area already had once.
+        bleConnHandle = BLE_CONN_HANDLE_INVALID;
+
+        // Reset so the next connection must negotiate again from scratch. MTU
+        // does NOT carry across connections.
+        mtuExchangeObserved = false;
+        bleSubscribedAtMs = 0;
+
+        restartAdvertising();
+    }
+
+    // Advertising must come back or the bridge is invisible forever. The result
+    // is checked rather than assumed, because a silent failure here looks
+    // exactly like the watch being out of range.
+    void restartAdvertising() {
+        if (NimBLEDevice::startAdvertising()) {
+            logLine("BLE advertising restarted, waiting for reconnect");
+            return;
+        }
+
+        logLine("BLE ADVERTISING RESTART FAILED, retrying");
+
+        delay(50);
+
+        if (NimBLEDevice::startAdvertising()) {
+            logLine("BLE advertising restarted on retry");
+            return;
+        }
+
+        logLine("BLE ADVERTISING STILL DOWN: bridge is undiscoverable");
+    }
+
     void markConnected() {
         bleClientConnected = true;
         bleClientSubscribed = false;

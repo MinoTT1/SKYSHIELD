@@ -304,7 +304,7 @@ Troubleshooting:
 - If BLE remains at `BLE SCAN` for more than 20 seconds, the app logs `scan timeout` and continues scanning.
 - If BLE reaches `BLE SUB` but no packet arrives within 20 seconds, the app logs `notification timeout after subscribe` and keeps showing `BLE SUB`.
 - If BLE errors before notifications, the HUD shows `BLE ERR`.
-- If BLE disconnects, `BleAlertSource` enters `SIGNAL_LOST` and restarts scanning. With `USE_MOCK_FALLBACK = false`, the HUD should return to `BLE SCAN` and `SCAN`.
+- If BLE disconnects, `BleAlertSource` enters `SIGNAL_LOST`, arms a backoff and restarts scanning, then resubscribes and issues a state-recovery read. With `USE_MOCK_FALLBACK = false`, the HUD should show `LINK LOST`, then return to `BLE SCAN` and `SCAN`, then `MONITOR` once reconnected. See [docs/ble-reconnect.md](../docs/ble-reconnect.md).
 
 ## Simulated BLE Lifecycle
 

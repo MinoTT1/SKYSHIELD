@@ -47,6 +47,12 @@ const BLE_ERR_DISC = "SIGNAL LOST";
 const BLE_ERR_PARSE = "ERR PARSE";
 const BLE_STAGE_TIMEOUT_MS = 20000;
 
+// Reconnect backoff. A drop is normal operation on this product -- range,
+// watch sleep and interference all cause them -- so recovery is automatic.
+// The delay escalates so a rapidly flapping link cannot spin the radio.
+const BLE_RECONNECT_MIN_MS = 1000;
+const BLE_RECONNECT_MAX_MS = 8000;
+
 class BleAlertSource extends AlertSource {
     var _latestAlert;
     var _hasUnreadAlert;
@@ -88,6 +94,11 @@ class BleAlertSource extends AlertSource {
     var _hasLatestAlert;
     var _lastPayloadLength;
     var _lastDirectParseResult;
+    var _reconnectPending;
+    var _reconnectAtMs;
+    var _reconnectDelayMs;
+    var _reconnectCount;
+    var _stateRecoveryPending;
     var _decoder;
     var _latency;
 
@@ -135,6 +146,11 @@ class BleAlertSource extends AlertSource {
         _hasLatestAlert = false;
         _lastPayloadLength = 0;
         _lastDirectParseResult = "";
+        _reconnectPending = false;
+        _reconnectAtMs = 0;
+        _reconnectDelayMs = BLE_RECONNECT_MIN_MS;
+        _reconnectCount = 0;
+        _stateRecoveryPending = false;
     }
 
     function start() {
@@ -165,8 +181,77 @@ class BleAlertSource extends AlertSource {
         }
     }
 
+    // Clears everything tied to the dead connection and arms a rescan.
+    //
+    // The hasEver* latches MUST be reset here. canProcessScanCallback() and
+    // canSetScanError() both refuse to act once any of them is true, which is
+    // correct while a connection is being established but would permanently
+    // ignore scan results after a drop.
+    //
+    // The delegate and the registered profile are deliberately NOT recreated:
+    // they belong to the app, not the connection, and reallocating them on
+    // every flap would leak.
+    function scheduleReconnect(reason) {
+        _device = null;
+        _alertCharacteristic = null;
+        _stateRecoveryPending = false;
+
+        setLifecycleFlags(false, false, false, false, "reconnect reset");
+
+        hasEverFoundPeripheral = false;
+        hasEverConnected = false;
+        hasEverSubscribed = false;
+        _scanTimeoutLogged = false;
+        _rxTimeoutLogged = false;
+
+        if (!_enabled) {
+            log("reconnect skipped, source stopped");
+            return;
+        }
+
+        _reconnectPending = true;
+        _reconnectAtMs = _uptimeMs + _reconnectDelayMs;
+
+        log("reconnect armed in " + _reconnectDelayMs + "ms after " + reason);
+
+        // Escalate for the next attempt; reset once a packet actually arrives.
+        _reconnectDelayMs = _reconnectDelayMs * 2;
+
+        if (_reconnectDelayMs > BLE_RECONNECT_MAX_MS) {
+            _reconnectDelayMs = BLE_RECONNECT_MAX_MS;
+        }
+    }
+
+    function serviceReconnect() {
+        if (!_reconnectPending || !_enabled) {
+            return;
+        }
+
+        if (_uptimeMs < _reconnectAtMs) {
+            return;
+        }
+
+        _reconnectPending = false;
+        _reconnectCount += 1;
+
+        log("reconnect attempt " + _reconnectCount + " starting rescan");
+
+        try {
+            Ble.setScanState(Ble.SCAN_STATE_OFF);
+        } catch (ex) {
+            log("reconnect scan reset warning: " + ex);
+        }
+
+        startScan();
+    }
+
+    function getReconnectCount() {
+        return _reconnectCount;
+    }
+
     function stop() {
         _enabled = false;
+        _reconnectPending = false;
 
         try {
             Ble.setScanState(Ble.SCAN_STATE_OFF);
@@ -182,6 +267,8 @@ class BleAlertSource extends AlertSource {
     function tick(elapsedMs) {
         _uptimeMs += elapsedMs;
         _diagElapsedMs += elapsedMs;
+
+        serviceReconnect();
 
         if ((_diagState == BLE_DIAG_SCAN) && (_diagElapsedMs >= BLE_STAGE_TIMEOUT_MS) && !_scanTimeoutLogged) {
             _scanTimeoutLogged = true;
@@ -593,6 +680,11 @@ class BleAlertSource extends AlertSource {
         }
 
         _alertCharacteristic = null;
+
+        // Previously this was the end of the line: nothing ever restarted
+        // scanning, so a single drop left the watch dark until the app was
+        // relaunched. A drop is normal operation, so recovery is automatic.
+        scheduleReconnect("disconnect state=" + state);
     }
 
     function discoverAlertCharacteristic(device) {
@@ -678,10 +770,56 @@ class BleAlertSource extends AlertSource {
             log("subscribed waiting for notification callback");
             logTiming("CONNECT_START_TO_SUBSCRIBE", _connectStartedAtMs, _subscribedAtMs);
             logTiming("CONNECTED_TO_SUBSCRIBE", _connectedAtMs, _subscribedAtMs);
+            requestCurrentStateRead();
             return;
         }
 
         setBleError(BLE_STAGE_SUB, "subscribe status=" + status);
+    }
+
+    // Recovers current state after a (re)connect.
+    //
+    // The bridge keeps the most recent alert readable on the same
+    // characteristic, so a READ returns it immediately instead of leaving the
+    // operator with a blank HUD until the next alert happens to fire. On a
+    // quiet link that could otherwise be minutes.
+    function requestCurrentStateRead() {
+        if (_alertCharacteristic == null) {
+            return;
+        }
+
+        try {
+            _stateRecoveryPending = true;
+            _alertCharacteristic.requestRead();
+            log("state recovery read requested");
+        } catch (ex) {
+            // Not fatal: notifications still work, the HUD just stays blank
+            // until the next alert.
+            _stateRecoveryPending = false;
+            log("state recovery read unavailable: " + ex);
+        }
+    }
+
+    function handleCharacteristicRead(characteristic, status, value) {
+        if (!isAlertCharacteristic(characteristic)) {
+            return;
+        }
+
+        var wasRecovery = _stateRecoveryPending;
+        _stateRecoveryPending = false;
+
+        if (status != Ble.STATUS_SUCCESS) {
+            log("state recovery read failed status=" + status);
+            return;
+        }
+
+        if (wasRecovery) {
+            log("state recovery read returned " + byteLength(value) + " bytes");
+        }
+
+        // Same decode path as a notification. A stale cached alert is still a
+        // real alert; freshness is handled by the view's packet-age logic.
+        onNotificationBytes(value);
     }
 
     function handleCharacteristicChanged(characteristic, value) {
@@ -717,6 +855,10 @@ class BleAlertSource extends AlertSource {
 
         _latestAlert = result.alert;
         recordLatencySample(_latestAlert);
+
+        // A decoded packet proves the link works, so the next drop starts from
+        // the shortest backoff again rather than inheriting an escalated one.
+        _reconnectDelayMs = BLE_RECONNECT_MIN_MS;
 
         _hasLatestAlert = true;
         _hasUnreadAlert = true;
@@ -1176,5 +1318,10 @@ class SkyShieldBleDelegate extends Ble.BleDelegate {
     function onCharacteristicChanged(characteristic, value) {
         System.println("SKYSHIELD BLE: NOTIFICATION delegate callback entered");
         _source.handleCharacteristicChanged(characteristic, value);
+    }
+
+    function onCharacteristicRead(characteristic, status, value) {
+        System.println("SKYSHIELD BLE: READ delegate callback entered");
+        _source.handleCharacteristicRead(characteristic, status, value);
     }
 }
