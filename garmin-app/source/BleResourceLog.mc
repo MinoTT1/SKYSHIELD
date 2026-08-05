@@ -1,4 +1,5 @@
 import Toybox.System;
+import Toybox.Application;
 
 // Diagnostic ledger for BLE resource lifecycle.
 //
@@ -20,8 +21,18 @@ import Toybox.System;
 //     THE LAST LINE PRINTED IS THE LOCATION OF THE FAULT. That is the single
 //     most valuable signal here.
 //
-// This class performs no BLE calls and changes no behaviour. It only counts and
-// prints.
+// CAPTURE METHOD: println alone is NOT sufficient on this hardware. A System
+// Error kills the app before the log buffer is flushed, so a crashed session
+// leaves no file. Every counter is therefore ALSO written to Application.Storage
+// as it changes. Storage commits to flash immediately and survives the crash, so
+// the next launch can read back exactly where the previous session died and show
+// it on screen -- no file, no USB, no MTP.
+//
+// A session-open flag distinguishes a crash from a clean exit: it is set on
+// start, cleared in onStop(), and a session found still open on the next launch
+// did not exit cleanly.
+//
+// This class performs no BLE calls. It counts, prints and persists.
 class BleResourceLog {
     var _pair;
     var _unpair;
@@ -38,6 +49,16 @@ class BleResourceLog {
     var _sourceStop;
     var _readRequest;
     var _readCallback;
+    var _session;
+    var _lastEvent;
+    var _lastStep;
+
+    // Storage keys. Short on purpose; Connect IQ storage is small.
+    static const KEY_SESSION = "ss_seq";
+    static const KEY_OPEN = "ss_open";
+    static const KEY_LEDGER = "ss_led";
+    static const KEY_STEP = "ss_step";
+    static const KEY_EVENT = "ss_evt";
 
     function initialize() {
         _pair = 0;
@@ -55,6 +76,87 @@ class BleResourceLog {
         _sourceStop = 0;
         _readRequest = 0;
         _readCallback = 0;
+        _lastEvent = "none";
+        _lastStep = "none";
+        _session = 0;
+    }
+
+    // Opens a persisted session. Call once at app start, AFTER reading the
+    // previous session's report.
+    function beginSession() {
+        var previous = Application.Storage.getValue(KEY_SESSION);
+
+        if (previous == null) {
+            previous = 0;
+        }
+
+        _session = previous + 1;
+
+        try {
+            Application.Storage.setValue(KEY_SESSION, _session);
+            Application.Storage.setValue(KEY_OPEN, true);
+            Application.Storage.setValue(KEY_LEDGER, "no events yet");
+            Application.Storage.setValue(KEY_STEP, "none");
+            Application.Storage.setValue(KEY_EVENT, "session start");
+        } catch (ex) {
+            System.println("SKYSHIELD BLERES  storage unavailable: " + ex);
+        }
+
+        System.println("SKYSHIELD BLERES  session #" + _session + " opened");
+    }
+
+    // Marks a clean exit. Anything that skips this -- a System Error, a
+    // watchdog, a power loss -- leaves the session flagged open, which is how
+    // the next launch knows it crashed.
+    function endSessionCleanly() {
+        try {
+            Application.Storage.setValue(KEY_OPEN, false);
+        } catch (ex) {
+            System.println("SKYSHIELD BLERES  storage unavailable on close: " + ex);
+        }
+    }
+
+    // Reads the previous session's final state. Returns null when there is
+    // nothing recorded or the previous session exited cleanly.
+    static function readCrashReport() {
+        var open = Application.Storage.getValue(KEY_OPEN);
+
+        if (open == null) {
+            return null;   // never run before
+        }
+
+        if (!open) {
+            return null;   // previous session exited cleanly
+        }
+
+        return {
+            :session => Application.Storage.getValue(KEY_SESSION),
+            :ledger => Application.Storage.getValue(KEY_LEDGER),
+            :step => Application.Storage.getValue(KEY_STEP),
+            :event => Application.Storage.getValue(KEY_EVENT)
+        };
+    }
+
+    // Compact ledger string. Kept short so it fits both the watch screen and a
+    // storage value.
+    function ledgerText() {
+        return "P" + _pair + "/U" + _unpair +
+            " LEAK=" + (_pair - _unpair) +
+            " prof" + _profileRegister + "/" + _profileCallback +
+            " c" + _connect + " d" + _disconnect +
+            " s" + _subscribeRequest + " sc" + _scanOn + "/" + _scanOff;
+    }
+
+    // Commits the current state. Called on every event so a crash cannot
+    // outrun it.
+    function persist() {
+        try {
+            Application.Storage.setValue(KEY_LEDGER, ledgerText());
+            Application.Storage.setValue(KEY_STEP, _lastStep);
+            Application.Storage.setValue(KEY_EVENT, _lastEvent);
+        } catch (ex) {
+            // Never let diagnostics take the app down.
+        }
     }
 
     // ---- acquires ----------------------------------------------------------
@@ -146,7 +248,9 @@ class BleResourceLog {
     // Step marker for the abrupt-teardown walkthrough. The fault is instant and
     // stackless, so the final step printed identifies where it died.
     function step(label) {
+        _lastStep = label;
         System.println("SKYSHIELD BLERES  step: " + label);
+        persist();
     }
 
     // ---- the ledger --------------------------------------------------------
@@ -154,6 +258,7 @@ class BleResourceLog {
     // Prints every counter plus explicit leak figures. An acquire with no
     // matching release shows up as a climbing leak across connect cycles.
     function mark(event) {
+        _lastEvent = event;
         System.println("SKYSHIELD BLERES  " + event);
         System.println("SKYSHIELD BLERES  LEDGER t=" + System.getTimer() +
             " pair=" + _pair + " unpair=" + _unpair +
@@ -165,6 +270,7 @@ class BleResourceLog {
             " scan=" + _scanOn + "/" + _scanOff +
             " read=" + _readRequest + "/" + _readCallback +
             " src=" + _sourceStart + "/" + _sourceStop);
+        persist();
     }
 
     // Reads for anything that wants the figures without printing.

@@ -90,27 +90,86 @@ Individual API calls are also bracketed, for example `setScanState(SCANNING)
 returned` and `unpairDevice returned`, so a fault *inside* a Connect IQ call is
 distinguishable from one in our own code.
 
-## Retrieving the log from an Enduro 2
+## Capture method: on-screen, not file-based
 
-`System.println` output from a **sideloaded** app is written to a log file on the
-watch's own storage. The watch mounts as a USB mass-storage volume.
+**File logging does not work for this crash on this hardware.** A field attempt
+found no new `SKYSHIELD.TXT` and no new `CIQ_LOG.YML` entry after a reproduced
+crash, only files hours older.
 
-1. **Before the test**, connect the watch by USB and open the volume.
-2. Go to **`GARMIN/APPS/LOGS/`**.
-3. **Delete or rename the existing log** so the capture is clean. The app name
-   is `SKYSHIELD`, so the file is normally **`SKYSHIELD.TXT`**.
-   - If that filename is not present, list the directory and take whatever is
-     there — the naming varies across firmware versions. `CIQ_LOG.YML` is the
-     separate system error report and is also worth capturing, because it
-     records the `System Error` itself.
-4. **Eject the watch properly** and unplug it. Logs are not flushed while it is
-   mounted.
-5. Run the reproduction below.
-6. Reconnect by USB and copy **both** `SKYSHIELD.TXT` and `CIQ_LOG.YML`.
+Two independent reasons, either of which is sufficient:
 
-Keep the test short. Log files are size-capped and rotate, and this build is
-deliberately verbose — a long session risks losing the beginning, which is the
-part containing the first connect cycle.
+1. **A System Error kills the app before the log buffer is flushed.** Connect IQ
+   writes `println` output on a clean app exit or periodic flush. A stackless
+   system fault is neither, so the buffer is lost with the process.
+2. **MTP has no safe-eject and caches aggressively.** Even a written file may not
+   appear until the device is unmounted and re-enumerated.
+
+So the ledger no longer depends on a file. **Every counter is written to
+`Application.Storage` as it changes.** Storage commits to flash immediately and
+survives the crash, and the next launch reads it back and renders it on the
+splash screen.
+
+### How to read it
+
+1. Reproduce the crash.
+2. **Relaunch the SKYSHIELD app.**
+3. The splash is replaced by a red **`PREV SESSION CRASHED`** readout, held for
+   **40 seconds** so it can be read or photographed:
+
+```text
+      PREV SESSION CRASHED
+          session #3
+
+            LEDGER
+      P2/U0 LEAK=2 prof1/1
+        c2 d1 s2 sc3/2
+
+           DIED AT
+    teardown 5: dead device
+       queued for unpair
+      DISCONNECT callback #1
+```
+
+4. Photograph it and paste the values back.
+
+No USB, no MTP, no file. If the previous session exited cleanly the readout does
+not appear and the normal splash shows instead.
+
+### How crash detection works
+
+`beginSession()` sets a session-open flag in Storage on launch; `onStop()`
+clears it. A System Error never reaches `onStop()`, so a session found still
+open on the next launch did not exit cleanly. The flag is read in
+`SkyShieldApp.initialize()`, which runs **before** `BleAlertSource` opens the new
+session, so the crashed session's final state is captured before it is
+overwritten.
+
+### Reading the ledger
+
+```text
+P<pair>/U<unpair> LEAK=<pair-unpair> prof<reg>/<callback> c<conn> d<disc> s<sub> sc<on>/<off>
+```
+
+| Field | Meaning |
+|---|---|
+| `LEAK` | connection slots acquired and never released — **the headline figure** |
+| `prof` | profile registrations / callbacks, which have no unregister at all |
+| `c` / `d` | connect / disconnect callbacks |
+| `s` | subscribe requests |
+| `sc` | scan on / off |
+
+`DIED AT` is the last teardown step and the last lifecycle event recorded before
+the fault.
+
+### Caveat
+
+This build writes to flash inside BLE callbacks. That is what makes the state
+survive, but it does change timing slightly. If the crash becomes intermittent
+or disappears with this build installed, that is itself a finding — it would
+point at a race rather than a pure resource leak, and is worth reporting.
+
+`println` output is still emitted, so if a log file does happen to appear it
+remains usable as a secondary source.
 
 ## Reproduction
 

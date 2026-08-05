@@ -8,6 +8,8 @@ const UI_PHASE_BANDS = 1;
 const UI_PHASE_IDLE = 2;
 const TIMER_INTERVAL_MS = 250;
 const SPLASH_DURATION_MS = 1000;
+// Held long enough to read or photograph the post-crash ledger off the screen.
+const SPLASH_CRASH_REPORT_MS = 40000;
 const ALERT_DURATION_MS = 3000;
 const BANDS_DURATION_MS = 2000;
 const MONITOR_TIMEOUT_MS = 5000;
@@ -54,9 +56,11 @@ class SkyShieldView extends WatchUi.View {
     var _lastHapticSkipCycleStartMs;
     var _lastHapticNonAlertCycleStartMs;
     var _operationalState;
+    var _crashReport;
 
-    function initialize() {
+    function initialize(crashReport) {
         View.initialize();
+        _crashReport = crashReport;
         _engine = new AlertEngine();
         _settings = new SettingsModel();
         _history = new AlertHistory();
@@ -131,7 +135,7 @@ class SkyShieldView extends WatchUi.View {
         if (_showSplash) {
             _splashElapsedMs += TIMER_INTERVAL_MS;
 
-            if (_splashElapsedMs >= SPLASH_DURATION_MS) {
+            if (_splashElapsedMs >= splashDurationMs()) {
                 _splashElapsedMs = 0;
                 _showSplash = false;
                 _engine.startBle();
@@ -577,10 +581,123 @@ class SkyShieldView extends WatchUi.View {
         }
     }
 
+    // Longer splash when the previous session crashed, so the ledger can be
+    // read or photographed before the app moves on.
+    function splashDurationMs() {
+        if (_crashReport != null) {
+            return SPLASH_CRASH_REPORT_MS;
+        }
+
+        return SPLASH_DURATION_MS;
+    }
+
     function drawSplashScreen(dc, width) {
+        if (_crashReport != null) {
+            drawCrashReport(dc, width);
+            return;
+        }
+
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, 96, "SKYSHIELD", Graphics.FONT_SMALL);
         drawCentered(dc, width, 132, "TACTICAL RF DETECTOR", Graphics.FONT_TINY);
+    }
+
+    // Post-crash readout.
+    //
+    // The BLE fault kills the app before any log file is flushed, so these
+    // figures come from Application.Storage, written as they changed. This is
+    // the capture method: read the numbers off the watch, no USB required.
+    function drawCrashReport(dc, width) {
+        var y = 22;
+
+        dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, "PREV SESSION CRASHED", Graphics.FONT_XTINY);
+        y += 24;
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, "session #" + safeText(_crashReport[:session]), Graphics.FONT_XTINY);
+        y += 26;
+
+        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, "LEDGER", Graphics.FONT_XTINY);
+        y += 22;
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+
+        // Wrapped by hand: the ledger is wider than the round display.
+        var ledger = safeText(_crashReport[:ledger]);
+        var parts = splitForDisplay(ledger);
+
+        for (var i = 0; i < parts.size(); i += 1) {
+            drawCentered(dc, width, y, parts[i], Graphics.FONT_XTINY);
+            y += 20;
+        }
+
+        y += 6;
+        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, "DIED AT", Graphics.FONT_XTINY);
+        y += 22;
+
+        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, safeText(_crashReport[:step]), Graphics.FONT_XTINY);
+        y += 20;
+        drawCentered(dc, width, y, safeText(_crashReport[:event]), Graphics.FONT_XTINY);
+    }
+
+    // Splits a ledger string into screen-width chunks on spaces.
+    function splitForDisplay(text) {
+        var out = [];
+        var current = "";
+        var words = tokenize(text);
+
+        for (var i = 0; i < words.size(); i += 1) {
+            var candidate = current.equals("") ? words[i] : (current + " " + words[i]);
+
+            if (candidate.length() > 20) {
+                out.add(current);
+                current = words[i];
+            } else {
+                current = candidate;
+            }
+        }
+
+        if (!current.equals("")) {
+            out.add(current);
+        }
+
+        return out;
+    }
+
+    function tokenize(text) {
+        var words = [];
+        var current = "";
+
+        for (var i = 0; i < text.length(); i += 1) {
+            var ch = text.substring(i, i + 1);
+
+            if (ch.equals(" ")) {
+                if (!current.equals("")) {
+                    words.add(current);
+                    current = "";
+                }
+            } else {
+                current += ch;
+            }
+        }
+
+        if (!current.equals("")) {
+            words.add(current);
+        }
+
+        return words;
+    }
+
+    function safeText(value) {
+        if (value == null) {
+            return "--";
+        }
+
+        return value.toString();
     }
 
     function drawRxNoModelDiagnostic(dc, width) {

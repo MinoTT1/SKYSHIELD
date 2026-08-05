@@ -152,6 +152,9 @@ class BleAlertSource extends AlertSource {
         _lastPayloadLength = 0;
         _lastDirectParseResult = "";
         _res = new BleResourceLog();
+        _res.beginSession();
+        // Lets onStop() close the session without walking the view hierarchy.
+        SkyShieldApp.activeLog = _res;
         _devicePendingUnpair = null;
         _reconnectPending = false;
         _reconnectAtMs = 0;
