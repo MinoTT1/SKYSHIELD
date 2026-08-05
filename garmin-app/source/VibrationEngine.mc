@@ -31,6 +31,22 @@ const HAPTIC_LINK_RESTORED_PROFILE = [
     [60, 200]
 ];
 
+// How long the link must stay up continuously before LINK RESTORED fires.
+//
+// At the edge of range a link can flap every few seconds. Buzzing "restored" on
+// each brief reconnect would produce exactly the vibration chaos the operator
+// cannot act on, and would devalue the LINK LOST signal by association.
+//
+// This delay is deliberately NOT applied to LINK LOST, which is the
+// safety-critical half: a drop is announced immediately, every time. Only the
+// reassurance is held back until it is actually true.
+//
+// A 10s wait costs the operator nothing, because they already know coverage is
+// back the moment alerts resume. RESTORED is the explicit confirmation that the
+// link is now STABLE, which is a stronger and more useful claim than "a packet
+// just arrived".
+const HAPTIC_LINK_STABLE_MS = 10000;
+
 const HAPTIC_SYSTEM_NONE = "NONE";
 const HAPTIC_SYSTEM_LINK_LOST = "LINK_LOST";
 const HAPTIC_SYSTEM_LINK_RESTORED = "LINK_RESTORED";
@@ -52,6 +68,11 @@ class VibrationEngine {
     // events never read or write _lastAlertKey.
     var _lastSystemEvent;
 
+    // Pending LINK RESTORED. Armed when the link comes back, fired only after it
+    // has held for HAPTIC_LINK_STABLE_MS, cancelled if it drops again first.
+    var _linkRestorePending;
+    var _linkStableSinceMs;
+
     function initialize(settings) {
         _settings = settings;
         _lastAlertKey = null;
@@ -59,6 +80,8 @@ class VibrationEngine {
         _lastVibrationMs = 0;
         _busyUntilMs = 0;
         _lastSystemEvent = HAPTIC_SYSTEM_NONE;
+        _linkRestorePending = false;
+        _linkStableSinceMs = 0;
     }
 
     // Clears THREAT haptic state only. Called when an RF session ends, which
@@ -78,20 +101,77 @@ class VibrationEngine {
         return playSystemEvent(HAPTIC_SYSTEM_LINK_LOST, HAPTIC_LINK_LOST_PROFILE);
     }
 
-    // Only meaningful after a link loss was actually announced.
+    // Arms a LINK RESTORED that will fire only once the link proves stable.
     //
-    // _operationalState starts at LINK LOST, so the first healthy state after
-    // app launch is a LINK-LOST-to-MONITOR transition even though nothing was
-    // ever lost. Without this guard the watch would buzz "restored" on every
-    // startup. It also keeps the pair symmetric: a loss the operator was never
-    // told about produces no recovery buzz either.
-    function triggerLinkRestored() {
+    // Called when the link comes back. It does NOT buzz: at the edge of range a
+    // reconnect may last seconds, and announcing recovery that promptly evaporates
+    // is worse than saying nothing.
+    //
+    // Only meaningful after a loss was actually announced. _operationalState
+    // starts at LINK LOST, so the first healthy state after app launch is a
+    // LINK-LOST-to-MONITOR transition even though nothing was ever lost; without
+    // this guard the watch would arm a "restored" buzz on every startup. It also
+    // keeps the pair symmetric: a loss the operator was never told about produces
+    // no recovery buzz either.
+    function armLinkRestored(now) {
         if (!_lastSystemEvent.equals(HAPTIC_SYSTEM_LINK_LOST)) {
             System.println("HAPTIC SYSTEM skipped: no announced link loss to restore");
             return false;
         }
 
+        if (_linkRestorePending) {
+            return false;   // already counting; do not restart the window
+        }
+
+        _linkRestorePending = true;
+        _linkStableSinceMs = now;
+        System.println("HAPTIC SYSTEM link back, holding RESTORED for " +
+            HAPTIC_LINK_STABLE_MS + "ms of stability");
+        return true;
+    }
+
+    // Cancels a pending LINK RESTORED because the link dropped again.
+    //
+    // The operator is still inside the loss they already felt, so no new LOST
+    // buzz is emitted either -- triggerLinkLost()'s repeat guard sees
+    // _lastSystemEvent still at LINK_LOST and suppresses it. One loss episode,
+    // one buzz, however many times the link flaps within it.
+    function cancelLinkRestored(reason) {
+        if (!_linkRestorePending) {
+            return;
+        }
+
+        _linkRestorePending = false;
+        _linkStableSinceMs = 0;
+        System.println("HAPTIC SYSTEM RESTORED cancelled: " + reason);
+    }
+
+    // Fires a pending LINK RESTORED once the stability window has elapsed.
+    // Call periodically with the current link health.
+    function serviceLinkRestored(now, linkHealthy) {
+        if (!_linkRestorePending) {
+            return false;
+        }
+
+        // Belt and braces: the transition handler cancels on a drop, but if that
+        // were ever missed, an unhealthy link must not announce recovery.
+        if (!linkHealthy) {
+            cancelLinkRestored("link not healthy at service time");
+            return false;
+        }
+
+        if ((now - _linkStableSinceMs) < HAPTIC_LINK_STABLE_MS) {
+            return false;
+        }
+
+        _linkRestorePending = false;
+        _linkStableSinceMs = 0;
+
         return playSystemEvent(HAPTIC_SYSTEM_LINK_RESTORED, HAPTIC_LINK_RESTORED_PROFILE);
+    }
+
+    function isLinkRestorePending() {
+        return _linkRestorePending;
     }
 
     // Plays a system-event rhythm.

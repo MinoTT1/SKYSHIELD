@@ -149,6 +149,7 @@ class SkyShieldView extends WatchUi.View {
         syncLiveBleAlert();
         updateCriticalPulse();
         updateAlertData();
+        serviceLinkRestoreHaptic();
 
         WatchUi.requestUpdate();
     }
@@ -521,6 +522,21 @@ class SkyShieldView extends WatchUi.View {
         handleLinkStateHaptic(previous, state);
     }
 
+    // Services the pending LINK RESTORED buzz.
+    //
+    // Driven from the timer tick rather than the render path, so the stability
+    // window advances on a fixed 250ms cadence regardless of how often the
+    // screen happens to redraw.
+    function serviceLinkRestoreHaptic() {
+        if (!_vibrationEngine.isLinkRestorePending()) {
+            return;
+        }
+
+        var healthy = !_engine.hasBleExplicitDisconnect() && _engine.isBleLinkAlive();
+
+        _vibrationEngine.serviceLinkRestored(System.getTimer(), healthy);
+    }
+
     // Link loss must be FELT, not just displayed.
     //
     // The whole premise of this product is that the operator trusts vibration
@@ -539,7 +555,12 @@ class SkyShieldView extends WatchUi.View {
         }
 
         if (state.equals(OP_STATE_LINK_LOST)) {
+            // Any pending recovery is void: the link did not hold.
+            _vibrationEngine.cancelLinkRestored("dropped again before stabilising");
+
             if (_engine.hasBleExplicitDisconnect()) {
+                // Immediate and unconditional. This is the safety-critical half
+                // and is never delayed or rate-limited.
                 _vibrationEngine.triggerLinkLost();
             } else {
                 System.println("HAPTIC SYSTEM skipped: LINK LOST from timeout, not a BLE drop");
@@ -548,9 +569,11 @@ class SkyShieldView extends WatchUi.View {
             return;
         }
 
-        // Leaving LINK LOST for any working state means coverage is back.
+        // Leaving LINK LOST means the link is back, but not yet that it is
+        // trustworthy. Arm the recovery buzz and let the stability window decide;
+        // serviceLinkRestored() fires it from the timer tick.
         if (previous.equals(OP_STATE_LINK_LOST)) {
-            _vibrationEngine.triggerLinkRestored();
+            _vibrationEngine.armLinkRestored(System.getTimer());
         }
     }
 

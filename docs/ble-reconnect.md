@@ -180,6 +180,46 @@ LINK LOST descends: firm, pause, weaker-but-longer. Falling intensity reads as
 something going away. LINK RESTORED is the mirror — quieter, rising, and shorter
 overall, so it cannot be mistaken for an alert.
 
+### The stability floor on LINK RESTORED
+
+At the edge of range a link can flap every few seconds. Buzzing "restored" on
+each brief reconnect produces exactly the vibration chaos the operator cannot
+act on, and devalues the LINK LOST signal by association.
+
+So the two halves are treated asymmetrically:
+
+| | Timing | Why |
+|---|---|---|
+| **LINK LOST** | immediate, every real drop | safety-critical; never delayed or suppressed |
+| **LINK RESTORED** | only after `HAPTIC_LINK_STABLE_MS` (10s) of continuous link | reassurance must be true before it is given |
+
+A reconnect **arms** the recovery buzz rather than firing it. If the link drops
+again inside the window the pending buzz is cancelled, and no new LINK LOST is
+emitted either — the operator is still inside the loss episode they already
+felt. `triggerLinkLost()`'s repeat guard handles that on its own: because
+RESTORED never fired, `_lastSystemEvent` is still `LINK_LOST`.
+
+**One loss episode produces exactly one buzz, however many times the link flaps
+within it.** The episode closes only when RESTORED finally fires; a genuine drop
+after that starts a new episode and buzzes again.
+
+The 10s delay costs the operator nothing. They already know coverage is back the
+moment alerts resume; RESTORED is the explicit confirmation that the link is now
+*stable*, which is a stronger and more useful claim than "a packet just
+arrived".
+
+Simulated at the real 250ms tick cadence:
+
+| Scenario | Result |
+|---|---|
+| flap 5× in 15s then stabilize | 1 LOST, 1 RESTORED (~10s after it holds) |
+| drop, reconnect 3s, drop again | 1 LOST, **0** RESTORED |
+| drop, reconnect and hold | 1 LOST, 1 RESTORED after 10s |
+| drop, never returns | 1 LOST, 0 RESTORED |
+| two separate stable episodes | 2 LOST, 2 RESTORED |
+
+`HAPTIC_LINK_STABLE_MS` in `VibrationEngine.mc` is the single tuning point.
+
 ### Firing rules
 
 - **Once per drop.** Edge-triggered on the state transition, not the state, so
