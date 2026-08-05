@@ -97,6 +97,7 @@ class BleAlertSource extends AlertSource {
     // Dead device awaiting Ble.unpairDevice(). Released from the timer tick, not
     // from inside the BLE callback, so teardown APIs are never called while the
     // stack is mid-disconnect.
+    var _res;
     var _devicePendingUnpair;
     var _reconnectPending;
     var _reconnectAtMs;
@@ -150,6 +151,7 @@ class BleAlertSource extends AlertSource {
         _hasLatestAlert = false;
         _lastPayloadLength = 0;
         _lastDirectParseResult = "";
+        _res = new BleResourceLog();
         _devicePendingUnpair = null;
         _reconnectPending = false;
         _reconnectAtMs = 0;
@@ -160,6 +162,7 @@ class BleAlertSource extends AlertSource {
 
     function start() {
         _enabled = true;
+        _res.sourceStarted();
         log("init");
         setDiagnosticState(BLE_DIAG_INIT, BLE_STATUS_OFF);
 
@@ -175,7 +178,9 @@ class BleAlertSource extends AlertSource {
                 return;
             }
 
+            _res.step("setDelegate called");
             Ble.setDelegate(_delegate);
+            _res.step("setDelegate returned");
             log("delegate set");
             registerSkyShieldProfile();
             startScan();
@@ -202,8 +207,13 @@ class BleAlertSource extends AlertSource {
         // workarea and Ble.unpairDevice() is the only thing that frees it;
         // nulling our own reference releases nothing. Pairing again with the old
         // slot still held is what raised "Error Processing Workarea connections".
+        _res.step("teardown 4: scheduleReconnect entered");
+
         if (_device != null) {
             _devicePendingUnpair = _device;
+            _res.step("teardown 5: dead device queued for unpair");
+        } else {
+            _res.step("teardown 5: NO device reference to queue");
         }
 
         _device = null;
@@ -247,6 +257,7 @@ class BleAlertSource extends AlertSource {
     // the whole point is that a disappearing bridge degrades to LINK LOST.
     function releasePendingDevice() {
         if (_devicePendingUnpair == null) {
+            _res.step("releasePendingDevice: nothing queued");
             return;
         }
 
@@ -254,9 +265,12 @@ class BleAlertSource extends AlertSource {
         _devicePendingUnpair = null;
 
         try {
+            _res.unpairAttempt();
             Ble.unpairDevice(dead);
+            _res.step("unpairDevice returned");
             log("unpaired dead device, workarea slot released");
         } catch (ex) {
+            _res.step("unpairDevice THREW: " + ex);
             log("unpair failed (already released?): " + ex);
         }
     }
@@ -279,6 +293,7 @@ class BleAlertSource extends AlertSource {
         log("reconnect attempt " + _reconnectCount + " starting rescan");
 
         try {
+            _res.scanStopped();
             Ble.setScanState(Ble.SCAN_STATE_OFF);
         } catch (ex) {
             log("reconnect scan reset warning: " + ex);
@@ -293,6 +308,7 @@ class BleAlertSource extends AlertSource {
 
     function stop() {
         _enabled = false;
+        _res.sourceStopped();
         _reconnectPending = false;
 
         if (_device != null) {
@@ -304,6 +320,7 @@ class BleAlertSource extends AlertSource {
         releasePendingDevice();
 
         try {
+            _res.scanStopped();
             Ble.setScanState(Ble.SCAN_STATE_OFF);
         } catch (ex) {
             log("stop warning: " + ex);
@@ -471,9 +488,12 @@ class BleAlertSource extends AlertSource {
         };
 
         try {
+            _res.profileRegisterAttempt();
             Ble.registerProfile(profile);
+            _res.step("registerProfile returned");
             log("profile registration requested");
         } catch (ex) {
+            _res.step("registerProfile THREW: " + ex);
             log("profile registration failed: " + ex);
         }
     }
@@ -508,7 +528,9 @@ class BleAlertSource extends AlertSource {
         log("scan requested");
 
         try {
+            _res.scanStarted();
             Ble.setScanState(Ble.SCAN_STATE_SCANNING);
+            _res.step("setScanState(SCANNING) returned");
         } catch (ex) {
             setLifecycleFlags(false, false, false, false, "scan start failed");
             log("scan failed: " + ex);
@@ -525,6 +547,7 @@ class BleAlertSource extends AlertSource {
         setLifecycleFlags(false, isConnecting, isConnected, isSubscribed, "scan stop");
 
         try {
+            _res.scanStopped();
             Ble.setScanState(Ble.SCAN_STATE_OFF);
             log("scan stop requested");
         } catch (ex) {
@@ -533,6 +556,7 @@ class BleAlertSource extends AlertSource {
     }
 
     function handleProfileRegister(uuid, status) {
+        _res.profileRegisterCallback(status);
         log("PROFILE callback entered");
         log("profile registered status=" + status);
 
@@ -686,7 +710,9 @@ class BleAlertSource extends AlertSource {
         log("BLE connecting");
 
         try {
+            _res.pairAttempt();
             _device = Ble.pairDevice(scanResult);
+            _res.step("pairDevice returned");
 
             if (_device == null) {
                 setLifecycleFlags(false, false, false, false, "connect failed");
@@ -702,6 +728,7 @@ class BleAlertSource extends AlertSource {
         _device = device;
 
         if (state == Ble.CONNECTION_STATE_CONNECTED) {
+            _res.connected();
             log("CONNECTED callback entered");
             hasEverConnected = true;
             explicitDisconnectSeen = false;
@@ -716,6 +743,9 @@ class BleAlertSource extends AlertSource {
             return;
         }
 
+        _res.disconnected(state);
+        _res.step("teardown 1: disconnect callback entered");
+
         _disconnectedAtMs = _uptimeMs;
         explicitDisconnectSeen = true;
         log("DISCONNECT callback entered");
@@ -729,12 +759,16 @@ class BleAlertSource extends AlertSource {
             setBleError(BLE_STAGE_CONN, "disconnected state=" + state);
         }
 
+        _res.step("teardown 2: error state set");
+
         _alertCharacteristic = null;
+        _res.step("teardown 3: characteristic reference cleared");
 
         // Previously this was the end of the line: nothing ever restarted
         // scanning, so a single drop left the watch dark until the app was
         // relaunched. A drop is normal operation, so recovery is automatic.
         scheduleReconnect("disconnect state=" + state);
+        _res.step("teardown 6: disconnect callback complete");
     }
 
     function discoverAlertCharacteristic(device) {
@@ -810,6 +844,7 @@ class BleAlertSource extends AlertSource {
         var descriptor = null;
 
         try {
+            _res.descriptorLookup();
             descriptor = _alertCharacteristic.getDescriptor(_cccdUuid);
         } catch (ex) {
             setBleError(BLE_STAGE_SUB, "cccd lookup failed: " + ex);
@@ -824,6 +859,7 @@ class BleAlertSource extends AlertSource {
         try {
             // Garmin calls onCharacteristicChanged() after notifications are enabled by writing [0x01,0x00] to CCCD 0x2902.
             log("CCCD uuid=0x2902 value=[1,0]");
+            _res.subscribeRequested();
             descriptor.requestWrite([1, 0]b);
             setDiagnosticState(BLE_DIAG_SUB, BLE_STATUS_SUBSCRIBE);
             log("subscribe requested");
@@ -841,6 +877,7 @@ class BleAlertSource extends AlertSource {
         }
 
         if (status == Ble.STATUS_SUCCESS) {
+            _res.subscribeSucceeded();
             hasEverSubscribed = true;
             _subscribedAtMs = _uptimeMs;
             lastSubscribeMs = _uptimeMs;
@@ -883,6 +920,7 @@ class BleAlertSource extends AlertSource {
 
         try {
             _stateRecoveryPending = true;
+            _res.readRequested();
             _alertCharacteristic.requestRead();
             log("state recovery read requested");
         } catch (ex) {
@@ -894,6 +932,7 @@ class BleAlertSource extends AlertSource {
     }
 
     function handleCharacteristicRead(characteristic, status, value) {
+        _res.readCallback();
         var wasRecovery = _stateRecoveryPending;
         _stateRecoveryPending = false;
 
@@ -1192,6 +1231,7 @@ class BleAlertSource extends AlertSource {
 
     function stopScanForConnect() {
         try {
+            _res.scanStopped();
             Ble.setScanState(Ble.SCAN_STATE_OFF);
             log("scan stop requested for connect");
         } catch (ex) {
