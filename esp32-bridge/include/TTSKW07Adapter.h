@@ -117,27 +117,45 @@ private:
     uint32_t _detectionsParsed;
     uint32_t _malformedLines;
 
-    // RSSI and frequency are preserved from the raw line for the log even
-    // though the alert schema carries neither.
+    // The raw T code, frequency and R value are preserved for the log even
+    // though the alert schema has no field for them. The T code in particular
+    // is what identifies an unrecognized protocol worth reporting to the
+    // vendor, so it must not be lost just because it does not go on the wire.
     void logDiagnostics(const skyshield::TTSKW07Diagnostics& diagnostics) const {
-        Serial.print("TTSKW07 detector fields: type=");
-        Serial.print(diagnostics.rawType);
+        Serial.print("TTSKW07 fields: T=");
+        Serial.print(diagnostics.typeCode);
 
-        if (diagnostics.detectionTime[0] != '\0') {
-            Serial.print(" time=");
-            Serial.print(diagnostics.detectionTime);
-        }
-
-        if (diagnostics.hasRssi) {
-            Serial.print(" rssi=");
-            Serial.print(diagnostics.rssiDbm);
-            Serial.print("dBm");
+        if (!diagnostics.typeCodeRecognized) {
+            Serial.print(" (UNRECOGNIZED CODE, reported as unknown)");
         }
 
         if (diagnostics.hasFrequency) {
-            Serial.print(" freq=");
+            Serial.print(" F=");
             Serial.print(diagnostics.frequencyMhz);
             Serial.print("MHz");
+        }
+
+        if (diagnostics.hasSignal) {
+            // Relative scale, not dBm. See docs/ttskw07-format.md.
+            Serial.print(" R=");
+            Serial.print(diagnostics.signalValue);
+        }
+
+        if (diagnostics.typeText[0] != '\0') {
+            Serial.print(" type=\"");
+            Serial.print(diagnostics.typeText);
+            Serial.print("\"");
+        }
+
+        if (diagnostics.typeTextTruncated) {
+            Serial.print(" [description truncated]");
+        }
+
+        // Captured for traceability only. Never used for timing: the device
+        // clock is frequently unset or wrong.
+        if (diagnostics.timestamp[0] != '\0') {
+            Serial.print(" device_clock=");
+            Serial.print(diagnostics.timestamp);
         }
 
         Serial.println();

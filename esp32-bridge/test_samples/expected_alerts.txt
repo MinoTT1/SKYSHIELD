@@ -4,38 +4,28 @@
 # TTSKW07Parser, encoding it with SkyShieldCodec, and decoding it back.
 # Asserted by tools/contract-test/contract_test.cpp.
 #
-# This file REPLACES expected_s2_payloads.txt, which described the retired S2
-# wire format and encoded four mappings that contradicted
-# docs/TTSKW07_INTEGRATION_PLAN.md. Those are corrected here and explained in
-# docs/TTSKW07_MAPPING.md:
-#
-#   1. confidence is null, never 0    - the detector reports none, and
-#                                       "CONF 0%" reads as "certainly not a
-#                                       threat" when the truth is "no idea"
-#   2. failed classification never    - old fixture escalated UNKNOWN to
-#      becomes CRITICAL                 CRITICAL; that is escalation on
-#                                       ignorance. CRITICAL is only reachable
-#                                       via the watch's track-persistence
-#                                       logic, never from one detector line
-#   3. AUTEL_EVO -> threat UNKNOWN    - old fixture claimed DJI, a false
-#      with the vendor in drone_class   vendor attribution
-#   4. DJI_O3 -> drone_class DJI_O3   - old fixture reported it as MAVIC
+# GROUND TRUTH: these eight detection lines are real TTSKW07 output taken
+# from the vendor's Handheld Drone Detector Tool videos and screenshots. Do not
+# edit them to make a test pass -- they are what the device actually emits.
 #
 # The test uses deterministic inputs so the CBOR column is reproducible:
 #   timestamp_ms = 1000 + line_index
 #   sequence     = line_index + 1
 #
 # Format, pipe-delimited:
-#   INDEX|RESULT|KIND|THREAT|BAND|DISTANCE|SEVERITY|CONFIDENCE|DRONE_CLASS|SOURCE|CBOR_HEX
+#   INDEX|RESULT|KIND|THREAT|BAND|DISTANCE|SEVERITY|CONFIDENCE|T_CODE|T_KNOWN|DRONE_CLASS|CBOR_HEX
 #
 # RESULT is OK or SKIPPED. For SKIPPED rows the KIND column carries the parser
 # reason and every remaining column is "-". A SKIPPED line must emit no alert.
-# CONFIDENCE is the literal "null" when absent.
+# CONFIDENCE is the literal "null" when absent (the device reports none).
 #
-0|OK|classified|DJI|2.4GHz|MID|MEDIUM|null|DJI_MAVIC|TTSKW07|AC0103021903E803010400050006020701080209020AF60B69444A495F4D415649430F675454534B573037
-1|OK|classified|DJI|5.8GHz|NEAR|HIGH|null|DJI_O3|TTSKW07|AC0103021903E903020400050006020702080409030AF60B66444A495F4F330F675454534B573037
-2|OK|classified|FPV|5.8GHz|NEAR|HIGH|null|FPV_ANALOG|TTSKW07|AC0103021903EA03030400050006010702080409030AF60B6A4650565F414E414C4F470F675454534B573037
-3|OK|classified|UNKNOWN|2.4GHz|MID|MEDIUM|null|AUTEL_EVO|TTSKW07|AC0103021903EB03040400050006000701080209020AF60B69415554454C5F45564F0F675454534B573037
-4|OK|classified|UNKNOWN|MULTI|NEAR|HIGH|null|UNKNOWN|TTSKW07|AC0103021903EC03050400050006000702080509030AF60B67554E4B4E4F574E0F675454534B573037
-5|SKIPPED|NOT_A_DETECTION|-|-|-|-|-|-|-|-
-6|SKIPPED|NOT_A_DETECTION|-|-|-|-|-|-|-|-
+0|OK|classified|FPV|3.3GHz|NEAR|HIGH|null|20|known|FM Analog(DIY FPV, Aircraft model)|AC0103021903E803010400050006010702080309030AF60B7822464D20416E616C6F6728444959204650562C204169726372616674206D6F64656C290F675454534B573037
+1|OK|classified|DJI|2.4GHz|MID|MEDIUM|null|6|known|DJI O3(FPV, Mavic Air 2s, Mavic Mini 3 Pro)|AC0103021903E903020400050006020701080209020AF60B782B444A49204F33284650562C204D61766963204169722032732C204D61766963204D696E6920332050726F290F675454534B573037
+2|OK|classified|DJI|5.8GHz|MID|MEDIUM|null|5|known|DJI O3+(Mavic 3 series, AVATA)|AC0103021903EA03030400050006020701080409020AF60B781E444A49204F332B284D617669632033207365726965732C204156415441290F675454534B573037
+3|OK|classified|DJI|2.4GHz|MID|MEDIUM|null|2|known|DJI OCU(Mavic, Mavic Pro, P4P V2.0, Mavic 2, Mavic 2 Pro)|AC0103021903EB03040400050006020701080209020AF60B7839444A49204F4355284D617669632C204D617669632050726F2C205034502056322E302C204D6176696320322C204D6176696320322050726F290F675454534B573037
+4|OK|classified|UNKNOWN|5.8GHz|MID|MEDIUM|null|11|known|SkyLink(AUTEL Lite/Nano)|AC0103021903EC03050400050006000701080409020AF60B7818536B794C696E6B28415554454C204C6974652F4E616E6F290F675454534B573037
+5|OK|classified|UNKNOWN|5.8GHz|MID|MEDIUM|null|12|known|SkyLink(AUTEL EVO2 Pro)|AC0103021903ED03060400050006000701080409020AF60B77536B794C696E6B28415554454C2045564F322050726F290F675454534B573037
+6|OK|classified|UNKNOWN|2.4GHz|FAR|LOW|null|7|known|Unknown|AC0103021903EE03070400050006000700080209010AF60B67556E6B6E6F776E0F675454534B573037
+7|OK|classified|UNKNOWN|5.8GHz|NEAR|HIGH|null|7|known|Unknown|AC0103021903EF03080400050006000702080409030AF60B67556E6B6E6F776E0F675454534B573037
+8|SKIPPED|NOT_A_DETECTION|-|-|-|-|-|-|-|-|-
+9|SKIPPED|NOT_A_DETECTION|-|-|-|-|-|-|-|-|-

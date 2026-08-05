@@ -194,8 +194,8 @@ def verify_fixture(path):
 
     for row in rows:
         fields = row.split("|")
-        if len(fields) < 11:
-            results.append((row, "11 fields", "%d fields" % len(fields), False))
+        if len(fields) < 12:
+            results.append((row, "12 fields", "%d fields" % len(fields), False))
             continue
 
         index, result = fields[0], fields[1]
@@ -205,7 +205,7 @@ def verify_fixture(path):
         label = "line %s" % index
 
         try:
-            alert = decode_alert(bytes.fromhex(fields[10]))
+            alert = decode_alert(bytes.fromhex(fields[11]))
         except (CborError, ValueError) as error:
             results.append((label, "decodes", "error: %s" % error, False))
             continue
@@ -219,8 +219,7 @@ def verify_fixture(path):
         confidence = "null" if alert["confidence"] is None else str(alert["confidence"])
         _check(results, label + " confidence", fields[7], confidence)
 
-        _check(results, label + " drone_class", fields[8], alert.get("drone_class", "-"))
-        _check(results, label + " source", fields[9], alert.get("source", "-"))
+        _check(results, label + " drone_class", fields[10], alert.get("drone_class", "-"))
 
     return results
 

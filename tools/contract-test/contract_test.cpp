@@ -133,8 +133,9 @@ std::vector<std::string> readLines(const std::string& path, bool keepBlank) {
 // Layer 1: round trip against the fixture
 // ---------------------------------------------------------------------------
 
-void runRoundTrip(const std::string& samplesPath, const std::string& fixturePath) {
-    printf("\n[1] ROUND TRIP  parse -> encode -> decode vs fixture\n");
+void runRoundTrip(const std::string& samplesPath, const std::string& fixturePath,
+                  const char* label) {
+    printf("\n[1] ROUND TRIP  %s\n", label);
 
     // Blank lines are kept: a whitespace-only line is one of the cases the
     // parser must skip, so dropping it here would hide the assertion.
@@ -153,8 +154,8 @@ void runRoundTrip(const std::string& samplesPath, const std::string& fixturePath
     for (size_t i = 0; i < rows; i += 1) {
         const std::vector<std::string> expected = splitPipe(fixture[i]);
 
-        if (expected.size() < 11) {
-            fail("fixture row " + std::to_string(i) + " is malformed", "11 fields",
+        if (expected.size() < 12) {
+            fail("fixture row " + std::to_string(i) + " is malformed", "12 fields",
                  std::to_string(expected.size()) + " fields");
             continue;
         }
@@ -192,10 +193,17 @@ void runRoundTrip(const std::string& samplesPath, const std::string& fixturePath
             continue;
         }
 
+        // The numeric T code is the primary classification input, so it is
+        // asserted alongside whether the parser recognized it.
+        checkEqual(label + " t_code", expected[8],
+                   std::to_string(static_cast<int>(diagnostics.typeCode)));
+        checkEqual(label + " t_code recognized", expected[9],
+                   diagnostics.typeCodeRecognized ? "known" : "unknown");
+
         // Locking the exact bytes means any change to key assignment, enum
         // numbering or integer encoding fails loudly instead of silently
         // shipping a format the watch cannot read.
-        checkEqual(label + " CBOR bytes", expected[10], toHex(buffer, length));
+        checkEqual(label + " CBOR bytes", expected[11], toHex(buffer, length));
 
         Alert decoded;
         const DecodeResult decodeStatus = decodeAlert(buffer, length, decoded);
@@ -212,10 +220,8 @@ void runRoundTrip(const std::string& samplesPath, const std::string& fixturePath
         checkEqual(label + " distance", expected[5], distanceName(decoded.distance));
         checkEqual(label + " severity", expected[6], severityName(decoded.severity));
         checkEqual(label + " confidence", expected[7], confidenceText(decoded));
-        checkEqual(label + " drone_class", expected[8],
+        checkEqual(label + " drone_class", expected[10],
                    decoded.hasDroneClass ? std::string(decoded.droneClass) : std::string("-"));
-        checkEqual(label + " source", expected[9],
-                   decoded.hasSource ? std::string(decoded.source) : std::string("-"));
 
         // Survives the round trip, not just the encode.
         checkEqual(label + " sequence survives", std::to_string(sequence),
@@ -229,11 +235,10 @@ void runRoundTrip(const std::string& samplesPath, const std::string& fixturePath
 // Layer 2: guardrail against the four retired mappings
 // ---------------------------------------------------------------------------
 
-// Parses one line and returns the decoded alert, so the guardrail asserts on
-// what actually comes off the wire rather than on parser internals.
-bool decodeSampleLine(const char* line, Alert& decoded) {
+// Parses one line and reports both the decoded alert and the parser
+// diagnostics, so guardrails can assert on the t_code as well as the wire.
+bool decodeSampleLineFull(const char* line, Alert& decoded, TTSKW07Diagnostics& diagnostics) {
     Alert parsed;
-    TTSKW07Diagnostics diagnostics;
 
     if (ttskw07ParseLine(line, 1000, 1, parsed, diagnostics) != TTSKW07_OK) {
         return false;
@@ -250,91 +255,191 @@ bool decodeSampleLine(const char* line, Alert& decoded) {
 }
 
 void runGuardrail() {
-    printf("\n[2] GUARDRAIL  the four retired mappings must not return\n");
+    printf("\n[2] GUARDRAIL  classification rules that must not regress\n");
 
-    const char* mavicLine =
-        "TTSKW07 TIME=00:00:01 TYPE=DJI_MAVIC BAND=2.4GHz FREQ_MHZ=2437 RSSI=-61DBM SIGNAL=MID";
-    const char* o3Line =
-        "TTSKW07 TIME=00:00:05 TYPE=DJI_O3 BAND=5.8GHz FREQ_MHZ=5805 RSSI=-48DBM SIGNAL=NEAR";
-    const char* autelLine =
-        "TTSKW07 TIME=00:00:13 TYPE=AUTEL_EVO BAND=2.4GHz FREQ_MHZ=2462 RSSI=-66DBM SIGNAL=MID";
-    const char* unknownLine =
-        "TTSKW07 TIME=00:00:17 TYPE=UNKNOWN BAND=MULTI FREQ_MHZ=UNKNOWN RSSI=-42DBM SIGNAL=NEAR";
+    // Real vendor lines, so the guardrail exercises the actual format.
+    const char* analogLine  = "06 11:25:36   F:3320MHz   R:093   T:20   FM Analog(DIY FPV, Aircraft model)";
+    const char* o3Line      = "06 11:25:48   F:2419MHz   R:043   T:06   DJI O3(FPV, Mavic Air 2s, Mavic Mini 3 Pro)";
+    const char* o3PlusLine  = "05-09 09:28:00 F:5773MHz  R:046   T:05   DJI O3+(Mavic 3 series, AVATA)";
+    const char* autelLite   = "06 14:16:22   F:5768MHz   R:042   T:11   SkyLink(AUTEL Lite/Nano)";
+    const char* autelEvo    = "06 14:26:30   F:5768MHz   R:046   T:12   SkyLink(AUTEL EVO2 Pro)";
+    const char* unknownLine = "06 11:34:56   F:2409MHz   R:023   T:07   Unknown";
 
     Alert alert;
+    TTSKW07Diagnostics diagnostics;
 
     // --- #1 confidence is null, never 0 -------------------------------------
-    // "CONF 0%" on a threat HUD reads as "certainly not a threat" when the
-    // truth is "the detector told us nothing".
-    if (decodeSampleLine(mavicLine, alert)) {
-        checkTrue("#1 DJI_MAVIC confidence is absent", !alert.hasConfidence);
-        checkNotEqual("#1 DJI_MAVIC confidence must not be a number", "0", confidenceText(alert));
-        checkEqual("#1 DJI_MAVIC confidence reads null", "null", confidenceText(alert));
+    // The device reports no confidence. "CONF 0%" on a threat HUD reads as
+    // "certainly not a threat" when the truth is "we were told nothing".
+    if (decodeSampleLineFull(o3Line, alert, diagnostics)) {
+        checkTrue("#1 confidence is absent", !alert.hasConfidence);
+        checkNotEqual("#1 confidence must not be a number", "0", confidenceText(alert));
+        checkEqual("#1 confidence reads null", "null", confidenceText(alert));
     } else {
-        fail("#1 DJI_MAVIC line decodes", "decoded", "failed");
+        fail("#1 DJI O3 line decodes", "decoded", "failed");
     }
 
-    if (decodeSampleLine(unknownLine, alert)) {
-        checkTrue("#1 UNKNOWN confidence is absent", !alert.hasConfidence);
-    }
-
-    // --- #2 failed classification never becomes CRITICAL --------------------
-    // The old fixture mapped an unclassifiable detection to CRITICAL, which is
-    // escalation on ignorance.
-    if (decodeSampleLine(unknownLine, alert)) {
-        checkNotEqual("#2 unclassified UNKNOWN must not be CRITICAL",
-                      "CRITICAL", severityName(alert.severity));
-        checkEqual("#2 unclassified UNKNOWN with NEAR signal is HIGH",
-                   "HIGH", severityName(alert.severity));
-        checkEqual("#2 threat stays UNKNOWN", "UNKNOWN", threatName(alert.threat));
-    } else {
-        fail("#2 UNKNOWN line decodes", "decoded", "failed");
-    }
-
-    // The policy itself must be incapable of emitting CRITICAL, so no future
-    // tuning of the table can reintroduce escalation on ignorance.
+    // --- #2 no single detector line may reach CRITICAL ----------------------
+    // Escalation is the watch's job, based on track persistence the bridge
+    // does not have. Raising severity because classification failed would
+    // manufacture false positives.
     checkTrue("#2 default severity policy can never emit CRITICAL",
               ttskw07PolicyAvoidsCritical(TTSKW07_DEFAULT_SEVERITY_POLICY));
 
-    // No TTSKW07 line, at any signal strength, may reach CRITICAL.
     {
-        const char* signals[] = { "NEAR", "MID", "FAR", "UNKNOWN", "BOGUS" };
+        // Sweep the whole R range, including values above the 0-100 the vendor
+        // implies and the 117 actually observed in a capture.
+        const int signals[] = { 0, 23, 42, 46, 70, 93, 100, 117, 250 };
 
         for (size_t i = 0; i < (sizeof(signals) / sizeof(signals[0])); i += 1) {
-            std::string line = "TTSKW07 TYPE=DJI_MAVIC BAND=2.4GHz SIGNAL=";
-            line += signals[i];
+            char line[128];
+            snprintf(line, sizeof(line),
+                     "06 11:25:36   F:2419MHz   R:%03d   T:20   FM Analog(DIY FPV)", signals[i]);
 
-            if (decodeSampleLine(line.c_str(), alert)) {
-                checkNotEqual(std::string("#2 SIGNAL=") + signals[i] + " must not be CRITICAL",
-                              "CRITICAL", severityName(alert.severity));
+            if (decodeSampleLineFull(line, alert, diagnostics)) {
+                checkNotEqual(std::string("#2 R=") + std::to_string(signals[i]) +
+                              " must not be CRITICAL", "CRITICAL", severityName(alert.severity));
             }
         }
     }
 
+    if (decodeSampleLineFull(unknownLine, alert, diagnostics)) {
+        checkNotEqual("#2 unclassified T:07 must not be CRITICAL",
+                      "CRITICAL", severityName(alert.severity));
+        checkEqual("#2 unclassified T:07 threat stays UNKNOWN", "UNKNOWN", threatName(alert.threat));
+    }
+
     // --- #3 Autel is never attributed to DJI --------------------------------
-    if (decodeSampleLine(autelLine, alert)) {
-        checkNotEqual("#3 AUTEL_EVO threat must not be DJI", "DJI", threatName(alert.threat));
-        checkEqual("#3 AUTEL_EVO threat is UNKNOWN", "UNKNOWN", threatName(alert.threat));
-        checkEqual("#3 AUTEL_EVO vendor survives in drone_class", "AUTEL_EVO",
+    // The threat enum has no Autel value. Labelling an Autel airframe "DJI"
+    // would be a false vendor claim on a threat display; the vendor text is
+    // preserved in drone_class instead.
+    if (decodeSampleLineFull(autelLite, alert, diagnostics)) {
+        checkNotEqual("#3 T:11 AUTEL threat must not be DJI", "DJI", threatName(alert.threat));
+        checkEqual("#3 T:11 AUTEL threat is UNKNOWN", "UNKNOWN", threatName(alert.threat));
+        checkEqual("#3 T:11 AUTEL vendor survives in drone_class", "SkyLink(AUTEL Lite/Nano)",
                    alert.hasDroneClass ? std::string(alert.droneClass) : std::string("-"));
     } else {
-        fail("#3 AUTEL_EVO line decodes", "decoded", "failed");
+        fail("#3 AUTEL Lite line decodes", "decoded", "failed");
     }
 
-    // --- #4 model names are preserved, not remapped -------------------------
-    if (decodeSampleLine(o3Line, alert)) {
-        checkNotEqual("#4 DJI_O3 drone_class must not be MAVIC", "MAVIC",
-                      alert.hasDroneClass ? std::string(alert.droneClass) : std::string("-"));
-        checkEqual("#4 DJI_O3 drone_class is preserved verbatim", "DJI_O3",
+    if (decodeSampleLineFull(autelEvo, alert, diagnostics)) {
+        checkNotEqual("#3 T:12 AUTEL threat must not be DJI", "DJI", threatName(alert.threat));
+        checkEqual("#3 T:12 AUTEL vendor survives in drone_class", "SkyLink(AUTEL EVO2 Pro)",
                    alert.hasDroneClass ? std::string(alert.droneClass) : std::string("-"));
-        checkEqual("#4 DJI_O3 threat family is still DJI", "DJI", threatName(alert.threat));
+    }
+
+    // --- #4 model detail is preserved verbatim ------------------------------
+    // The numeric code identifies the family; only the text carries the model.
+    if (decodeSampleLineFull(o3PlusLine, alert, diagnostics)) {
+        checkEqual("#4 O3+ description preserved verbatim", "DJI O3+(Mavic 3 series, AVATA)",
+                   alert.hasDroneClass ? std::string(alert.droneClass) : std::string("-"));
+        checkEqual("#4 O3+ threat family is DJI", "DJI", threatName(alert.threat));
     } else {
-        fail("#4 DJI_O3 line decodes", "decoded", "failed");
+        fail("#4 DJI O3+ line decodes", "decoded", "failed");
     }
 
-    if (decodeSampleLine(mavicLine, alert)) {
-        checkEqual("#4 DJI_MAVIC drone_class is preserved verbatim", "DJI_MAVIC",
+    if (decodeSampleLineFull(analogLine, alert, diagnostics)) {
+        checkEqual("#4 analog FPV description preserved", "FM Analog(DIY FPV, Aircraft model)",
                    alert.hasDroneClass ? std::string(alert.droneClass) : std::string("-"));
+        checkEqual("#4 T:20 maps to FPV", "FPV", threatName(alert.threat));
+    }
+
+    // --- #5 an unrecognized t_code degrades, never guesses -------------------
+    // A future firmware revision will emit codes this table has never seen.
+    // That must not crash, must not fail the line, and must not be inferred
+    // from the description text.
+    {
+        const int unknownCodes[] = { 0, 1, 13, 42, 99, 255 };
+
+        for (size_t i = 0; i < (sizeof(unknownCodes) / sizeof(unknownCodes[0])); i += 1) {
+            char line[160];
+            // Description deliberately says "DJI" to prove the text is not used
+            // to guess a classification the code did not provide.
+            snprintf(line, sizeof(line),
+                     "06 12:02:10   F:2419MHz   R:061   T:%02d   DJI Something(unlisted)",
+                     unknownCodes[i]);
+
+            const std::string tag = "#5 T:" + std::to_string(unknownCodes[i]);
+
+            if (!decodeSampleLineFull(line, alert, diagnostics)) {
+                fail(tag + " still parses", "parsed", "rejected");
+                continue;
+            }
+
+            checkEqual(tag + " degrades to UNKNOWN", "UNKNOWN", threatName(alert.threat));
+            checkNotEqual(tag + " must not be guessed as DJI from text",
+                          "DJI", threatName(alert.threat));
+            checkEqual(tag + " raw code is retained", std::to_string(unknownCodes[i]),
+                       std::to_string(static_cast<int>(diagnostics.typeCode)));
+            checkTrue(tag + " is flagged unrecognized", !diagnostics.typeCodeRecognized);
+            checkEqual(tag + " description is retained", "DJI Something(unlisted)",
+                       alert.hasDroneClass ? std::string(alert.droneClass) : std::string("-"));
+        }
+    }
+
+    // Every documented code must still be recognized, so a table edit that
+    // drops one is caught.
+    {
+        const int knownCodes[] = { 2, 5, 6, 7, 11, 12, 20 };
+
+        for (size_t i = 0; i < (sizeof(knownCodes) / sizeof(knownCodes[0])); i += 1) {
+            checkTrue("#5 documented T:" + std::to_string(knownCodes[i]) + " is recognized",
+                      ttskw07IsKnownTypeCode(static_cast<uint16_t>(knownCodes[i])));
+        }
+    }
+
+    // --- #6 band is never force-fitted --------------------------------------
+    // A frequency outside every known band must degrade to UNKNOWN rather than
+    // snapping to the nearest one, which would invent a band the device never
+    // reported.
+    {
+        struct FrequencyCase { int megahertz; const char* band; };
+
+        const FrequencyCase cases[] = {
+            { 3320, "3.3GHz" },   // real capture
+            { 2419, "2.4GHz" },   // real capture
+            { 5773, "5.8GHz" },   // real capture
+            { 5930, "5.8GHz" },   // real capture, above the nominal 5900
+            {  868, "UNKNOWN" },  // ISM/LoRa, not a drone video band
+            { 1575, "UNKNOWN" },  // GPS L1
+            { 4000, "UNKNOWN" },  // between 3.3 and 5.8
+            { 7000, "UNKNOWN" },  // above everything
+            {    0, "UNKNOWN" }
+        };
+
+        for (size_t i = 0; i < (sizeof(cases) / sizeof(cases[0])); i += 1) {
+            char line[128];
+            snprintf(line, sizeof(line),
+                     "06 11:25:36   F:%04dMHz   R:061   T:06   DJI O3(test)", cases[i].megahertz);
+
+            const std::string tag = "#6 F:" + std::to_string(cases[i].megahertz) + "MHz";
+
+            if (decodeSampleLineFull(line, alert, diagnostics)) {
+                checkEqual(tag + " band", cases[i].band, bandName(alert.band));
+            } else {
+                fail(tag + " parses", "parsed", "rejected");
+            }
+        }
+    }
+
+    // --- #7 the device timestamp never drives timing ------------------------
+    // Captures show it unset (00-01-01) or plainly wrong. The alert's
+    // timestamp_ms must come from the caller's monotonic clock regardless.
+    {
+        const char* unsetClock =
+            "00-01-01 17:58:38 F:5930MHz R:117  T:07   Unknown";
+
+        Alert parsed;
+        TTSKW07Diagnostics local;
+
+        if (ttskw07ParseLine(unsetClock, 4242, 9, parsed, local) == TTSKW07_OK) {
+            checkEqual("#7 timestamp_ms comes from the caller, not the device",
+                       "4242", std::to_string(parsed.timestampMs));
+            checkEqual("#7 device clock text is captured for the log",
+                       "00-01-01 17:58:38", std::string(local.timestamp));
+        } else {
+            fail("#7 unset-clock line parses", "parsed", "rejected");
+        }
     }
 }
 
@@ -513,14 +618,16 @@ void runCodec() {
 }  // namespace
 
 int main(int argc, char** argv) {
-    if (argc < 3) {
-        printf("usage: contract_test <ttskw07_raw_samples.txt> <expected_alerts.txt>\n");
+    if (argc < 5) {
+        printf("usage: contract_test <raw_samples.txt> <expected_alerts.txt> "
+               "<edge_cases.txt> <expected_edge_cases.txt>\n");
         return 2;
     }
 
     printf("SKYSHIELD contract test (protocol_version %d)\n", PROTOCOL_VERSION);
 
-    runRoundTrip(argv[1], argv[2]);
+    runRoundTrip(argv[1], argv[2], "real vendor captures");
+    runRoundTrip(argv[3], argv[4], "synthetic edge cases");
     runGuardrail();
     runCodec();
 

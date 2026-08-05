@@ -21,22 +21,30 @@ one. Nobody noticed, because no test compared them.
 
 ## What it checks
 
-**1. Round trip.** Every line of `ttskw07_raw_samples.txt` runs
-parse → encode → decode and must match `expected_alerts.txt`, including the
-exact CBOR bytes. The noise line and the blank line must emit no alert at all.
+**1. Round trip.** Two fixture pairs run parse → encode → decode and must match
+their expected file, including the exact CBOR bytes:
+
+- `ttskw07_raw_samples.txt` — **real vendor captures**, ground truth
+- `ttskw07_edge_cases.txt` — **synthetic** degradation cases
+
+Noise and blank lines must emit no alert at all. The two files are kept
+separate so invented lines can never be mistaken for device output.
 
 Locking the bytes means any change to key assignment, enum numbering or integer
 encoding fails loudly instead of shipping a format the watch cannot read.
 
 **2. Guardrail.** Explicit negative assertions that fail if any of the four
-retired misleading mappings return (see `docs/TTSKW07_MAPPING.md`):
+retired misleading mappings return (see `docs/ttskw07-format.md`):
 
 | # | Must never happen |
 |---|---|
 | 1 | `confidence` reported as `0` instead of `null` |
 | 2 | a failed classification escalated to `CRITICAL` |
-| 3 | `AUTEL_*` attributed to threat `DJI` |
-| 4 | `DJI_O3` reported as `MAVIC` |
+| 3 | Autel (`T:11`/`T:12`) attributed to threat `DJI` |
+| 4 | a classification guessed from the description text |
+| 5 | an unrecognized `T` code failing or being guessed |
+| 6 | an out-of-band frequency force-fitted to a band |
+| 7 | the unreliable device clock used for timing |
 
 These are separate from the fixture comparison on purpose. If they were only
 enforced by the golden file, regenerating the fixture against a regressed
@@ -58,7 +66,7 @@ production tree is never modified. A mutation that does not change the file is
 reported as `[HARNESS BUG]`, not a pass — otherwise a stale pattern would
 silently produce a vacuous result.
 
-Current status: **5 mutations, 5 caught**, each tripping explicit `#1`-`#4`
+Current status: **7 mutations, 7 caught**, each tripping explicit `#1`-`#7`
 assertions rather than only the fixture comparison.
 
 ## Independent cross-check

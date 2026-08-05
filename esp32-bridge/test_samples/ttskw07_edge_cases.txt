@@ -1,0 +1,11 @@
+06 12:01:04   F:0868MHz   R:055   T:07   Unknown
+06 12:02:10   F:2419MHz   R:061   T:99   Some Future Protocol(unlisted)
+06 12:03:11   F:2419MHz   R:061   T:20
+06 12:04:12   F:2419MHz   R:061
+06 12:05:13   R:061   T:20   Missing frequency
+F:2419MHz R:061 T:20 No timestamp at all
+   06 12:06:14    F:2419MHz     R:061     T:06     DJI O3(ragged spacing)
+06 12:07:15   F:abcdMHz   R:061   T:20   Non-numeric frequency
+06 12:08:16   F:2419MHz   R:   T:20   Empty R value
+06 12:09:17   F:2419MHz   R:061   T:02   DJI OCU(a description far longer than the sixty three byte drone class capacity can hold, deliberately)
+Bluetooth device connected

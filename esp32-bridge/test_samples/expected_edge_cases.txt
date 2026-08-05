@@ -1,0 +1,32 @@
+# SKYSHIELD TTSKW07 contract fixture
+#
+# Expected result of parsing each line of ttskw07_edge_cases.txt with
+# TTSKW07Parser, encoding it with SkyShieldCodec, and decoding it back.
+# Asserted by tools/contract-test/contract_test.cpp.
+#
+# SYNTHETIC robustness cases, NOT vendor captures. These are constructed to
+# exercise degradation paths: out-of-band frequency, unrecognized T code,
+# missing fields, ragged spacing, non-numeric values and over-long text.
+#
+# The test uses deterministic inputs so the CBOR column is reproducible:
+#   timestamp_ms = 1000 + line_index
+#   sequence     = line_index + 1
+#
+# Format, pipe-delimited:
+#   INDEX|RESULT|KIND|THREAT|BAND|DISTANCE|SEVERITY|CONFIDENCE|T_CODE|T_KNOWN|DRONE_CLASS|CBOR_HEX
+#
+# RESULT is OK or SKIPPED. For SKIPPED rows the KIND column carries the parser
+# reason and every remaining column is "-". A SKIPPED line must emit no alert.
+# CONFIDENCE is the literal "null" when absent (the device reports none).
+#
+0|OK|contact|UNKNOWN|UNKNOWN|MID|MEDIUM|null|7|known|Unknown|AC0103021903E803010400050106000701080009020AF60B67556E6B6E6F776E0F675454534B573037
+1|OK|classified|UNKNOWN|2.4GHz|MID|MEDIUM|null|99|unknown|Some Future Protocol(unlisted)|AC0103021903E903020400050006000701080209020AF60B781E536F6D65204675747572652050726F746F636F6C28756E6C6973746564290F675454534B573037
+2|OK|classified|FPV|2.4GHz|MID|MEDIUM|null|20|known|-|AB0103021903EA03030400050006010701080209020AF60F675454534B573037
+3|SKIPPED|MALFORMED|-|-|-|-|-|-|-|-|-
+4|SKIPPED|NOT_A_DETECTION|-|-|-|-|-|-|-|-|-
+5|OK|classified|FPV|2.4GHz|MID|MEDIUM|null|20|known|No timestamp at all|AC0103021903ED03060400050006010701080209020AF60B734E6F2074696D657374616D7020617420616C6C0F675454534B573037
+6|OK|classified|DJI|2.4GHz|MID|MEDIUM|null|6|known|DJI O3(ragged spacing)|AC0103021903EE03070400050006020701080209020AF60B76444A49204F33287261676765642073706163696E67290F675454534B573037
+7|SKIPPED|MALFORMED|-|-|-|-|-|-|-|-|-
+8|SKIPPED|MALFORMED|-|-|-|-|-|-|-|-|-
+9|OK|classified|DJI|2.4GHz|MID|MEDIUM|null|2|known|DJI OCU(a description far longer than the sixty three byte dron|AC0103021903F1030A0400050006020701080209020AF60B783F444A49204F43552861206465736372697074696F6E20666172206C6F6E676572207468616E2074686520736978747920746872656520627974652064726F6E0F675454534B573037
+10|SKIPPED|NOT_A_DETECTION|-|-|-|-|-|-|-|-|-

@@ -1,4 +1,22 @@
-# TTSKW07 to SKYSHIELD Mapping
+# TTSKW07 to SKYSHIELD Mapping (SUPERSEDED)
+
+> **This document describes a line format that does not exist.**
+>
+> It was written against `TTSKW07 TIME=... TYPE=... BAND=... SIGNAL=...` sample
+> lines that were invented before any real detector output was available. The
+> device's actual format is completely different:
+>
+> ```text
+> 06 11:25:36   F:3320MHz   R:093   T:20   FM Analog(DIY FPV, Aircraft model)
+> ```
+>
+> The current mapping is **[docs/ttskw07-format.md](ttskw07-format.md)**, based
+> on real captures from the vendor's tool.
+>
+> Kept only for the reasoning behind the four normalization decisions, which
+> carried over unchanged to the real parser: confidence stays null rather than
+> 0, a failed classification never escalates to CRITICAL, Autel is never
+> reported as DJI, and model text is preserved verbatim.
 
 How a raw Tatusky TTSKW07 detection line becomes a SKYSHIELD alert.
 

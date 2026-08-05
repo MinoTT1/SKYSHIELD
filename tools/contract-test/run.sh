@@ -21,6 +21,8 @@ BUILD_DIR="${SCRIPT_DIR}/.build"
 INCLUDE_DIR="${REPO_ROOT}/esp32-bridge/include"
 SAMPLES="${REPO_ROOT}/esp32-bridge/test_samples/ttskw07_raw_samples.txt"
 FIXTURE="${REPO_ROOT}/esp32-bridge/test_samples/expected_alerts.txt"
+EDGE_SAMPLES="${REPO_ROOT}/esp32-bridge/test_samples/ttskw07_edge_cases.txt"
+EDGE_FIXTURE="${REPO_ROOT}/esp32-bridge/test_samples/expected_edge_cases.txt"
 
 CXX="${CXX:-g++}"
 CXXFLAGS="-std=c++11 -Wall -Wextra -Werror -I${INCLUDE_DIR}"
@@ -39,11 +41,12 @@ echo "==> building contract test"
 "${CXX}" ${CXXFLAGS} -o "${BUILD_DIR}/contract_test" "${SCRIPT_DIR}/contract_test.cpp"
 
 echo "==> running contract test"
-"${BUILD_DIR}/contract_test" "${SAMPLES}" "${FIXTURE}"
+"${BUILD_DIR}/contract_test" "${SAMPLES}" "${FIXTURE}" "${EDGE_SAMPLES}" "${EDGE_FIXTURE}"
 
 echo
 echo "==> independent CBOR cross-check (python, RFC 8949)"
 python3 "${SCRIPT_DIR}/skyshield_cbor.py" "${FIXTURE}"
+python3 "${SCRIPT_DIR}/skyshield_cbor.py" "${EDGE_FIXTURE}"
 
 echo
 echo "ALL CONTRACT CHECKS PASSED"

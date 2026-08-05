@@ -23,7 +23,13 @@ static const uint8_t PROTOCOL_VERSION = 3;
 // plausible-but-wrong alert, which is the worst failure mode here.
 static const size_t MAX_PAYLOAD_BYTES = 180;
 
-static const size_t DRONE_CLASS_CAPACITY = 24;
+// Sized to hold the TTSKW07's longest observed type description verbatim:
+// "DJI OCU(Mavic, Mavic Pro, P4P V2.0, Mavic 2, Mavic 2 Pro)" is 57 bytes.
+// This is a buffer capacity, not a schema constraint -- drone_class remains an
+// unbounded string in protocol/skyshield-alert.schema.json. Raising it grows
+// the worst-case packet to roughly 110 bytes, still well inside both
+// MAX_PAYLOAD_BYTES and the 182-byte usable payload at the negotiated MTU 185.
+static const size_t DRONE_CLASS_CAPACITY = 64;
 static const size_t SOURCE_CAPACITY = 16;
 
 // Enum values are wire values. They are permanent; see docs/wire-protocol.md.

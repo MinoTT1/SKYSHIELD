@@ -1,91 +1,64 @@
 #pragma once
 
-// Parser for Tatusky TTSKW07 ASCII detection lines.
+// Parser for the Tatusky TTSKW07 handheld drone detector's ASCII output.
 //
 // Arduino-free by design so the contract test exercises this exact code
 // natively against the captured samples in test_samples/.
 //
-// Vendor-confirmed transport (docs/TTSKW07_INTEGRATION_PLAN.md):
-//   USB Virtual COM, 115200 8N1, no flow control, ASCII, realtime output.
+// Transport (vendor-confirmed): USB Virtual COM, 115200 8N1, no flow control.
 //
-// Observed line format (esp32-bridge/test_samples/ttskw07_raw_samples.txt):
-//   TTSKW07 TIME=00:00:01 TYPE=DJI_MAVIC BAND=2.4GHz FREQ_MHZ=2437 RSSI=-61DBM SIGNAL=MID
+// REAL line format, from the vendor's "Handheld Drone Detector Tool" live
+// output and export screenshots:
 //
-// Keys are parsed by name, not by position, and unrecognized keys are ignored,
-// so a firmware revision that adds or reorders fields does not break parsing.
+//   <DATE TIME>   F:<freq>MHz   R:<nnn>   T:<nn>   <type description text>
+//
+//   06 11:25:36   F:3320MHz   R:093   T:20   FM Analog(DIY FPV, Aircraft model)
+//   05-09 09:28:00 F:5773MHz  R:046   T:05   DJI O3+(Mavic 3 series, AVATA)
+//   00-01-01 17:58:38 F:5930MHz R:117 T:07   Unknown
+//
+// Fields are located by their F:/R:/T: labels, never by column position: the
+// leading timestamp varies in width (1 to 3 date components) and the spacing
+// between columns is inconsistent across captures.
+//
+// Full format notes and the t_code table: docs/ttskw07-format.md
 //
 // ---------------------------------------------------------------------------
 // WHAT THIS PARSER DELIBERATELY DOES NOT DO
 // ---------------------------------------------------------------------------
-// The integration plan states: "Do not fake severity. Do not fake confidence.
-// Missing fields must remain unknown rather than inferred without evidence."
-// The TTSKW07 reports neither severity nor confidence, so:
+// Per docs/TTSKW07_INTEGRATION_PLAN.md: "Do not fake severity. Do not fake
+// confidence. Missing fields must remain unknown rather than inferred without
+// evidence."
 //
-//   * confidence is always ABSENT (CBOR null). The HUD renders "CONF --".
-//     It is never set to 0, which would read as "certainly not a threat".
+//   * confidence is always ABSENT (CBOR null). The device reports none, and 0
+//     would read as "certainly not a threat" rather than "no data".
 //
-//   * severity is a documented SKYSHIELD MIDDLEWARE POLICY derived from the
-//     detector's own SIGNAL field, not a detector claim. The mapping is
-//     deterministic and is stated in docs/TTSKW07_MAPPING.md. It never yields
-//     CRITICAL: nothing in TTSKW07 output justifies the top severity, and
-//     escalation is the watch's job once a track is repeated and locked.
+//   * an unrecognized t_code degrades to threat UNKNOWN. It is never guessed
+//     from the description text, and it never fails the line: the raw code and
+//     the full type text are preserved so no information is lost.
 //
-//   * an unclassifiable TYPE does NOT raise severity. Escalating on ignorance
-//     produces exactly the false positives this product cannot afford.
+//   * AUTEL is not reported as DJI. The threat enum has no Autel value, so
+//     Autel detections carry threat UNKNOWN with the vendor text intact in
+//     drone_class. See docs/ttskw07-format.md for the proposed enum addition.
 //
-//   * vendor identity is never invented. AUTEL_* maps to threat UNKNOWN
-//     because the threat enum has no Autel value; the real vendor string is
-//     preserved in drone_class instead of being misattributed to DJI.
+//   * a frequency outside every known band maps to BAND_UNKNOWN rather than
+//     being force-fitted to the nearest one.
+//
+//   * the device timestamp is captured but NEVER used for timing. Samples show
+//     it unset (00-01-01) or wrong, because it depends on the operator setting
+//     the device clock. SKYSHIELD times everything on its own monotonic clock.
 
 #include "SkyShieldProtocol.h"
 
 namespace skyshield {
 
-static const char TTSKW07_LINE_PREFIX[] = "TTSKW07";
-static const size_t TTSKW07_MAX_LINE = 200;
+static const size_t TTSKW07_MAX_LINE = 220;
+static const size_t TTSKW07_TIMESTAMP_CAPACITY = 24;
 
 enum TTSKW07ParseResult : uint8_t {
     TTSKW07_OK = 0,
     TTSKW07_NOT_A_DETECTION = 1,  // noise, banner, blank: skip quietly
-    TTSKW07_MALFORMED = 2         // looks like ours but is not usable
+    TTSKW07_MALFORMED = 2         // has the labels but they are unusable
 };
-
-// SKYSHIELD middleware severity policy for the TTSKW07.
-//
-// The detector reports no severity, but severity is a required wire field, so
-// SKYSHIELD derives one from the detector's own SIGNAL value. This is a
-// normalization policy, NOT a detector claim, and operator-facing material
-// must describe it that way. Full rationale in docs/TTSKW07_MAPPING.md.
-//
-// It is a named, swappable table rather than a hardcoded switch so the policy
-// can be tuned per deployment without editing parse logic, and so the contract
-// test can assert properties of it directly.
-//
-// INVARIANT: no entry may be SEVERITY_CRITICAL. Nothing in a single TTSKW07
-// line justifies the top severity. Escalation to CRITICAL is the watch's job,
-// based on track persistence and repetition -- evidence the bridge does not
-// have. The contract test enforces this invariant.
-struct TTSKW07SeverityPolicy {
-    Severity onNear;
-    Severity onMid;
-    Severity onFar;
-    Severity onUnknown;
-};
-
-static const TTSKW07SeverityPolicy TTSKW07_DEFAULT_SEVERITY_POLICY = {
-    SEVERITY_HIGH,    // NEAR  -> strong signal
-    SEVERITY_MEDIUM,  // MID
-    SEVERITY_LOW,     // FAR
-    SEVERITY_LOW      // signal unknown or absent
-};
-
-// True when the policy can never emit CRITICAL. Asserted by the contract test.
-inline bool ttskw07PolicyAvoidsCritical(const TTSKW07SeverityPolicy& policy) {
-    return (policy.onNear != SEVERITY_CRITICAL) &&
-           (policy.onMid != SEVERITY_CRITICAL) &&
-           (policy.onFar != SEVERITY_CRITICAL) &&
-           (policy.onUnknown != SEVERITY_CRITICAL);
-}
 
 inline const char* ttskw07ResultName(TTSKW07ParseResult result) {
     switch (result) {
@@ -95,31 +68,84 @@ inline const char* ttskw07ResultName(TTSKW07ParseResult result) {
     }
 }
 
-// Diagnostics preserved from the raw line but not carried on the wire. The
-// schema has no RSSI field; these exist so the source data can be logged
-// faithfully rather than discarded at parse time.
+// Maps the detector's R value to a coarse signal-strength category.
+//
+// PENDING VENDOR CONFIRMATION on two points: that higher R means stronger
+// signal, and that the scale is relative rather than dBm. Samples range 023 to
+// 117, so it is not bounded at 100. These thresholds are a SKYSHIELD
+// normalization policy, not a detector claim.
+struct TTSKW07SignalPolicy {
+    uint16_t nearMin;  // r >= this -> NEAR
+    uint16_t midMin;   // r >= this -> MID
+};
+
+static const TTSKW07SignalPolicy TTSKW07_DEFAULT_SIGNAL_POLICY = { 70, 40 };
+
+// SKYSHIELD middleware severity policy. The detector reports no severity, but
+// severity is a required wire field, so it is derived from the signal category.
+//
+// INVARIANT: no entry may be SEVERITY_CRITICAL. Nothing in a single detector
+// line justifies the top severity; escalation is the watch's job, based on
+// track persistence the bridge does not have. The contract test enforces this.
+struct TTSKW07SeverityPolicy {
+    Severity onNear;
+    Severity onMid;
+    Severity onFar;
+    Severity onUnknown;
+};
+
+static const TTSKW07SeverityPolicy TTSKW07_DEFAULT_SEVERITY_POLICY = {
+    SEVERITY_HIGH,    // NEAR
+    SEVERITY_MEDIUM,  // MID
+    SEVERITY_LOW,     // FAR
+    SEVERITY_LOW      // unknown
+};
+
+inline bool ttskw07PolicyAvoidsCritical(const TTSKW07SeverityPolicy& policy) {
+    return (policy.onNear != SEVERITY_CRITICAL) &&
+           (policy.onMid != SEVERITY_CRITICAL) &&
+           (policy.onFar != SEVERITY_CRITICAL) &&
+           (policy.onUnknown != SEVERITY_CRITICAL);
+}
+
+// Everything the raw line carried, including what the wire format has no field
+// for. Kept so the source data can be logged faithfully rather than discarded.
 struct TTSKW07Diagnostics {
-    bool hasRssi;
-    int rssiDbm;
     bool hasFrequency;
     uint32_t frequencyMhz;
-    char detectionTime[16];
-    char rawType[DRONE_CLASS_CAPACITY];
+    bool hasSignal;
+    uint16_t signalValue;   // the R value, raw
+    bool hasTypeCode;
+    uint16_t typeCode;      // the T value, raw
+    bool typeCodeRecognized;
+    // True when the description was longer than DRONE_CLASS_CAPACITY and was
+    // cut. Surfaced so a shortened label is never mistaken for the whole thing.
+    bool typeTextTruncated;
+    char timestamp[TTSKW07_TIMESTAMP_CAPACITY];   // device clock, NOT for timing
+    char typeText[DRONE_CLASS_CAPACITY];
 };
 
 inline void ttskw07DiagnosticsInit(TTSKW07Diagnostics& diagnostics) {
-    diagnostics.hasRssi = false;
-    diagnostics.rssiDbm = 0;
     diagnostics.hasFrequency = false;
     diagnostics.frequencyMhz = 0;
-    diagnostics.detectionTime[0] = '\0';
-    diagnostics.rawType[0] = '\0';
+    diagnostics.hasSignal = false;
+    diagnostics.signalValue = 0;
+    diagnostics.hasTypeCode = false;
+    diagnostics.typeCode = 0;
+    diagnostics.typeCodeRecognized = false;
+    diagnostics.typeTextTruncated = false;
+    diagnostics.timestamp[0] = '\0';
+    diagnostics.typeText[0] = '\0';
 }
 
 namespace detail {
 
 inline bool isSpace(char ch) {
     return (ch == ' ') || (ch == '\t');
+}
+
+inline bool isDigit(char ch) {
+    return (ch >= '0') && (ch <= '9');
 }
 
 inline size_t cstrLength(const char* text) {
@@ -132,87 +158,51 @@ inline size_t cstrLength(const char* text) {
     return length;
 }
 
-// Case-sensitive comparison of a bounded token against a C string. Detector
-// keys are fixed-case in the vendor output, so exact matching is correct and
-// avoids accepting near-miss garbage.
-inline bool tokenEquals(const char* token, size_t tokenLength, const char* expected) {
-    size_t i = 0;
+// Finds `label` at or after `from`. Returns the index just past the label, or
+// npos-equivalent (length) when absent.
+inline size_t findLabel(const char* line, size_t length, size_t from, const char* label) {
+    const size_t labelLength = cstrLength(label);
 
-    for (; i < tokenLength; i += 1) {
-        if ((expected[i] == '\0') || (token[i] != expected[i])) {
-            return false;
+    if (labelLength == 0) {
+        return length;
+    }
+
+    for (size_t i = from; (i + labelLength) <= length; i += 1) {
+        size_t j = 0;
+
+        while ((j < labelLength) && (line[i + j] == label[j])) {
+            j += 1;
+        }
+
+        if (j == labelLength) {
+            return i + labelLength;
         }
     }
 
-    return expected[i] == '\0';
+    return length;
 }
 
-inline bool tokenStartsWith(const char* token, size_t tokenLength, const char* prefix) {
-    size_t i = 0;
+// Reads an unsigned decimal starting at `from`, skipping leading spaces.
+// Leading zeros are fine ("093"). Returns false when no digit is present.
+inline bool readUnsignedAt(const char* line, size_t length, size_t from,
+                           uint32_t& outValue, size_t& outEnd) {
+    size_t i = from;
 
-    while (prefix[i] != '\0') {
-        if ((i >= tokenLength) || (token[i] != prefix[i])) {
-            return false;
-        }
-
+    while ((i < length) && isSpace(line[i])) {
         i += 1;
     }
 
-    return true;
-}
-
-inline bool copyToken(const char* token, size_t tokenLength, char* out, size_t capacity) {
-    if (tokenLength >= capacity) {
-        return false;
-    }
-
-    for (size_t i = 0; i < tokenLength; i += 1) {
-        out[i] = token[i];
-    }
-
-    out[tokenLength] = '\0';
-    return true;
-}
-
-// Parses a signed decimal with an optional non-numeric suffix, so "-61DBM"
-// yields -61. Returns false when no digits are present at all.
-inline bool parseSignedPrefix(const char* token, size_t tokenLength, int& outValue) {
-    size_t index = 0;
-    bool negative = false;
-
-    if ((index < tokenLength) && ((token[index] == '-') || (token[index] == '+'))) {
-        negative = (token[index] == '-');
-        index += 1;
-    }
-
-    int value = 0;
-    bool sawDigit = false;
-
-    while ((index < tokenLength) && (token[index] >= '0') && (token[index] <= '9')) {
-        value = (value * 10) + (token[index] - '0');
-        sawDigit = true;
-        index += 1;
-    }
-
-    if (!sawDigit) {
-        return false;
-    }
-
-    outValue = negative ? -value : value;
-    return true;
-}
-
-inline bool parseUnsigned(const char* token, size_t tokenLength, uint32_t& outValue) {
     uint32_t value = 0;
     bool sawDigit = false;
 
-    for (size_t i = 0; i < tokenLength; i += 1) {
-        if ((token[i] < '0') || (token[i] > '9')) {
-            return false;
-        }
-
-        value = (value * 10) + static_cast<uint32_t>(token[i] - '0');
+    while ((i < length) && isDigit(line[i])) {
+        value = (value * 10) + static_cast<uint32_t>(line[i] - '0');
         sawDigit = true;
+        i += 1;
+
+        if (value > 1000000u) {
+            return false;  // absurd, treat as malformed rather than wrapping
+        }
     }
 
     if (!sawDigit) {
@@ -220,38 +210,57 @@ inline bool parseUnsigned(const char* token, size_t tokenLength, uint32_t& outVa
     }
 
     outValue = value;
+    outEnd = i;
     return true;
 }
 
-inline Band bandFromToken(const char* token, size_t length) {
-    if (tokenEquals(token, length, "1.2GHz")) { return BAND_1_2; }
-    if (tokenEquals(token, length, "2.4GHz")) { return BAND_2_4; }
-    if (tokenEquals(token, length, "3.3GHz")) { return BAND_3_3; }
-    if (tokenEquals(token, length, "5.8GHz")) { return BAND_5_8; }
-    if (tokenEquals(token, length, "MULTI")) { return BAND_MULTI; }
+// Copies line[begin,end) with surrounding whitespace removed. Returns false if
+// the text did not fit, so a truncation is reported rather than silently
+// shipping a description that looks complete but is not.
+inline bool copyTrimmed(const char* line, size_t begin, size_t end,
+                        char* out, size_t capacity) {
+    while ((begin < end) && isSpace(line[begin])) {
+        begin += 1;
+    }
+
+    while ((end > begin) && isSpace(line[end - 1])) {
+        end -= 1;
+    }
+
+    size_t written = 0;
+
+    while ((begin < end) && ((written + 1) < capacity)) {
+        out[written] = line[begin];
+        written += 1;
+        begin += 1;
+    }
+
+    out[written] = '\0';
+    return begin == end;
+}
+
+// Frequency to band.
+//
+// Ranges are deliberately a little wider than the nominal ISM allocations so a
+// real detection at a band edge is not thrown away, but they are still bounded:
+// a frequency outside all of them degrades to UNKNOWN rather than snapping to
+// the nearest band. The 5.8GHz window extends to 5950 because FPV raceband
+// channels run past 5900 (the captured sample at 5930MHz is one).
+inline Band bandFromFrequency(uint32_t megahertz) {
+    if ((megahertz >= 1100u) && (megahertz <= 1350u)) { return BAND_1_2; }
+    if ((megahertz >= 2350u) && (megahertz <= 2550u)) { return BAND_2_4; }
+    if ((megahertz >= 3200u) && (megahertz <= 3600u)) { return BAND_3_3; }
+    if ((megahertz >= 5650u) && (megahertz <= 5950u)) { return BAND_5_8; }
     return BAND_UNKNOWN;
 }
 
-inline Distance distanceFromToken(const char* token, size_t length) {
-    if (tokenEquals(token, length, "NEAR")) { return DISTANCE_NEAR; }
-    if (tokenEquals(token, length, "MID")) { return DISTANCE_MID; }
-    if (tokenEquals(token, length, "FAR")) { return DISTANCE_FAR; }
-    return DISTANCE_UNKNOWN;
+inline Distance distanceFromSignal(uint32_t signalValue, const TTSKW07SignalPolicy& policy) {
+    if (signalValue >= policy.nearMin) { return DISTANCE_NEAR; }
+    if (signalValue >= policy.midMin) { return DISTANCE_MID; }
+    return DISTANCE_FAR;
 }
 
-// Vendor family from the detector's TYPE token.
-//
-// AUTEL deliberately maps to UNKNOWN: the threat enum has no Autel value and
-// labeling an Autel airframe "DJI" would be a false vendor attribution. The
-// true vendor string survives in drone_class.
-inline Threat threatFromTypeToken(const char* token, size_t length) {
-    if (tokenStartsWith(token, length, "DJI")) { return THREAT_DJI; }
-    if (tokenStartsWith(token, length, "FPV")) { return THREAT_FPV; }
-    return THREAT_UNKNOWN;
-}
-
-// Applies the configured severity policy. See TTSKW07SeverityPolicy.
-inline Severity severityFromSignal(Distance distance, const TTSKW07SeverityPolicy& policy) {
+inline Severity severityFromDistance(Distance distance, const TTSKW07SeverityPolicy& policy) {
     switch (distance) {
         case DISTANCE_NEAR: return policy.onNear;
         case DISTANCE_MID: return policy.onMid;
@@ -262,17 +271,60 @@ inline Severity severityFromSignal(Distance distance, const TTSKW07SeverityPolic
 
 }  // namespace detail
 
+// Classification by the numeric T code.
+//
+// The code is the PRIMARY signal because it is short, stable and not
+// localizable; the description text is long and may be translated.
+//
+// DERIVED FROM VENDOR VIDEOS AND SCREENSHOTS -- PENDING VENDOR CONFIRMATION
+// VIA EMAIL. Codes not in this table are not guessed; see ttskw07ThreatFromCode.
+//
+//   T:20  FM Analog (DIY FPV, aircraft model)   -> FPV
+//   T:06  DJI O3 (FPV, Mavic Air 2s, Mini 3)    -> DJI
+//   T:05  DJI O3+ (Mavic 3 series, AVATA)       -> DJI
+//   T:02  DJI OCU (Mavic, P4P V2.0, Mavic 2)    -> DJI
+//   T:11  SkyLink (AUTEL Lite/Nano)             -> UNKNOWN (no Autel enum)
+//   T:12  SkyLink (AUTEL EVO2 Pro)              -> UNKNOWN (no Autel enum)
+//   T:07  Unknown                               -> UNKNOWN
+inline bool ttskw07IsKnownTypeCode(uint16_t typeCode) {
+    switch (typeCode) {
+        case 2: case 5: case 6: case 7: case 11: case 12: case 20:
+            return true;
+        default:
+            return false;
+    }
+}
+
+// Maps a T code to the closest existing threat enum value.
+//
+// Autel deliberately maps to UNKNOWN: the enum has FPV, DJI and UNKNOWN only,
+// and labelling an Autel airframe "DJI" would be a false vendor attribution on
+// a threat display. The real vendor string survives in drone_class.
+inline Threat ttskw07ThreatFromCode(uint16_t typeCode) {
+    switch (typeCode) {
+        case 20:                    // FM Analog / analog FPV
+            return THREAT_FPV;
+        case 2: case 5: case 6:     // DJI OCU, O3+, O3
+            return THREAT_DJI;
+        case 11: case 12:           // AUTEL SkyLink -- no enum value exists
+            return THREAT_UNKNOWN;
+        default:                    // T:07 Unknown, and any unrecognized code
+            return THREAT_UNKNOWN;
+    }
+}
+
 // Parses one raw TTSKW07 line into a normalized alert.
 //
-// timestampMs and sequence are supplied by the caller; the parser does not
-// read a clock so it stays testable and side-effect free.
+// timestampMs and sequence are supplied by the caller; the parser reads no
+// clock, so it stays testable and side-effect free.
 inline TTSKW07ParseResult ttskw07ParseLine(
         const char* line,
         uint32_t timestampMs,
         uint32_t sequence,
         Alert& alert,
         TTSKW07Diagnostics& diagnostics,
-        const TTSKW07SeverityPolicy& severityPolicy = TTSKW07_DEFAULT_SEVERITY_POLICY) {
+        const TTSKW07SeverityPolicy& severityPolicy = TTSKW07_DEFAULT_SEVERITY_POLICY,
+        const TTSKW07SignalPolicy& signalPolicy = TTSKW07_DEFAULT_SIGNAL_POLICY) {
     alertInit(alert);
     ttskw07DiagnosticsInit(diagnostics);
 
@@ -280,162 +332,90 @@ inline TTSKW07ParseResult ttskw07ParseLine(
         return TTSKW07_NOT_A_DETECTION;
     }
 
-    const size_t lineLength = detail::cstrLength(line);
+    const size_t length = detail::cstrLength(line);
 
-    if ((lineLength == 0) || (lineLength > TTSKW07_MAX_LINE)) {
+    if ((length == 0) || (length > TTSKW07_MAX_LINE)) {
         return TTSKW07_NOT_A_DETECTION;
     }
 
-    size_t index = 0;
+    // Labels are located in order, so a stray "R:" or "T:" inside the trailing
+    // description text cannot be mistaken for a field.
+    const size_t afterF = detail::findLabel(line, length, 0, "F:");
 
-    while ((index < lineLength) && detail::isSpace(line[index])) {
-        index += 1;
-    }
-
-    // Anything not carrying the detector prefix is another device's chatter, a
-    // boot banner, or UART noise. Skip quietly rather than logging an error
-    // per line, which would flood the console on a noisy link.
-    if (!detail::tokenStartsWith(&line[index], lineLength - index, TTSKW07_LINE_PREFIX)) {
+    if (afterF >= length) {
+        // No frequency label at all: another device's chatter, a banner, or
+        // UART noise. Skip quietly rather than logging an error per line.
         return TTSKW07_NOT_A_DETECTION;
     }
 
-    index += detail::cstrLength(TTSKW07_LINE_PREFIX);
+    const size_t afterR = detail::findLabel(line, length, afterF, "R:");
+    const size_t afterT = (afterR < length) ? detail::findLabel(line, length, afterR, "T:") : length;
 
-    // The prefix must be a whole token: "TTSKW07X ..." is not ours.
-    if ((index < lineLength) && !detail::isSpace(line[index])) {
-        return TTSKW07_NOT_A_DETECTION;
-    }
-
-    bool sawType = false;
-    bool sawBand = false;
-    bool sawSignal = false;
-
-    Threat threat = THREAT_UNKNOWN;
-    Band band = BAND_UNKNOWN;
-    Distance distance = DISTANCE_UNKNOWN;
-
-    while (index < lineLength) {
-        while ((index < lineLength) && detail::isSpace(line[index])) {
-            index += 1;
-        }
-
-        if (index >= lineLength) {
-            break;
-        }
-
-        const size_t tokenStart = index;
-
-        while ((index < lineLength) && !detail::isSpace(line[index])) {
-            index += 1;
-        }
-
-        const size_t tokenLength = index - tokenStart;
-        const char* token = &line[tokenStart];
-
-        size_t separator = 0;
-
-        while ((separator < tokenLength) && (token[separator] != '=')) {
-            separator += 1;
-        }
-
-        // A token with no '=' is not a key/value pair. Ignore it rather than
-        // rejecting the whole line, so a trailing status word cannot discard
-        // an otherwise valid detection.
-        if (separator >= tokenLength) {
-            continue;
-        }
-
-        const char* key = token;
-        const size_t keyLength = separator;
-        const char* value = &token[separator + 1];
-        const size_t valueLength = tokenLength - separator - 1;
-
-        if (valueLength == 0) {
-            return TTSKW07_MALFORMED;
-        }
-
-        if (detail::tokenEquals(key, keyLength, "TYPE")) {
-            threat = detail::threatFromTypeToken(value, valueLength);
-
-            // Preserve the detector's own type string verbatim rather than
-            // remapping it to a coarser label; the plan requires source data
-            // be preserved faithfully before normalization.
-            //
-            // An over-long model name drops the label but KEEPS the detection:
-            // the threat family, band and signal are still valid, and losing a
-            // real detection over a cosmetic field would be the worse failure.
-            if (detail::copyToken(value, valueLength, diagnostics.rawType, DRONE_CLASS_CAPACITY)) {
-                alertSetDroneClass(alert, diagnostics.rawType);
-            }
-
-            sawType = true;
-            continue;
-        }
-
-        if (detail::tokenEquals(key, keyLength, "BAND")) {
-            band = detail::bandFromToken(value, valueLength);
-            sawBand = true;
-            continue;
-        }
-
-        if (detail::tokenEquals(key, keyLength, "SIGNAL")) {
-            distance = detail::distanceFromToken(value, valueLength);
-            sawSignal = true;
-            continue;
-        }
-
-        if (detail::tokenEquals(key, keyLength, "RSSI")) {
-            int rssi = 0;
-
-            if (detail::parseSignedPrefix(value, valueLength, rssi)) {
-                diagnostics.hasRssi = true;
-                diagnostics.rssiDbm = rssi;
-            }
-
-            continue;
-        }
-
-        if (detail::tokenEquals(key, keyLength, "FREQ_MHZ")) {
-            uint32_t frequency = 0;
-
-            // "UNKNOWN" is a legitimate value here and must not fail the line.
-            if (detail::parseUnsigned(value, valueLength, frequency)) {
-                diagnostics.hasFrequency = true;
-                diagnostics.frequencyMhz = frequency;
-            }
-
-            continue;
-        }
-
-        if (detail::tokenEquals(key, keyLength, "TIME")) {
-            detail::copyToken(value, valueLength, diagnostics.detectionTime,
-                              sizeof(diagnostics.detectionTime));
-            continue;
-        }
-
-        // Unrecognized key from a newer firmware revision: ignore it.
-    }
-
-    // A detection line without these three carries nothing actionable.
-    if (!sawType || !sawBand || !sawSignal) {
+    if ((afterR >= length) || (afterT >= length)) {
+        // It looked like a detection line but is missing R: or T:.
         return TTSKW07_MALFORMED;
     }
+
+    uint32_t frequencyMhz = 0;
+    uint32_t signalValue = 0;
+    uint32_t typeCode = 0;
+    size_t frequencyEnd = 0;
+    size_t signalEnd = 0;
+    size_t typeCodeEnd = 0;
+
+    if (!detail::readUnsignedAt(line, length, afterF, frequencyMhz, frequencyEnd) ||
+        !detail::readUnsignedAt(line, length, afterR, signalValue, signalEnd) ||
+        !detail::readUnsignedAt(line, length, afterT, typeCode, typeCodeEnd)) {
+        return TTSKW07_MALFORMED;
+    }
+
+    if (typeCode > 0xFFFFu) {
+        return TTSKW07_MALFORMED;
+    }
+
+    diagnostics.hasFrequency = true;
+    diagnostics.frequencyMhz = frequencyMhz;
+    diagnostics.hasSignal = true;
+    diagnostics.signalValue = static_cast<uint16_t>(signalValue);
+    diagnostics.hasTypeCode = true;
+    diagnostics.typeCode = static_cast<uint16_t>(typeCode);
+    diagnostics.typeCodeRecognized = ttskw07IsKnownTypeCode(diagnostics.typeCode);
+
+    // Everything before "F:" is the device timestamp. Captured for the log
+    // only: the samples show it unset (00-01-01) or plainly wrong, because it
+    // depends on the operator having set the device clock.
+    const size_t labelStart = (afterF >= 2) ? (afterF - 2) : 0;
+    detail::copyTrimmed(line, 0, labelStart, diagnostics.timestamp, TTSKW07_TIMESTAMP_CAPACITY);
+
+    // Free-text remainder after the T code. Preserved verbatim: it carries the
+    // model detail ("AVATA", "Mavic Air 2s") that the numeric code does not.
+    // Real descriptions top out at 57 bytes, so truncation should not occur;
+    // if it ever does, the flag makes it visible instead of silent.
+    diagnostics.typeTextTruncated = !detail::copyTrimmed(
+        line, typeCodeEnd, length, diagnostics.typeText, DRONE_CLASS_CAPACITY);
 
     alert.timestampMs = timestampMs;
     alert.sequence = sequence;
     alert.sensorType = SENSOR_RF;
-    alert.threat = threat;
-    alert.band = band;
-    alert.distance = distance;
-    alert.severity = detail::severityFromSignal(distance, severityPolicy);
+    alert.threat = ttskw07ThreatFromCode(diagnostics.typeCode);
+    alert.band = detail::bandFromFrequency(frequencyMhz);
+    alert.distance = detail::distanceFromSignal(signalValue, signalPolicy);
+    alert.severity = detail::severityFromDistance(alert.distance, severityPolicy);
 
-    // The TTSKW07 reports no confidence. Leave it absent (CBOR null) rather
-    // than inventing a number.
+    // The device reports no confidence. Leave it absent rather than inventing
+    // a number; absent is distinguishable from 0 on the wire.
     alert.hasConfidence = false;
 
-    // Nothing identifiable and no band: a real detection with no usable
-    // classification. That is precisely a contact alert.
-    if ((threat == THREAT_UNKNOWN) && (band == BAND_UNKNOWN)) {
+    // An over-long description drops the label but KEEPS the detection: the
+    // threat family, band and signal are still valid, and losing a real
+    // detection over a cosmetic field would be the worse failure.
+    if (diagnostics.typeText[0] != '\0') {
+        alertSetDroneClass(alert, diagnostics.typeText);
+    }
+
+    // Nothing identifiable and no usable band: a real detection with no usable
+    // classification, which is exactly a contact alert.
+    if ((alert.threat == THREAT_UNKNOWN) && (alert.band == BAND_UNKNOWN)) {
         alert.alertKind = KIND_CONTACT;
     } else {
         alert.alertKind = KIND_CLASSIFIED;
