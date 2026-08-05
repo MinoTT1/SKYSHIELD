@@ -94,6 +94,10 @@ class BleAlertSource extends AlertSource {
     var _hasLatestAlert;
     var _lastPayloadLength;
     var _lastDirectParseResult;
+    // Dead device awaiting Ble.unpairDevice(). Released from the timer tick, not
+    // from inside the BLE callback, so teardown APIs are never called while the
+    // stack is mid-disconnect.
+    var _devicePendingUnpair;
     var _reconnectPending;
     var _reconnectAtMs;
     var _reconnectDelayMs;
@@ -146,6 +150,7 @@ class BleAlertSource extends AlertSource {
         _hasLatestAlert = false;
         _lastPayloadLength = 0;
         _lastDirectParseResult = "";
+        _devicePendingUnpair = null;
         _reconnectPending = false;
         _reconnectAtMs = 0;
         _reconnectDelayMs = BLE_RECONNECT_MIN_MS;
@@ -192,6 +197,15 @@ class BleAlertSource extends AlertSource {
     // they belong to the app, not the connection, and reallocating them on
     // every flap would leak.
     function scheduleReconnect(reason) {
+        // Hand the dead device to the unpair queue rather than just dropping the
+        // reference. Ble.pairDevice() occupies a slot in the Connect IQ BLE
+        // workarea and Ble.unpairDevice() is the only thing that frees it;
+        // nulling our own reference releases nothing. Pairing again with the old
+        // slot still held is what raised "Error Processing Workarea connections".
+        if (_device != null) {
+            _devicePendingUnpair = _device;
+        }
+
         _device = null;
         _alertCharacteristic = null;
         _stateRecoveryPending = false;
@@ -222,6 +236,31 @@ class BleAlertSource extends AlertSource {
         }
     }
 
+    // Frees the Connect IQ BLE workarea slot held by a dead connection.
+    //
+    // Called from the timer tick, never from inside a BLE callback: invoking
+    // teardown APIs while the stack is processing an abrupt disconnect is
+    // exactly the condition that faulted.
+    //
+    // Failure is logged and swallowed. If the peer vanished, the stack may have
+    // already released it, and an exception here must not take the app down --
+    // the whole point is that a disappearing bridge degrades to LINK LOST.
+    function releasePendingDevice() {
+        if (_devicePendingUnpair == null) {
+            return;
+        }
+
+        var dead = _devicePendingUnpair;
+        _devicePendingUnpair = null;
+
+        try {
+            Ble.unpairDevice(dead);
+            log("unpaired dead device, workarea slot released");
+        } catch (ex) {
+            log("unpair failed (already released?): " + ex);
+        }
+    }
+
     function serviceReconnect() {
         if (!_reconnectPending || !_enabled) {
             return;
@@ -233,6 +272,9 @@ class BleAlertSource extends AlertSource {
 
         _reconnectPending = false;
         _reconnectCount += 1;
+
+        // MUST happen before the rescan can lead to another pairDevice().
+        releasePendingDevice();
 
         log("reconnect attempt " + _reconnectCount + " starting rescan");
 
@@ -252,6 +294,14 @@ class BleAlertSource extends AlertSource {
     function stop() {
         _enabled = false;
         _reconnectPending = false;
+
+        if (_device != null) {
+            _devicePendingUnpair = _device;
+            _device = null;
+        }
+
+        _alertCharacteristic = null;
+        releasePendingDevice();
 
         try {
             Ble.setScanState(Ble.SCAN_STATE_OFF);
@@ -695,7 +745,22 @@ class BleAlertSource extends AlertSource {
             return;
         }
 
-        var service = device.getService(_serviceUuid);
+        if (explicitDisconnectSeen) {
+            log("service discovery skipped, link already gone");
+            return;
+        }
+
+        // Discovery walks live stack objects. If the peer vanishes mid-discovery
+        // -- exactly what a bridge reset does -- these calls can fail rather than
+        // return null, so they are wrapped instead of only null-checked.
+        var service = null;
+
+        try {
+            service = device.getService(_serviceUuid);
+        } catch (ex) {
+            setBleError(BLE_STAGE_SVC, "service discovery failed: " + ex);
+            return;
+        }
 
         if (service == null) {
             setBleError(BLE_STAGE_SVC, "service not discovered");
@@ -707,7 +772,13 @@ class BleAlertSource extends AlertSource {
         log("service discovered");
         log("CHAR callback entered");
 
-        _alertCharacteristic = service.getCharacteristic(_alertCharacteristicUuid);
+        try {
+            _alertCharacteristic = service.getCharacteristic(_alertCharacteristicUuid);
+        } catch (ex) {
+            _alertCharacteristic = null;
+            setBleError(BLE_STAGE_CHAR, "characteristic discovery failed: " + ex);
+            return;
+        }
 
         if (_alertCharacteristic == null) {
             setBleError(BLE_STAGE_CHAR, "characteristic not discovered");
@@ -731,7 +802,19 @@ class BleAlertSource extends AlertSource {
             return;
         }
 
-        var descriptor = _alertCharacteristic.getDescriptor(_cccdUuid);
+        if (explicitDisconnectSeen) {
+            log("subscribe skipped, link already gone");
+            return;
+        }
+
+        var descriptor = null;
+
+        try {
+            descriptor = _alertCharacteristic.getDescriptor(_cccdUuid);
+        } catch (ex) {
+            setBleError(BLE_STAGE_SUB, "cccd lookup failed: " + ex);
+            return;
+        }
 
         if (descriptor == null) {
             setBleError(BLE_STAGE_SUB, "cccd descriptor not discovered");
@@ -784,7 +867,17 @@ class BleAlertSource extends AlertSource {
     // operator with a blank HUD until the next alert happens to fire. On a
     // quiet link that could otherwise be minutes.
     function requestCurrentStateRead() {
-        if (_alertCharacteristic == null) {
+        // Every one of these must hold. On an abrupt peer disappearance the
+        // characteristic reference can outlive the connection behind it, and
+        // issuing a read against a dead connection is a BLE-stack fault, not a
+        // catchable Monkey C error.
+        if ((_alertCharacteristic == null) || (_device == null)) {
+            log("state recovery skipped, no live characteristic");
+            return;
+        }
+
+        if (!isConnected || !isSubscribed || explicitDisconnectSeen) {
+            log("state recovery skipped, link not established");
             return;
         }
 
@@ -801,15 +894,28 @@ class BleAlertSource extends AlertSource {
     }
 
     function handleCharacteristicRead(characteristic, status, value) {
+        var wasRecovery = _stateRecoveryPending;
+        _stateRecoveryPending = false;
+
+        // A read queued before an abrupt drop can complete after teardown has
+        // begun. Nothing useful can come of it, and touching the result risks
+        // reaching into a freed connection.
+        if (explicitDisconnectSeen || !isConnected) {
+            log("state recovery result ignored, link already gone");
+            return;
+        }
+
         if (!isAlertCharacteristic(characteristic)) {
             return;
         }
 
-        var wasRecovery = _stateRecoveryPending;
-        _stateRecoveryPending = false;
-
         if (status != Ble.STATUS_SUCCESS) {
             log("state recovery read failed status=" + status);
+            return;
+        }
+
+        if (value == null) {
+            log("state recovery read returned no data");
             return;
         }
 
@@ -824,6 +930,13 @@ class BleAlertSource extends AlertSource {
 
     function handleCharacteristicChanged(characteristic, value) {
         log("NOTIFICATION callback entered");
+
+        // A notification already in flight when the peer vanished must not be
+        // processed against a connection that is being torn down.
+        if (explicitDisconnectSeen) {
+            log("notification ignored, link already gone");
+            return;
+        }
 
         if (!isAlertCharacteristic(characteristic)) {
             log("notification ignored for non-alert characteristic");
@@ -1046,7 +1159,7 @@ class BleAlertSource extends AlertSource {
     }
 
     function isAlertCharacteristic(characteristic) {
-        if (characteristic == null) {
+        if ((characteristic == null) || (_alertCharacteristicUuid == null)) {
             return false;
         }
 

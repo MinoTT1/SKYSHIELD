@@ -247,6 +247,66 @@ the one event meaning "you are no longer covered".
 `VibrationEngine.reset()` clears threat state only. It runs when an RF session
 ends, which says nothing about the link, so it must not re-arm a link buzz.
 
+## Surviving an abrupt peer disappearance
+
+A clean disconnect and the bridge *vanishing* are different failures. Re-flashing
+the ESP32, a power loss or a firmware crash removes the peripheral instantly,
+mid-connection, with no teardown handshake. This must degrade to LINK LOST, never
+to a system fault.
+
+### The workarea slot leak
+
+Adding reconnect introduced a crash: **"System Error: Error Processing Workarea
+connections"**, empty stack, on the instant the bridge was reset while connected.
+
+`Ble.pairDevice()` occupies a slot in the Connect IQ BLE **workarea**, and
+`Ble.unpairDevice()` is the only thing that frees it. `scheduleReconnect()` set
+`_device = null`, which released our reference but **not the stack's slot**. On
+the next connect, `pairDevice()` was called again while the dead connection still
+held its slot, and the BLE subsystem faulted.
+
+The old build survived this only because it never reconnected: `pairDevice()` ran
+at most once per app launch, so the leak was never exercised. The reconnect work
+did not create the leak, it just started using the second slot.
+
+Dead devices are now handed to `_devicePendingUnpair` and released by
+`releasePendingDevice()` **from the timer tick, before any rescan can lead to
+another pairing** — never from inside a BLE callback, since calling teardown APIs
+while the stack is processing an abrupt disconnect is itself unsafe.
+
+### Guarded accesses
+
+Everything that reaches into a live stack object on the disconnect path is now
+guarded. On an abrupt drop these can fail rather than return null, so null checks
+alone were not enough.
+
+| Access | Guard |
+|---|---|
+| `Ble.unpairDevice()` | deferred to timer tick, try/caught, failure logged not fatal |
+| `device.getService()` | try/caught; skipped entirely if already disconnected |
+| `service.getCharacteristic()` | try/caught, clears the reference on failure |
+| `characteristic.getDescriptor()` | try/caught |
+| `characteristic.requestRead()` | requires live device, connected, subscribed, no disconnect seen |
+| read result callback | ignored if the link went away while it was in flight |
+| notification callback | ignored once a disconnect has been seen |
+| `isAlertCharacteristic()` | also null-checks the cached UUID |
+
+The link-loss haptic path was **cleared of suspicion**: `VibrationEngine` never
+references a BLE object, and `serviceLinkRestoreHaptic()` reads only two booleans.
+It cannot fault during teardown.
+
+### Reproducing
+
+1. Connect the watch and confirm alerts are flowing.
+2. With the watch still connected, **re-flash or reset the ESP32**.
+3. The watch must show **LINK LOST** with the descending double-buzz, then begin
+   scanning. It must not show a system error.
+4. Let the bridge come back up.
+5. The watch should reconnect on its own, and `LINK RESTORED` should fire after
+   the 10s stability window.
+6. Repeat the reset several times in a row: the workarea slot is released each
+   cycle, so this must stay stable rather than failing on the second or third.
+
 ## Verifying on hardware
 
 Watch the bridge serial log throughout. Watch-side lines are visible in the
