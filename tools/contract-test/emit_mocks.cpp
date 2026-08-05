@@ -91,9 +91,24 @@ int main() {
     alertSetSource(alert, "MOCK");
     emit("UNKNOWN / CRITICAL / MULTI / NEAR / conf 94", alert);
 
+    // AUTEL, first-class as of protocol version 4, with the raw detector code
+    // carried through so the watch can surface it.
+    alertInit(alert);
+    alert.timestampMs = 14000;
+    alert.sequence = 4;
+    alert.threat = THREAT_AUTEL;
+    alert.severity = SEVERITY_MEDIUM;
+    alert.band = BAND_5_8;
+    alert.distance = DISTANCE_MID;
+    alertSetDroneClass(alert, "SkyLink(AUTEL EVO2 Pro)");
+    alert.hasDetectorTypeCode = true;
+    alert.detectorTypeCode = 12;
+    alertSetSource(alert, "MOCK");
+    emit("AUTEL / MEDIUM / 5.8GHz / MID / confidence null / T:12", alert);
+
     // Data-less contact, so the watch's no-classification path stays exercised
     // in the simulator.
-    alertInitContact(alert, 16000, 4);
+    alertInitContact(alert, 16000, 5);
     alertSetSource(alert, "MOCK");
     emit("CONTACT: detected but unclassifiable, confidence null", alert);
 

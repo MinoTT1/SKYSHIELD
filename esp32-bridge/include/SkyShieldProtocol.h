@@ -15,8 +15,10 @@
 namespace skyshield {
 
 // Bumped on any breaking change to field meaning or CBOR key assignment.
-// Versions 1 and 2 were the retired pipe-delimited S1/S2 formats.
-static const uint8_t PROTOCOL_VERSION = 3;
+// Version 4 adds AUTEL to the threat enum and the optional detector_type_code
+// field. Version 3 was the first CBOR version; 1 and 2 were the retired
+// pipe-delimited S1/S2 formats.
+static const uint8_t PROTOCOL_VERSION = 4;
 
 // Hard ceiling on an encoded packet. The encoder refuses to emit anything
 // larger rather than truncating: a truncated CBOR map would decode to a
@@ -54,7 +56,11 @@ enum AlertKind : uint8_t {
 enum Threat : uint8_t {
     THREAT_UNKNOWN = 0,
     THREAT_FPV = 1,
-    THREAT_DJI = 2
+    THREAT_DJI = 2,
+    // First-class as of version 4. Before that, Autel detections had to be
+    // reported as UNKNOWN, because calling them DJI would be a false vendor
+    // attribution on a threat display.
+    THREAT_AUTEL = 3
 };
 
 enum Severity : uint8_t {
@@ -112,7 +118,8 @@ enum Key : uint8_t {
     KEY_DETECTOR_LATENCY_MS = 12,
     KEY_BANDS = 13,
     KEY_DIRECTION = 14,
-    KEY_SOURCE = 15
+    KEY_SOURCE = 15,
+    KEY_DETECTOR_TYPE_CODE = 16
 };
 
 // A complete normalized alert. This is the only alert struct on the CORE side;
@@ -146,6 +153,12 @@ struct Alert {
 
     bool hasSource;
     char source[SOURCE_CAPACITY];
+
+    // Raw, untranslated classification code from the detector (the TTSKW07's
+    // T value). Carried so an unrecognized code reaches the watch and field
+    // reports rather than only the bridge log.
+    bool hasDetectorTypeCode;
+    uint16_t detectorTypeCode;
 };
 
 // Zero-initializes to a valid, explicitly-unknown alert. Every producer should
@@ -174,6 +187,8 @@ inline void alertInit(Alert& alert) {
     alert.direction = DIRECTION_FRONT;
     alert.hasSource = false;
     alert.source[0] = '\0';
+    alert.hasDetectorTypeCode = false;
+    alert.detectorTypeCode = 0;
 }
 
 // Builds a data-less contact alert: something was detected, nothing could be
@@ -240,6 +255,7 @@ inline const char* threatName(Threat value) {
     switch (value) {
         case THREAT_FPV: return "FPV";
         case THREAT_DJI: return "DJI";
+        case THREAT_AUTEL: return "AUTEL";
         default: return "UNKNOWN";
     }
 }

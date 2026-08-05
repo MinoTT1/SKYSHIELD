@@ -309,23 +309,44 @@ void runGuardrail() {
         checkEqual("#2 unclassified T:07 threat stays UNKNOWN", "UNKNOWN", threatName(alert.threat));
     }
 
-    // --- #3 Autel is never attributed to DJI --------------------------------
-    // The threat enum has no Autel value. Labelling an Autel airframe "DJI"
-    // would be a false vendor claim on a threat display; the vendor text is
-    // preserved in drone_class instead.
+    // --- #3 Autel is first-class, and never DJI ----------------------------
+    // As of protocol version 4 AUTEL is its own threat value. It must decode as
+    // AUTEL: not DJI, which would be a false vendor claim, and no longer
+    // UNKNOWN, which was the pre-v4 compromise that lost real information.
     if (decodeSampleLineFull(autelLite, alert, diagnostics)) {
-        checkNotEqual("#3 T:11 AUTEL threat must not be DJI", "DJI", threatName(alert.threat));
-        checkEqual("#3 T:11 AUTEL threat is UNKNOWN", "UNKNOWN", threatName(alert.threat));
-        checkEqual("#3 T:11 AUTEL vendor survives in drone_class", "SkyLink(AUTEL Lite/Nano)",
+        checkEqual("#3 T:11 decodes as AUTEL", "AUTEL", threatName(alert.threat));
+        checkNotEqual("#3 T:11 must not be DJI", "DJI", threatName(alert.threat));
+        checkNotEqual("#3 T:11 must not fall back to UNKNOWN",
+                      "UNKNOWN", threatName(alert.threat));
+        checkEqual("#3 T:11 vendor text survives in drone_class", "SkyLink(AUTEL Lite/Nano)",
                    alert.hasDroneClass ? std::string(alert.droneClass) : std::string("-"));
     } else {
         fail("#3 AUTEL Lite line decodes", "decoded", "failed");
     }
 
     if (decodeSampleLineFull(autelEvo, alert, diagnostics)) {
-        checkNotEqual("#3 T:12 AUTEL threat must not be DJI", "DJI", threatName(alert.threat));
-        checkEqual("#3 T:12 AUTEL vendor survives in drone_class", "SkyLink(AUTEL EVO2 Pro)",
+        checkEqual("#3 T:12 decodes as AUTEL", "AUTEL", threatName(alert.threat));
+        checkNotEqual("#3 T:12 must not be DJI", "DJI", threatName(alert.threat));
+        checkNotEqual("#3 T:12 must not fall back to UNKNOWN",
+                      "UNKNOWN", threatName(alert.threat));
+        checkEqual("#3 T:12 vendor text survives in drone_class", "SkyLink(AUTEL EVO2 Pro)",
                    alert.hasDroneClass ? std::string(alert.droneClass) : std::string("-"));
+    }
+
+    // AUTEL must survive a full encode/decode round trip as a distinct value,
+    // not collapse into a neighbouring enum.
+    {
+        Alert autel;
+        alertInit(autel);
+        autel.threat = THREAT_AUTEL;
+
+        uint8_t buffer[MAX_PAYLOAD_BYTES];
+        const size_t length = encodeAlert(autel, buffer, sizeof(buffer));
+
+        Alert decoded;
+        checkEqual("#3 AUTEL round-trips through the codec", "OK",
+                   decodeResultName(decodeAlert(buffer, length, decoded)));
+        checkEqual("#3 AUTEL survives the round trip", "AUTEL", threatName(decoded.threat));
     }
 
     // --- #4 model detail is preserved verbatim ------------------------------
@@ -371,6 +392,15 @@ void runGuardrail() {
                           "DJI", threatName(alert.threat));
             checkEqual(tag + " raw code is retained", std::to_string(unknownCodes[i]),
                        std::to_string(static_cast<int>(diagnostics.typeCode)));
+
+            // The raw code must reach the WATCH, not just the bridge log: it
+            // is the only identifier of an undocumented protocol, and what
+            // makes a field report to the vendor actionable.
+            checkTrue(tag + " detector_type_code is present on the wire",
+                      alert.hasDetectorTypeCode);
+            checkEqual(tag + " detector_type_code carries the raw value",
+                       std::to_string(unknownCodes[i]),
+                       std::to_string(static_cast<int>(alert.detectorTypeCode)));
             checkTrue(tag + " is flagged unrecognized", !diagnostics.typeCodeRecognized);
             checkEqual(tag + " description is retained", "DJI Something(unlisted)",
                        alert.hasDroneClass ? std::string(alert.droneClass) : std::string("-"));
@@ -507,6 +537,12 @@ void runCodec() {
         checkEqual("protocol_version 2 is rejected", "WRONG_VERSION",
                    decodeResultName(decodeAlert(wrongVersion, sizeof(wrongVersion), decoded)));
 
+        // v3 packets predate AUTEL and detector_type_code, so a v4 decoder
+        // must reject them rather than silently misreading a threat value.
+        const uint8_t version3[] = { 0xA1, 0x01, 0x03 };
+        checkEqual("protocol_version 3 is rejected", "WRONG_VERSION",
+                   decodeResultName(decodeAlert(version3, sizeof(version3), decoded)));
+
         const uint8_t noVersion[] = { 0xA1, 0x03, 0x01 };
         checkEqual("missing protocol_version is rejected", "WRONG_VERSION",
                    decodeResultName(decodeAlert(noVersion, sizeof(noVersion), decoded)));
@@ -516,15 +552,15 @@ void runCodec() {
     {
         Alert decoded;
 
-        const uint8_t missingFields[] = { 0xA1, 0x01, 0x03 };
+        const uint8_t missingFields[] = { 0xA1, 0x01, 0x04 };
         checkEqual("incomplete map is rejected", "MISSING_FIELD",
                    decodeResultName(decodeAlert(missingFields, sizeof(missingFields), decoded)));
 
-        const uint8_t badEnum[] = { 0xA2, 0x01, 0x03, 0x06, 0x09 };
+        const uint8_t badEnum[] = { 0xA2, 0x01, 0x04, 0x06, 0x09 };
         checkEqual("out-of-range threat is rejected", "BAD_VALUE",
                    decodeResultName(decodeAlert(badEnum, sizeof(badEnum), decoded)));
 
-        const uint8_t badConfidence[] = { 0xA2, 0x01, 0x03, 0x0A, 0x18, 0xC8 };
+        const uint8_t badConfidence[] = { 0xA2, 0x01, 0x04, 0x0A, 0x18, 0xC8 };
         checkEqual("confidence above 100 is rejected", "BAD_VALUE",
                    decodeResultName(decodeAlert(badConfidence, sizeof(badConfidence), decoded)));
 
@@ -536,7 +572,7 @@ void runCodec() {
                    decodeResultName(decodeAlert(notAMap, sizeof(notAMap), decoded)));
 
         // Indefinite-length items are outside the accepted CBOR subset.
-        const uint8_t indefinite[] = { 0xBF, 0x01, 0x03, 0xFF };
+        const uint8_t indefinite[] = { 0xBF, 0x01, 0x04, 0xFF };
         checkTrue("indefinite-length map is rejected",
                   decodeAlert(indefinite, sizeof(indefinite), decoded) != DECODE_OK);
     }

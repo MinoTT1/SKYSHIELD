@@ -20,8 +20,8 @@
   "properties": {
     "protocol_version": {
       "type": "integer",
-      "const": 3,
-      "description": "Wire/semantic contract version. Incremented on any breaking change to field meaning or CBOR key assignment. Version 3 is the first CBOR-based version; versions 1 and 2 were the retired pipe-delimited S1/S2 formats and are not accepted."
+      "const": 4,
+      "description": "Wire/semantic contract version. Incremented on any breaking change to field meaning or CBOR key assignment. Version 4 adds AUTEL to the threat enum and the optional detector_type_code field. Version 3 was the first CBOR-based version. Versions 1 and 2 were the retired pipe-delimited S1/S2 formats. Only version 4 is accepted."
     },
     "timestamp_ms": {
       "type": "integer",
@@ -61,8 +61,10 @@
       "enum": [
         "FPV",
         "DJI",
+        "AUTEL",
         "UNKNOWN"
-      ]
+      ],
+      "description": "Manufacturer or protocol family. AUTEL is first-class as of version 4: previously Autel detections had to be reported as UNKNOWN, because reporting them as DJI would be a false vendor attribution on a threat display."
     },
     "severity": {
       "type": "string",
@@ -103,6 +105,12 @@
       "minimum": 0,
       "maximum": 100,
       "description": "Classification confidence percentage. MUST be null (not 0) when the detector supplies no confidence value, so that 'no data' is distinguishable from 'certainly not'. Contact alerts always carry null."
+    },
+    "detector_type_code": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535,
+      "description": "Optional raw numeric classification code straight from the detector, untranslated. For the TTSKW07 this is the T value. Carried so an unrecognized code is visible on the watch and in field reports rather than only in the bridge log, which is what makes a new or undocumented protocol reportable to the vendor. Absent when the detector reports no such code."
     },
     "drone_class": {
       "type": "string",

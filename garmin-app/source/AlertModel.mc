@@ -31,6 +31,11 @@ class AlertModel {
     // Null when the alert did not originate from a detector line.
     var detectorLatencyMs;
 
+    // Raw untranslated classification code from the detector (the TTSKW07's T
+    // value), or null when the detector reports none. Kept so an unrecognized
+    // code is visible on the watch rather than only in the bridge log.
+    var detectorTypeCode;
+
     // False when the bridge omitted per-band detail. The BANDS screen shows
     // UNKNOWN in that case instead of synthesizing levels.
     var hasBandDetail;
@@ -50,7 +55,12 @@ class AlertModel {
         sensorType = "RF";
         timestampMs = 0;
         detectorLatencyMs = null;
+        detectorTypeCode = null;
         hasBandDetail = false;
+    }
+
+    function isAutel() {
+        return (threatType != null) && threatType.equals("AUTEL");
     }
 
     function isContact() {

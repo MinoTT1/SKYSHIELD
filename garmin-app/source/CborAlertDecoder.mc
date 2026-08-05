@@ -8,7 +8,7 @@ import Toybox.System;
 //
 // Wire format: docs/wire-protocol.md
 
-const SKYSHIELD_PROTOCOL_VERSION = 3;
+const SKYSHIELD_PROTOCOL_VERSION = 4;
 
 // CBOR major types, in the high 3 bits of the initial byte.
 const CBOR_MAJOR_UINT = 0x00;
@@ -34,6 +34,7 @@ const CBOR_KEY_DETECTOR_LATENCY_MS = 12;
 const CBOR_KEY_BANDS = 13;
 const CBOR_KEY_DIRECTION = 14;
 const CBOR_KEY_SOURCE = 15;
+const CBOR_KEY_DETECTOR_TYPE_CODE = 16;
 
 const DECODE_OK = "OK";
 const DECODE_MALFORMED = "MALFORMED";
@@ -117,6 +118,7 @@ class CborAlertDecoder {
             :confidence => null,
             :droneClass => null,
             :detectorLatencyMs => null,
+            :detectorTypeCode => null,
             :bands => null,
             :direction => null,
             :source => null
@@ -181,7 +183,8 @@ class CborAlertDecoder {
         }
 
         if (key == CBOR_KEY_THREAT) {
-            var value = readBoundedUint(2);
+            // Upper bound is 3 as of protocol version 4, which added AUTEL.
+            var value = readBoundedUint(3);
             if (value == null) { return reject(DECODE_BAD_VALUE, "threat"); }
             state[:threat] = value;
             return null;
@@ -241,6 +244,15 @@ class CborAlertDecoder {
             var text = readTextString();
             if (text == null) { return reject(DECODE_MALFORMED, "bad source"); }
             state[:source] = text;
+            return null;
+        }
+
+        if (key == CBOR_KEY_DETECTOR_TYPE_CODE) {
+            var value = readUint();
+            if ((value == null) || (value > 65535)) {
+                return reject(DECODE_BAD_VALUE, "detector_type_code");
+            }
+            state[:detectorTypeCode] = value;
             return null;
         }
 
@@ -341,6 +353,7 @@ class CborAlertDecoder {
         alert.sensorType = sensorTypeName(state[:sensorType]);
         alert.timestampMs = state[:timestampMs];
         alert.detectorLatencyMs = state[:detectorLatencyMs];
+        alert.detectorTypeCode = state[:detectorTypeCode];
         alert.hasBandDetail = (state[:bands] != null);
 
         if (state[:droneClass] != null) {
@@ -355,6 +368,7 @@ class CborAlertDecoder {
     function threatName(value) {
         if (value == 1) { return "FPV"; }
         if (value == 2) { return "DJI"; }
+        if (value == 3) { return "AUTEL"; }
         return "UNKNOWN";
     }
 

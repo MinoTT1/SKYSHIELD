@@ -36,9 +36,8 @@
 //     from the description text, and it never fails the line: the raw code and
 //     the full type text are preserved so no information is lost.
 //
-//   * AUTEL is not reported as DJI. The threat enum has no Autel value, so
-//     Autel detections carry threat UNKNOWN with the vendor text intact in
-//     drone_class. See docs/ttskw07-format.md for the proposed enum addition.
+//   * AUTEL is never reported as DJI. It is a first-class threat value as of
+//     protocol version 4, and the vendor text stays intact in drone_class.
 //
 //   * a frequency outside every known band maps to BAND_UNKNOWN rather than
 //     being force-fitted to the nearest one.
@@ -283,8 +282,8 @@ inline Severity severityFromDistance(Distance distance, const TTSKW07SeverityPol
 //   T:06  DJI O3 (FPV, Mavic Air 2s, Mini 3)    -> DJI
 //   T:05  DJI O3+ (Mavic 3 series, AVATA)       -> DJI
 //   T:02  DJI OCU (Mavic, P4P V2.0, Mavic 2)    -> DJI
-//   T:11  SkyLink (AUTEL Lite/Nano)             -> UNKNOWN (no Autel enum)
-//   T:12  SkyLink (AUTEL EVO2 Pro)              -> UNKNOWN (no Autel enum)
+//   T:11  SkyLink (AUTEL Lite/Nano)             -> AUTEL
+//   T:12  SkyLink (AUTEL EVO2 Pro)              -> AUTEL
 //   T:07  Unknown                               -> UNKNOWN
 inline bool ttskw07IsKnownTypeCode(uint16_t typeCode) {
     switch (typeCode) {
@@ -295,19 +294,19 @@ inline bool ttskw07IsKnownTypeCode(uint16_t typeCode) {
     }
 }
 
-// Maps a T code to the closest existing threat enum value.
+// Maps a T code to a threat enum value.
 //
-// Autel deliberately maps to UNKNOWN: the enum has FPV, DJI and UNKNOWN only,
-// and labelling an Autel airframe "DJI" would be a false vendor attribution on
-// a threat display. The real vendor string survives in drone_class.
+// Autel is first-class as of protocol version 4. It must NEVER coerce to DJI:
+// that would be a false vendor attribution on a threat display. The full vendor
+// string still travels verbatim in drone_class alongside it.
 inline Threat ttskw07ThreatFromCode(uint16_t typeCode) {
     switch (typeCode) {
         case 20:                    // FM Analog / analog FPV
             return THREAT_FPV;
         case 2: case 5: case 6:     // DJI OCU, O3+, O3
             return THREAT_DJI;
-        case 11: case 12:           // AUTEL SkyLink -- no enum value exists
-            return THREAT_UNKNOWN;
+        case 11: case 12:           // AUTEL SkyLink Lite/Nano, EVO2 Pro
+            return THREAT_AUTEL;
         default:                    // T:07 Unknown, and any unrecognized code
             return THREAT_UNKNOWN;
     }
@@ -398,6 +397,12 @@ inline TTSKW07ParseResult ttskw07ParseLine(
     alert.sequence = sequence;
     alert.sensorType = SENSOR_RF;
     alert.threat = ttskw07ThreatFromCode(diagnostics.typeCode);
+
+    // The raw code always travels, recognized or not. For an unrecognized code
+    // it is the only identifier of the new protocol, and it is what makes a
+    // field report to the vendor actionable.
+    alert.hasDetectorTypeCode = true;
+    alert.detectorTypeCode = diagnostics.typeCode;
     alert.band = detail::bandFromFrequency(frequencyMhz);
     alert.distance = detail::distanceFromSignal(signalValue, signalPolicy);
     alert.severity = detail::severityFromDistance(alert.distance, severityPolicy);

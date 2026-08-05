@@ -123,6 +123,12 @@ class VibrationEngine {
             return "D";
         }
 
+        // Distinct from "U": without this, an AUTEL alert and an UNKNOWN alert
+        // would share a fingerprint and suppress each other's haptic.
+        if ((value != null) && value.equals("AUTEL")) {
+            return "A";
+        }
+
         return "U";
     }
 

@@ -6,7 +6,7 @@ other document is historical.
 
 - Semantic source of truth: `protocol/skyshield-alert.schema.json`
 - Wire encoding: CBOR (RFC 8949), definite-length, canonical integer keys
-- Current `protocol_version`: **3**
+- Current `protocol_version`: **4**
 
 The JSON schema defines what an alert *means*. This document defines how that
 same model is *encoded on the wire*. They must never diverge; the contract test
@@ -18,9 +18,16 @@ in `tools/contract-test/` exists to enforce that.
 |---|---|---|
 | 1 (`S1\|...`) | pipe-delimited ASCII | **retired** — never fully specified |
 | 2 (`S2\|...`) | pipe-delimited ASCII | **retired** — see `PAYLOAD_SPEC.md` (historical) |
-| 3 | CBOR map, integer keys | **current** |
+| 3 | CBOR map, integer keys | **retired** — no AUTEL, no `detector_type_code` |
+| 4 | CBOR map, integer keys | **current** |
 
-Receivers MUST reject any payload whose `protocol_version` is not 3. The old
+Receivers MUST reject any payload whose `protocol_version` is not 4.
+
+Version 4 adds `AUTEL` to the `threat` enum and the optional
+`detector_type_code` field. Both are wire changes and decoders reject
+out-of-range enum values, so a v3 decoder would reject an AUTEL alert outright
+rather than misreading it — the version bump makes that failure explicit instead
+of leaving two incompatible dialects in the field. The old
 pipe-delimited decoder has been removed; a decoder that silently accepted both
 was the root cause of the protocol drift documented in `ANALYSIS_REPORT.md`.
 
@@ -56,7 +63,7 @@ field's key is retired with it.
 
 | Key | Field | CBOR type | Required | Notes |
 |---:|---|---|---|---|
-| 1 | `protocol_version` | uint | yes | must be 3 |
+| 1 | `protocol_version` | uint | yes | must be 4 |
 | 2 | `timestamp_ms` | uint | yes | CORE monotonic ms since boot |
 | 3 | `sequence` | uint | yes | monotonic packet counter |
 | 4 | `sensor_type` | uint enum | yes | |
@@ -71,13 +78,14 @@ field's key is retired with it.
 | 13 | `bands` | array[4] uint enum | no | omitted when not reported |
 | 14 | `direction` | uint enum | no | experimental |
 | 15 | `source` | tstr | no | producing adapter label |
+| 16 | `detector_type_code` | uint | no | raw untranslated detector code |
 
 ### Enum values
 
 ```text
 sensor_type   0=rf        1=acoustic  2=radar  3=contact
 alert_kind    0=classified 1=contact
-threat        0=UNKNOWN   1=FPV       2=DJI
+threat        0=UNKNOWN   1=FPV       2=DJI    3=AUTEL
 severity      0=LOW       1=MEDIUM    2=HIGH   3=CRITICAL
 band          0=UNKNOWN   1=1.2GHz    2=2.4GHz 3=3.3GHz  4=5.8GHz  5=MULTI
 distance      0=UNKNOWN   1=FAR       2=MID    3=NEAR
@@ -113,9 +121,9 @@ This has a direct consequence for latency measurement:
 
 ## Payload size and BLE MTU
 
-The two worked examples above measure 41 and 32 bytes respectively (verified by
-the contract test, which asserts these exact byte strings). Both exceed the
-20-byte usable payload of an unnegotiated 23-byte ATT MTU,
+A typical alert measures 32-59 bytes; the worst case with a maximum-length
+drone_class is about 110. All exceed the 20-byte usable payload of an
+unnegotiated 23-byte ATT MTU,
 so the bridge requests a larger MTU at startup (`NimBLEDevice::setMTU`).
 
 The encoder enforces a hard ceiling of `SKYSHIELD_MAX_PAYLOAD_BYTES` (currently
@@ -127,11 +135,13 @@ a safety-adjacent system.
 
 ## Worked examples
 
+Verified byte-for-byte by the contract test. Regenerate after any format change.
+
 Classified FPV alert, sequence 1, 12840 ms since boot, 45 ms detector latency:
 
 ```json
 {
-  "protocol_version": 3, "timestamp_ms": 12840, "sequence": 1,
+  "protocol_version": 4, "timestamp_ms": 12840, "sequence": 1,
   "sensor_type": "rf", "alert_kind": "classified",
   "threat": "FPV", "severity": "HIGH", "band": "5.8GHz", "distance": "NEAR",
   "confidence": 87, "drone_class": "FPV", "detector_latency_ms": 45,
@@ -139,11 +149,11 @@ Classified FPV alert, sequence 1, 12840 ms since boot, 45 ms detector latency:
 }
 ```
 
-encodes to (spaces and comments added for readability only):
+encodes to 41 bytes (spacing and comments for readability only):
 
 ```text
 AD                    map(13)
-01 03                 1: 3                      protocol_version
+01 04                 1: 4                      protocol_version
 02 19 32 28           2: 12840                  timestamp_ms
 03 01                 3: 1                      sequence
 04 00                 4: 0   rf                 sensor_type
@@ -158,20 +168,56 @@ AD                    map(13)
 0F 67 54 54 53 4B 57 30 37   15: "TTSKW07"      source
 ```
 
+Autel alert carrying the raw detector code, both new in version 4:
+
+```json
+{
+  "protocol_version": 4, "timestamp_ms": 41230, "sequence": 9,
+  "sensor_type": "rf", "alert_kind": "classified",
+  "threat": "AUTEL", "severity": "MEDIUM", "band": "5.8GHz", "distance": "MID",
+  "confidence": null, "drone_class": "SkyLink(AUTEL EVO2 Pro)",
+  "detector_type_code": 12, "source": "TTSKW07"
+}
+```
+
+encodes to 59 bytes:
+
+```text
+AD                    map(13)
+01 04                 1: 4
+02 19 A1 0E           2: 41230
+03 09                 3: 9
+04 00                 4: 0   rf
+05 00                 5: 0   classified
+06 03                 6: 3   AUTEL                    new in version 4
+07 01                 7: 1   MEDIUM
+08 04                 8: 4   5.8GHz
+09 02                 9: 2   MID
+0A F6                 10: null                         detector reports none
+0B 77 ...             11: "SkyLink(AUTEL EVO2 Pro)"    vendor text preserved
+0F 67 54 54 53 4B 57 30 37   15: "TTSKW07"
+10 0C                 16: 12                           detector_type_code, new in v4
+```
+
+Note that `threat` is `AUTEL` *and* `drone_class` still carries the full vendor
+string. The enum value never replaces the detector's own text.
+
 Data-less contact alert — something was detected, nothing could be classified:
 
 ```json
 {
-  "protocol_version": 3, "timestamp_ms": 30110, "sequence": 7,
+  "protocol_version": 4, "timestamp_ms": 30110, "sequence": 7,
   "sensor_type": "rf", "alert_kind": "contact",
   "threat": "UNKNOWN", "severity": "LOW", "band": "UNKNOWN",
   "distance": "UNKNOWN", "confidence": null, "source": "TTSKW07"
 }
 ```
 
+encodes to 32 bytes:
+
 ```text
 AB                    map(11)
-01 03                 1: 3
+01 04                 1: 4
 02 19 75 9E           2: 30110
 03 07                 3: 7
 04 00                 4: 0   rf

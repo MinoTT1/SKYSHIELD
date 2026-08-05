@@ -115,6 +115,12 @@ class DisplayFormatter {
             return "DJI RF";
         }
 
+        // First-class as of protocol version 4. Previously an Autel detection
+        // rendered as "UNKNOWN RF" because the enum had no value for it.
+        if ((threat != null) && threat.equals("AUTEL")) {
+            return "AUTEL RF";
+        }
+
         if (threat == "UNKNOWN") {
             return "UNKNOWN RF";
         }

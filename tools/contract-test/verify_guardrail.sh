@@ -13,7 +13,8 @@
 # Rules under guard (docs/ttskw07-format.md):
 #   1. confidence 0 instead of null
 #   2. escalating a failed classification to CRITICAL
-#   3. attributing Autel to DJI
+#   3. attributing Autel to DJI, or regressing it to UNKNOWN
+#      (and dropping detector_type_code from the wire)
 #   4. guessing a classification from the description text
 #   5. force-fitting an out-of-band frequency
 #   6. trusting the unreliable device clock for timing
@@ -111,10 +112,20 @@ mutate "policy-emits-critical" \
     "severity policy table tuned to emit CRITICAL" \
     's/\QSEVERITY_HIGH,    \/\/ NEAR\E/SEVERITY_CRITICAL, \/\/ NEAR/'
 
-# --- #3: attribute Autel to DJI ----------------------------------------------
+# --- #3a: attribute Autel to DJI ---------------------------------------------
 mutate "autel-as-dji" \
     "AUTEL T:11 and T:12 attributed to threat DJI" \
     's/\Qcase 11: case 12:           \/\/ AUTEL SkyLink\E/case 11: case 12: return THREAT_DJI; \/\//'
+
+# --- #3b: regress Autel back to the pre-v4 UNKNOWN fallback ------------------
+mutate "autel-as-unknown" \
+    "AUTEL collapsed back to UNKNOWN, losing a first-class value" \
+    's/\Qcase 11: case 12:           \/\/ AUTEL SkyLink\E/case 11: case 12: return THREAT_UNKNOWN; \/\//'
+
+# --- #3c: drop the raw detector code from the wire ---------------------------
+mutate "drop-detector-type-code" \
+    "detector_type_code no longer carried, hiding unrecognized codes" \
+    's/\Qalert.hasDetectorTypeCode = true;\E/alert.hasDetectorTypeCode = false;/'
 
 # --- #4: guess a classification from the description text --------------------
 mutate "guess-from-text" \

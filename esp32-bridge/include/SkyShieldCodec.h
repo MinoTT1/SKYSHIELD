@@ -128,6 +128,7 @@ inline size_t encodeAlert(const Alert& alert, uint8_t* buffer, size_t capacity) 
     if (alert.hasBands) { entryCount += 1; }
     if (alert.hasDirection) { entryCount += 1; }
     if (alert.hasSource) { entryCount += 1; }
+    if (alert.hasDetectorTypeCode) { entryCount += 1; }
 
     CborWriter writer(buffer, capacity);
 
@@ -194,6 +195,11 @@ inline size_t encodeAlert(const Alert& alert, uint8_t* buffer, size_t capacity) 
     if (alert.hasSource) {
         writer.writeUint(KEY_SOURCE);
         writer.writeTextString(alert.source);
+    }
+
+    if (alert.hasDetectorTypeCode) {
+        writer.writeUint(KEY_DETECTOR_TYPE_CODE);
+        writer.writeUint(alert.detectorTypeCode);
     }
 
     if (writer.overflowed()) {
@@ -472,7 +478,7 @@ inline DecodeResult decodeAlert(const uint8_t* buffer, size_t length, Alert& ale
             case KEY_THREAT: {
                 uint64_t value = 0;
                 if (!reader.readUint(value)) { return DECODE_MALFORMED; }
-                if (value > THREAT_DJI) { return DECODE_BAD_VALUE; }
+                if (value > THREAT_AUTEL) { return DECODE_BAD_VALUE; }
                 alert.threat = static_cast<Threat>(value);
                 sawThreat = true;
                 break;
@@ -618,6 +624,15 @@ inline DecodeResult decodeAlert(const uint8_t* buffer, size_t length, Alert& ale
                 }
 
                 alert.hasSource = (alert.source[0] != '\0');
+                break;
+            }
+
+            case KEY_DETECTOR_TYPE_CODE: {
+                uint64_t value = 0;
+                if (!reader.readUint(value)) { return DECODE_MALFORMED; }
+                if (value > 0xFFFFu) { return DECODE_BAD_VALUE; }
+                alert.hasDetectorTypeCode = true;
+                alert.detectorTypeCode = static_cast<uint16_t>(value);
                 break;
             }
 

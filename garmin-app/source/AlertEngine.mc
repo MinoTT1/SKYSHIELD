@@ -319,6 +319,12 @@ class AlertEngine {
             return 1;
         }
 
+        // Autel is a commercial platform like DJI, so it ranks alongside it
+        // rather than above UNKNOWN.
+        if (alert.threatType.equals("AUTEL")) {
+            return 1;
+        }
+
         return 0;
     }
 

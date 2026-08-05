@@ -19,7 +19,7 @@ Usage:
 
 import sys
 
-PROTOCOL_VERSION = 3
+PROTOCOL_VERSION = 4
 
 KEY_NAMES = {
     1: "protocol_version",
@@ -37,11 +37,12 @@ KEY_NAMES = {
     13: "bands",
     14: "direction",
     15: "source",
+    16: "detector_type_code",
 }
 
 SENSOR_TYPES = ["rf", "acoustic", "radar", "contact"]
 ALERT_KINDS = ["classified", "contact"]
-THREATS = ["UNKNOWN", "FPV", "DJI"]
+THREATS = ["UNKNOWN", "FPV", "DJI", "AUTEL"]
 SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
 BANDS = ["UNKNOWN", "1.2GHz", "2.4GHz", "3.3GHz", "5.8GHz", "MULTI"]
 DISTANCES = ["UNKNOWN", "FAR", "MID", "NEAR"]
@@ -173,6 +174,11 @@ def decode_alert(payload):
         alert["direction"] = _enum(DIRECTIONS, raw[14], "direction")
     if 15 in raw:
         alert["source"] = raw[15]
+    if 16 in raw:
+        code = raw[16]
+        if not isinstance(code, int) or not 0 <= code <= 65535:
+            raise CborError("detector_type_code %r is out of range" % (code,))
+        alert["detector_type_code"] = code
 
     return alert
 
@@ -220,6 +226,11 @@ def verify_fixture(path):
         _check(results, label + " confidence", fields[7], confidence)
 
         _check(results, label + " drone_class", fields[10], alert.get("drone_class", "-"))
+
+        # For the TTSKW07 the wire's detector_type_code must equal the raw T
+        # code the parser reported, recognized or not.
+        _check(results, label + " detector_type_code", fields[8],
+               str(alert.get("detector_type_code", "-")))
 
     return results
 

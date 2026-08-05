@@ -77,8 +77,8 @@ description text cannot be mistaken for a field.
 | 05 | `DJI O3+(Mavic 3 series, AVATA)` | `DJI` |
 | 06 | `DJI O3(FPV, Mavic Air 2s, Mavic Mini 3 Pro)` | `DJI` |
 | 07 | `Unknown` | `UNKNOWN` |
-| 11 | `SkyLink(AUTEL Lite/Nano)` | `UNKNOWN` — see below |
-| 12 | `SkyLink(AUTEL EVO2 Pro)` | `UNKNOWN` — see below |
+| 11 | `SkyLink(AUTEL Lite/Nano)` | `AUTEL` |
+| 12 | `SkyLink(AUTEL EVO2 Pro)` | `AUTEL` |
 | 20 | `FM Analog(DIY FPV, Aircraft model)` | `FPV` |
 
 The numeric code is the **primary** classification signal, not the text,
@@ -96,6 +96,8 @@ A code outside this table:
   obviously contains a vendor name
 - retains the raw code in the parser diagnostics (logged as
   `T=99 (UNRECOGNIZED CODE, reported as unknown)`)
+- **carries the raw code to the watch** in `detector_type_code`, so an
+  undocumented protocol is visible in the field and not just in the bridge log
 - retains the full description verbatim in `drone_class`
 
 This is the same philosophy as the enum design: unknown is a real value, and a
@@ -114,7 +116,7 @@ the text is not used to manufacture a classification.
 | `r_value` | `severity` | derived policy; see below |
 | — | `confidence` | always `null`; the device reports none |
 | `timestamp` | *(log only)* | device clock is unreliable |
-| `t_code` | *(log only)* | no wire field; see "Open questions" |
+| `t_code` | `detector_type_code` | raw value, always carried |
 
 `sensor_type` is always `rf`. `source` is always `TTSKW07`.
 
@@ -187,7 +189,7 @@ on every TTSKW07 alert and the HUD renders `CONF --`.
 
 It is specifically **not** `0`. On a threat display `CONF 0%` reads as
 "certainly not a threat" when the truth is "we have no idea" — the opposite
-meaning. This is why `confidence` is nullable in `protocol_version: 3`.
+meaning. This is why `confidence` is nullable in the CBOR protocol.
 
 ## The device clock is not a time source
 
@@ -236,31 +238,36 @@ delivers at most one complete line per poll.
    replaced with the real value and confidence should stop being null.
 5. **Confirm the full band list** the hardware can report.
 
-## Proposed protocol changes — flagged, not implemented
+## Protocol changes made in version 4
 
-Two gaps in the current schema showed up while implementing this parser.
-Neither has been acted on, because both change protocol surface.
+Both gaps found while implementing this parser were closed as one coordinated,
+version-bumped change. `protocol_version` went 3 to 4.
 
-### 1. `threat` has no Autel value
+### 1. `threat` gained `AUTEL` (wire value 3)
 
-`threat` is `FPV | DJI | UNKNOWN`. Autel is a distinct manufacturer, so T:11
-and T:12 currently map to `UNKNOWN` with the vendor text preserved in
-`drone_class`.
+Previously T:11 and T:12 had to be reported as `UNKNOWN`, because the enum had
+only `FPV`, `DJI` and `UNKNOWN` and reporting `DJI` would have been a false
+vendor attribution. The HUD showed `UNKNOWN RF` for a positively identified
+Autel airframe.
 
-This is honest but lossy: the HUD shows `UNKNOWN RF` for a positively
-identified Autel airframe. Reporting it as `DJI` would be worse — a false
-vendor attribution on a threat display — so `UNKNOWN` stands until the enum is
-extended.
+`AUTEL` is now first-class. The watch renders `AUTEL RF`, ranks it alongside DJI
+in the priority engine, and gives it its own haptic fingerprint so an Autel and
+an unknown alert no longer suppress each other's vibration.
 
-**Proposal:** add `AUTEL` to the `threat` enum as wire value `3`. This is a
-backward-compatible addition for encoders, but decoders that reject out-of-range
-enums would need the new value first, so it requires a coordinated bump.
+**AUTEL must never coerce to DJI.** The contract test asserts both that it does
+not become DJI and that it does not fall back to UNKNOWN.
 
-### 2. The raw `t_code` does not travel on the wire
+### 2. `detector_type_code` added (CBOR key 16, optional)
 
-The numeric code is the most reliable identifier the device produces, and it is
-exactly what a field report about an unrecognized protocol would need. It is
-currently logged on the bridge only, so the watch never sees it.
+The raw numeric T code now travels on the wire untranslated, so an unrecognized
+code is visible on the watch and in field reports rather than only in the bridge
+log. That is what makes a new or undocumented protocol reportable to the vendor.
 
-**Proposal:** add an optional `detector_type_code` (uint) at CBOR key `16`,
-carrying the raw code untranslated. Cost is 2–3 bytes per alert.
+It is set on every TTSKW07 alert, recognized or not. Absent is valid for sources
+that report no such code.
+
+### Why one bump rather than two
+
+Both are wire changes, and decoders reject out-of-range enum values: a v3
+decoder receiving an AUTEL alert would reject the whole packet. Shipping them
+together means one incompatibility window instead of two.
