@@ -49,6 +49,7 @@ class BleResourceLog {
     var _sourceStop;
     var _readRequest;
     var _readCallback;
+    var _duplicateConnect;
     var _session;
     var _lastEvent;
     var _lastStep;
@@ -76,6 +77,7 @@ class BleResourceLog {
         _sourceStop = 0;
         _readRequest = 0;
         _readCallback = 0;
+        _duplicateConnect = 0;
         _lastEvent = "none";
         _lastStep = "none";
         _session = 0;
@@ -144,7 +146,9 @@ class BleResourceLog {
             " LEAK=" + (_pair - _unpair) +
             " prof" + _profileRegister + "/" + _profileCallback +
             " c" + _connect + " d" + _disconnect +
-            " s" + _subscribeRequest + " sc" + _scanOn + "/" + _scanOff;
+            " s" + _subscribeRequest + " sc" + _scanOn + "/" + _scanOff +
+            " rd" + _readRequest + "/" + _readCallback +
+            " DUP=" + _duplicateConnect;
     }
 
     // Commits the current state. Called on every event so a crash cannot
@@ -201,6 +205,14 @@ class BleResourceLog {
     function readCallback() {
         _readCallback += 1;
         mark("READ callback #" + _readCallback);
+    }
+
+    // A second CONNECTED with no disconnect between. This is the condition that
+    // caused the crash; counting it proves the guard is firing rather than
+    // leaving us to infer it from the absence of a fault.
+    function duplicateConnect() {
+        _duplicateConnect += 1;
+        mark("DUPLICATE CONNECT blocked #" + _duplicateConnect);
     }
 
     // ---- releases ----------------------------------------------------------
@@ -269,6 +281,7 @@ class BleResourceLog {
             " desc=" + _descriptorLookup +
             " scan=" + _scanOn + "/" + _scanOff +
             " read=" + _readRequest + "/" + _readCallback +
+            " dupconn=" + _duplicateConnect +
             " src=" + _sourceStart + "/" + _sourceStop);
         persist();
     }

@@ -53,6 +53,11 @@ const BLE_STAGE_TIMEOUT_MS = 20000;
 const BLE_RECONNECT_MIN_MS = 1000;
 const BLE_RECONNECT_MAX_MS = 8000;
 
+// Settle time before the one-shot state-recovery read is issued. Keeps the read
+// off the BLE callback that armed it and gives the link a moment to prove it is
+// real before anything is asked of it.
+const STATE_READ_SETTLE_MS = 750;
+
 class BleAlertSource extends AlertSource {
     var _latestAlert;
     var _hasUnreadAlert;
@@ -104,6 +109,10 @@ class BleAlertSource extends AlertSource {
     var _reconnectDelayMs;
     var _reconnectCount;
     var _stateRecoveryPending;
+    // One-shot per connection. The read is the operation that faulted, so it
+    // must be impossible to issue twice for a single link.
+    var _stateReadIssued;
+    var _stateReadDueAtMs;
     var _decoder;
     var _latency;
 
@@ -222,6 +231,8 @@ class BleAlertSource extends AlertSource {
         _device = null;
         _alertCharacteristic = null;
         _stateRecoveryPending = false;
+        _stateReadIssued = false;
+        _stateReadDueAtMs = 0;
 
         setLifecycleFlags(false, false, false, false, "reconnect reset");
 
@@ -339,6 +350,7 @@ class BleAlertSource extends AlertSource {
         _diagElapsedMs += elapsedMs;
 
         serviceReconnect();
+        serviceCurrentStateRead();
 
         if ((_diagState == BLE_DIAG_SCAN) && (_diagElapsedMs >= BLE_STAGE_TIMEOUT_MS) && !_scanTimeoutLogged) {
             _scanTimeoutLogged = true;
@@ -703,6 +715,9 @@ class BleAlertSource extends AlertSource {
     }
 
     function connectToScanResult(scanResult) {
+        // New link: the one-shot read is available again.
+        _stateReadIssued = false;
+        _stateReadDueAtMs = 0;
         hasEverConnected = true;
         explicitDisconnectSeen = false;
         _connectStartedAtMs = _uptimeMs;
@@ -733,6 +748,25 @@ class BleAlertSource extends AlertSource {
         if (state == Ble.CONNECTION_STATE_CONNECTED) {
             _res.connected();
             log("CONNECTED callback entered");
+
+            // THE CRASH FIX.
+            //
+            // The stack can deliver a SECOND connected callback with no
+            // disconnect in between -- confirmed on hardware: c2 d0, two
+            // connects and zero disconnects, when the peer vanished. Without
+            // this guard the whole discover -> subscribe -> read chain ran a
+            // second time against a peer that was already gone, and the
+            // duplicate read callback took the app down.
+            //
+            // Re-running discovery on an established link cannot help: we
+            // already hold the characteristic. Treat it as the duplicate it is.
+            if (isConnected && (_alertCharacteristic != null)) {
+                _res.duplicateConnect();
+                _res.step("duplicate CONNECTED ignored, already established");
+                log("duplicate connected callback ignored");
+                return;
+            }
+
             hasEverConnected = true;
             explicitDisconnectSeen = false;
             _connectedAtMs = _uptimeMs;
@@ -893,7 +927,7 @@ class BleAlertSource extends AlertSource {
             log("subscribed waiting for notification callback");
             logTiming("CONNECT_START_TO_SUBSCRIBE", _connectStartedAtMs, _subscribedAtMs);
             logTiming("CONNECTED_TO_SUBSCRIBE", _connectedAtMs, _subscribedAtMs);
-            requestCurrentStateRead();
+            armCurrentStateRead();
             return;
         }
 
@@ -906,6 +940,36 @@ class BleAlertSource extends AlertSource {
     // characteristic, so a READ returns it immediately instead of leaving the
     // operator with a blank HUD until the next alert happens to fire. On a
     // quiet link that could otherwise be minutes.
+    // Arms the state-recovery read. Deliberately does NOT issue it here.
+    //
+    // handleDescriptorWrite() is a BLE callback; calling back into the stack
+    // from inside one is what put a read in flight while the peer was
+    // disappearing. The read is issued from the timer tick instead, once, after
+    // a short settle, with the link re-validated at that moment.
+    function armCurrentStateRead() {
+        if (_stateReadIssued) {
+            log("state recovery already issued for this connection");
+            return;
+        }
+
+        _stateReadDueAtMs = _uptimeMs + STATE_READ_SETTLE_MS;
+        log("state recovery armed");
+    }
+
+    // Serviced from tick(). One read per connection, ever.
+    function serviceCurrentStateRead() {
+        if (_stateReadIssued || (_stateReadDueAtMs == 0)) {
+            return;
+        }
+
+        if (_uptimeMs < _stateReadDueAtMs) {
+            return;
+        }
+
+        _stateReadDueAtMs = 0;
+        requestCurrentStateRead();
+    }
+
     function requestCurrentStateRead() {
         // Every one of these must hold. On an abrupt peer disappearance the
         // characteristic reference can outlive the connection behind it, and
@@ -922,6 +986,7 @@ class BleAlertSource extends AlertSource {
         }
 
         try {
+            _stateReadIssued = true;
             _stateRecoveryPending = true;
             _res.readRequested();
             _alertCharacteristic.requestRead();
@@ -961,13 +1026,34 @@ class BleAlertSource extends AlertSource {
             return;
         }
 
+        // The value is a stack-owned buffer. If the peer vanished while the read
+        // was in flight, touching it is exactly what faulted, so every access is
+        // wrapped and a failure is swallowed rather than propagated.
+        var length = 0;
+
+        try {
+            length = byteLength(value);
+        } catch (ex) {
+            log("state recovery value unreadable, ignoring: " + ex);
+            return;
+        }
+
+        if (length == 0) {
+            log("state recovery read returned empty buffer");
+            return;
+        }
+
         if (wasRecovery) {
-            log("state recovery read returned " + byteLength(value) + " bytes");
+            log("state recovery read returned " + length + " bytes");
         }
 
         // Same decode path as a notification. A stale cached alert is still a
         // real alert; freshness is handled by the view's packet-age logic.
-        onNotificationBytes(value);
+        try {
+            onNotificationBytes(value);
+        } catch (ex) {
+            log("state recovery decode failed, ignoring: " + ex);
+        }
     }
 
     function handleCharacteristicChanged(characteristic, value) {

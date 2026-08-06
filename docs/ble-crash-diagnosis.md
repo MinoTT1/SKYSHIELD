@@ -1,6 +1,59 @@
 # Diagnosing the BLE Workarea Crash
 
-**Status: OPEN. This is an instrumentation build, not a fix.**
+**Status: DIAGNOSED AND FIXED, pending hardware re-test.**
+
+The instrumentation worked. The on-screen readout from a reproduced crash:
+
+```text
+PREV SESSION CRASHED
+session #1
+LEDGER
+P1/U0  LEAK=1  prof1/1
+c2 d0 s2 sc1/1
+DIED AT
+pairDevice returned
+READ callback #2
+```
+
+### What it actually says
+
+**`c2 d0` is the whole answer: two CONNECTED callbacks, zero disconnects.**
+
+When the peer vanished the stack did not report a disconnect at all. It
+delivered a **second CONNECTED callback** for a link that was already gone.
+`handleConnectedStateChanged()` had no idempotency guard, so that duplicate
+re-ran the entire chain -- discover service, discover characteristic, look up
+descriptor, subscribe, issue the state-recovery read -- against a dead peer.
+`READ callback #2` came back on that second, doomed read and took the app down.
+
+This also explains why the previous round of guards changed nothing. **Every one
+of them tested `explicitDisconnectSeen`, and with `d0` that flag was never set.**
+The guards were inert: they defended against a teardown that never happened.
+
+### Two corrections to the earlier reading
+
+- **`LEAK=1` is not a leak.** With `d0`, one pair and no disconnect means one
+  connection was simply still open. That is normal. The workarea slot theory
+  behind `4c54160` is unsupported by this data, and the crash happened on the
+  first cycle, well before any reconnect could exhaust anything.
+- **There was no "teardown".** The fault occurred on a live-looking connection
+  being set up a second time, not during a disconnect sequence.
+
+### The fix
+
+1. **Idempotent CONNECTED handling.** A second CONNECTED while already connected
+   with a characteristic in hand is logged and ignored. Re-running discovery on
+   an established link cannot help; we already hold the characteristic.
+2. **The state-recovery read is one-shot per connection** and is now issued from
+   the timer tick rather than from inside `handleDescriptorWrite()`. Calling back
+   into the BLE stack from within its own callback is what put a read in flight
+   while the peer was disappearing.
+3. **The read callback is hardened**: the value buffer is read inside try/catch
+   and the decode is wrapped, so a stack-owned buffer belonging to a vanished
+   peer cannot propagate a fault.
+
+A `DUP=` counter now appears in the ledger, so the next test **proves** the
+guard fired rather than leaving it to be inferred from the absence of a crash.
 
 Symptom: `System Error: Error Processing Workarea connections`, empty stack,
 CIQ 6.0.0 / firmware 26.09, Enduro 2 and fenix7x. Triggered reliably by
