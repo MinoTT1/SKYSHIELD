@@ -952,7 +952,19 @@ class BleAlertSource extends AlertSource {
         log("onNotificationReceived");
         log("BLE notification packet");
         logTiming("SUBSCRIBE_TO_NOTIFICATION", _subscribedAtMs, _uptimeMs);
-        onNotificationBytes(value);
+
+        _res.notification("entered");
+
+        // `value` is a stack-owned buffer. If the peer vanished mid-notification
+        // -- a cable pull is exactly that -- it can be partially valid, and
+        // reading it was the last unguarded BLE access left on this path.
+        try {
+            onNotificationBytes(value);
+            _res.notification("decoded");
+        } catch (ex) {
+            _res.notification("THREW");
+            log("notification processing failed, ignoring: " + ex);
+        }
     }
 
     // Decodes one BLE notification through CborAlertDecoder -- the single

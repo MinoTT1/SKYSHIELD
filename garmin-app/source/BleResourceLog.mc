@@ -50,6 +50,7 @@ class BleResourceLog {
     var _readRequest;
     var _readCallback;
     var _duplicateConnect;
+    var _notify;
     var _session;
     var _lastEvent;
     var _lastStep;
@@ -79,6 +80,7 @@ class BleResourceLog {
         _readRequest = 0;
         _readCallback = 0;
         _duplicateConnect = 0;
+        _notify = 0;
         _lastEvent = "none";
         _lastStep = "none";
         _dirty = false;
@@ -150,6 +152,7 @@ class BleResourceLog {
             " c" + _connect + " d" + _disconnect +
             " s" + _subscribeRequest + " sc" + _scanOn + "/" + _scanOff +
             " rd" + _readRequest + "/" + _readCallback +
+            " n" + _notify +
             " DUP=" + _duplicateConnect;
     }
 
@@ -238,6 +241,15 @@ class BleResourceLog {
     // A second CONNECTED with no disconnect between. This is the condition that
     // caused the crash; counting it proves the guard is firing rather than
     // leaving us to infer it from the absence of a fault.
+    // Notifications are the ONLY thing that happens on a healthy link after
+    // subscribe. Without this the ledger went silent once connected, so
+    // "DIED AT: SUBSCRIBE success" merely meant "nothing has been recorded
+    // since", not that the subscribe path was at fault.
+    function notification(stage) {
+        _notify += 1;
+        mark("NOTIFY #" + _notify + " " + stage);
+    }
+
     function duplicateConnect() {
         _duplicateConnect += 1;
         mark("DUPLICATE CONNECT blocked #" + _duplicateConnect);

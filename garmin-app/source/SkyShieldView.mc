@@ -562,14 +562,20 @@ class SkyShieldView extends WatchUi.View {
             // Any pending recovery is void: the link did not hold.
             _vibrationEngine.cancelLinkRestored("dropped again before stabilising");
 
-            if (_engine.hasBleExplicitDisconnect()) {
-                // Immediate and unconditional. This is the safety-critical half
-                // and is never delayed or rate-limited.
-                _vibrationEngine.triggerLinkLost();
-            } else {
-                System.println("HAPTIC SYSTEM skipped: LINK LOST from timeout, not a BLE drop");
-            }
-
+            // Fires on ANY entry to LINK LOST from a working state, not only
+            // on an explicit disconnect callback.
+            //
+            // Hardware showed that an abrupt peer death -- a pulled cable, a
+            // flat battery, physical damage -- produces NO disconnect callback
+            // at all (c1 d0). The watch only learns via the bridge-activity
+            // timeout, and that path was deliberately silent. So the single
+            // failure the operator most needs to feel was the one case that
+            // never buzzed.
+            //
+            // Arriving here from LIVE or MONITOR always means coverage was
+            // genuinely lost, however the watch found out. Immediate and
+            // unconditional: this is the safety-critical half.
+            _vibrationEngine.triggerLinkLost();
             return;
         }
 
