@@ -53,11 +53,6 @@ const BLE_STAGE_TIMEOUT_MS = 20000;
 const BLE_RECONNECT_MIN_MS = 1000;
 const BLE_RECONNECT_MAX_MS = 8000;
 
-// Settle time before the one-shot state-recovery read is issued. Keeps the read
-// off the BLE callback that armed it and gives the link a moment to prove it is
-// real before anything is asked of it.
-const STATE_READ_SETTLE_MS = 750;
-
 class BleAlertSource extends AlertSource {
     var _latestAlert;
     var _hasUnreadAlert;
@@ -108,11 +103,6 @@ class BleAlertSource extends AlertSource {
     var _reconnectAtMs;
     var _reconnectDelayMs;
     var _reconnectCount;
-    var _stateRecoveryPending;
-    // One-shot per connection. The read is the operation that faulted, so it
-    // must be impossible to issue twice for a single link.
-    var _stateReadIssued;
-    var _stateReadDueAtMs;
     var _decoder;
     var _latency;
 
@@ -169,7 +159,6 @@ class BleAlertSource extends AlertSource {
         _reconnectAtMs = 0;
         _reconnectDelayMs = BLE_RECONNECT_MIN_MS;
         _reconnectCount = 0;
-        _stateRecoveryPending = false;
     }
 
     function start() {
@@ -230,9 +219,6 @@ class BleAlertSource extends AlertSource {
 
         _device = null;
         _alertCharacteristic = null;
-        _stateRecoveryPending = false;
-        _stateReadIssued = false;
-        _stateReadDueAtMs = 0;
 
         setLifecycleFlags(false, false, false, false, "reconnect reset");
 
@@ -350,7 +336,6 @@ class BleAlertSource extends AlertSource {
         _diagElapsedMs += elapsedMs;
 
         serviceReconnect();
-        serviceCurrentStateRead();
 
         // Commits diagnostic state from normal app context. This is the other
         // half of the minimal subscribe-success fix: callbacks mark dirty, the
@@ -720,9 +705,6 @@ class BleAlertSource extends AlertSource {
     }
 
     function connectToScanResult(scanResult) {
-        // New link: the one-shot read is available again.
-        _stateReadIssued = false;
-        _stateReadDueAtMs = 0;
         hasEverConnected = true;
         explicitDisconnectSeen = false;
         _connectStartedAtMs = _uptimeMs;
@@ -932,133 +914,20 @@ class BleAlertSource extends AlertSource {
             log("subscribed waiting for notification callback");
             logTiming("CONNECT_START_TO_SUBSCRIBE", _connectStartedAtMs, _subscribedAtMs);
             logTiming("CONNECTED_TO_SUBSCRIBE", _connectedAtMs, _subscribedAtMs);
-            armCurrentStateRead();
+
+            // No GATT read is issued here, deliberately.
+            //
+            // A state-recovery read used to run after subscribing, to show the
+            // last alert immediately instead of waiting for the next one. It
+            // crashed the app three times: once as a duplicate read after a
+            // duplicate CONNECTED, once inside the subscribe callback, and
+            // finally in its own read callback. Its only benefit was cosmetic
+            // -- alerts arrive over notifications and need no read at all --
+            // so it was removed rather than guarded a fourth time.
             return;
         }
 
         setBleError(BLE_STAGE_SUB, "subscribe status=" + status);
-    }
-
-    // Recovers current state after a (re)connect.
-    //
-    // The bridge keeps the most recent alert readable on the same
-    // characteristic, so a READ returns it immediately instead of leaving the
-    // operator with a blank HUD until the next alert happens to fire. On a
-    // quiet link that could otherwise be minutes.
-    // Arms the state-recovery read. Deliberately does NOT issue it here.
-    //
-    // handleDescriptorWrite() is a BLE callback; calling back into the stack
-    // from inside one is what put a read in flight while the peer was
-    // disappearing. The read is issued from the timer tick instead, once, after
-    // a short settle, with the link re-validated at that moment.
-    function armCurrentStateRead() {
-        if (_stateReadIssued) {
-            log("state recovery already issued for this connection");
-            return;
-        }
-
-        _stateReadDueAtMs = _uptimeMs + STATE_READ_SETTLE_MS;
-        log("state recovery armed");
-    }
-
-    // Serviced from tick(). One read per connection, ever.
-    function serviceCurrentStateRead() {
-        if (_stateReadIssued || (_stateReadDueAtMs == 0)) {
-            return;
-        }
-
-        if (_uptimeMs < _stateReadDueAtMs) {
-            return;
-        }
-
-        _stateReadDueAtMs = 0;
-        requestCurrentStateRead();
-    }
-
-    function requestCurrentStateRead() {
-        // Every one of these must hold. On an abrupt peer disappearance the
-        // characteristic reference can outlive the connection behind it, and
-        // issuing a read against a dead connection is a BLE-stack fault, not a
-        // catchable Monkey C error.
-        if ((_alertCharacteristic == null) || (_device == null)) {
-            log("state recovery skipped, no live characteristic");
-            return;
-        }
-
-        if (!isConnected || !isSubscribed || explicitDisconnectSeen) {
-            log("state recovery skipped, link not established");
-            return;
-        }
-
-        try {
-            _stateReadIssued = true;
-            _stateRecoveryPending = true;
-            _res.readRequested();
-            _alertCharacteristic.requestRead();
-            log("state recovery read requested");
-        } catch (ex) {
-            // Not fatal: notifications still work, the HUD just stays blank
-            // until the next alert.
-            _stateRecoveryPending = false;
-            log("state recovery read unavailable: " + ex);
-        }
-    }
-
-    function handleCharacteristicRead(characteristic, status, value) {
-        _res.readCallback();
-        var wasRecovery = _stateRecoveryPending;
-        _stateRecoveryPending = false;
-
-        // A read queued before an abrupt drop can complete after teardown has
-        // begun. Nothing useful can come of it, and touching the result risks
-        // reaching into a freed connection.
-        if (explicitDisconnectSeen || !isConnected) {
-            log("state recovery result ignored, link already gone");
-            return;
-        }
-
-        if (!isAlertCharacteristic(characteristic)) {
-            return;
-        }
-
-        if (status != Ble.STATUS_SUCCESS) {
-            log("state recovery read failed status=" + status);
-            return;
-        }
-
-        if (value == null) {
-            log("state recovery read returned no data");
-            return;
-        }
-
-        // The value is a stack-owned buffer. If the peer vanished while the read
-        // was in flight, touching it is exactly what faulted, so every access is
-        // wrapped and a failure is swallowed rather than propagated.
-        var length = 0;
-
-        try {
-            length = byteLength(value);
-        } catch (ex) {
-            log("state recovery value unreadable, ignoring: " + ex);
-            return;
-        }
-
-        if (length == 0) {
-            log("state recovery read returned empty buffer");
-            return;
-        }
-
-        if (wasRecovery) {
-            log("state recovery read returned " + length + " bytes");
-        }
-
-        // Same decode path as a notification. A stale cached alert is still a
-        // real alert; freshness is handled by the view's packet-age logic.
-        try {
-            onNotificationBytes(value);
-        } catch (ex) {
-            log("state recovery decode failed, ignoring: " + ex);
-        }
     }
 
     function handleCharacteristicChanged(characteristic, value) {
@@ -1567,8 +1436,4 @@ class SkyShieldBleDelegate extends Ble.BleDelegate {
         _source.handleCharacteristicChanged(characteristic, value);
     }
 
-    function onCharacteristicRead(characteristic, status, value) {
-        System.println("SKYSHIELD BLE: READ delegate callback entered");
-        _source.handleCharacteristicRead(characteristic, status, value);
-    }
 }
