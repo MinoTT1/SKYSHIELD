@@ -33,34 +33,6 @@ import Toybox.Application;
 // did not exit cleanly.
 //
 // This class performs no BLE calls. It counts, prints and persists.
-// KILL SWITCH. Set false to build with the diagnostic completely inert: no
-// storage writes, no println, no crash screen. If a diagnostic-disabled build
-// starts cleanly while this one does not, the instrumentation is the fault.
-const DIAGNOSTICS_ENABLED = true;
-
-// Startup phases, written to storage IMMEDIATELY as they are reached.
-//
-// None of these run inside a BLE callback, so an immediate write is safe here --
-// unlike the BLE event ledger, which is deferred. This closes the blind window
-// during the splash, where nothing was being committed at all and a startup
-// crash therefore looked identical to "no events happened".
-const PHASE_APP_INIT = 1;
-const PHASE_CRASH_READ = 2;
-const PHASE_VIEW_CTOR = 3;
-const PHASE_ENGINE_READY = 4;
-const PHASE_ON_START = 5;
-const PHASE_ON_SHOW = 6;
-const PHASE_TIMER_STARTED = 7;
-const PHASE_SPLASH_TICK = 8;
-const PHASE_STARTBLE_CALLED = 9;
-const PHASE_BLE_START_ENTERED = 10;
-const PHASE_DELEGATE_SET = 11;
-const PHASE_PROFILE_REGISTERED = 12;
-const PHASE_SCAN_STARTED = 13;
-const PHASE_BLE_START_RETURNED = 14;
-const PHASE_FIRST_LIVE_TICK = 15;
-const PHASE_ON_STOP = 16;
-
 class BleResourceLog {
     var _pair;
     var _unpair;
@@ -81,8 +53,6 @@ class BleResourceLog {
     var _session;
     var _lastEvent;
     var _lastStep;
-    // Storage writes are DEFERRED. See persist()/flush().
-    var _dirty;
 
     // Storage keys. Short on purpose; Connect IQ storage is small.
     static const KEY_SESSION = "ss_seq";
@@ -90,25 +60,6 @@ class BleResourceLog {
     static const KEY_LEDGER = "ss_led";
     static const KEY_STEP = "ss_step";
     static const KEY_EVENT = "ss_evt";
-    static const KEY_PHASE = "ss_ph";
-    static const KEY_PHASE_TEXT = "ss_pht";
-
-    // Records how far startup got. Written immediately: startup is not a BLE
-    // callback, and this is the one window we are otherwise blind in.
-    static function markPhase(phase, label) {
-        if (!DIAGNOSTICS_ENABLED) {
-            return;
-        }
-
-        System.println("SKYSHIELD PHASE " + phase + ": " + label);
-
-        try {
-            Application.Storage.setValue(KEY_PHASE, phase);
-            Application.Storage.setValue(KEY_PHASE_TEXT, label);
-        } catch (ex) {
-            // Diagnostics must never take the app down.
-        }
-    }
 
     function initialize() {
         _pair = 0;
@@ -129,17 +80,12 @@ class BleResourceLog {
         _duplicateConnect = 0;
         _lastEvent = "none";
         _lastStep = "none";
-        _dirty = false;
         _session = 0;
     }
 
     // Opens a persisted session. Call once at app start, AFTER reading the
     // previous session's report.
     function beginSession() {
-        if (!DIAGNOSTICS_ENABLED) {
-            return;
-        }
-
         var previous = Application.Storage.getValue(KEY_SESSION);
 
         if (previous == null) {
@@ -154,8 +100,6 @@ class BleResourceLog {
             Application.Storage.setValue(KEY_LEDGER, "no events yet");
             Application.Storage.setValue(KEY_STEP, "none");
             Application.Storage.setValue(KEY_EVENT, "session start");
-            Application.Storage.setValue(KEY_PHASE, 0);
-            Application.Storage.setValue(KEY_PHASE_TEXT, "session start");
         } catch (ex) {
             System.println("SKYSHIELD BLERES  storage unavailable: " + ex);
         }
@@ -167,12 +111,6 @@ class BleResourceLog {
     // watchdog, a power loss -- leaves the session flagged open, which is how
     // the next launch knows it crashed.
     function endSessionCleanly() {
-        if (!DIAGNOSTICS_ENABLED) {
-            return;
-        }
-
-        markPhase(PHASE_ON_STOP, "clean exit");
-
         try {
             Application.Storage.setValue(KEY_OPEN, false);
         } catch (ex) {
@@ -183,10 +121,6 @@ class BleResourceLog {
     // Reads the previous session's final state. Returns null when there is
     // nothing recorded or the previous session exited cleanly.
     static function readCrashReport() {
-        if (!DIAGNOSTICS_ENABLED) {
-            return null;
-        }
-
         var open = Application.Storage.getValue(KEY_OPEN);
 
         if (open == null) {
@@ -201,9 +135,7 @@ class BleResourceLog {
             :session => Application.Storage.getValue(KEY_SESSION),
             :ledger => Application.Storage.getValue(KEY_LEDGER),
             :step => Application.Storage.getValue(KEY_STEP),
-            :event => Application.Storage.getValue(KEY_EVENT),
-            :phase => Application.Storage.getValue(KEY_PHASE),
-            :phaseText => Application.Storage.getValue(KEY_PHASE_TEXT)
+            :event => Application.Storage.getValue(KEY_EVENT)
         };
     }
 
@@ -219,30 +151,9 @@ class BleResourceLog {
             " DUP=" + _duplicateConnect;
     }
 
-    // Marks state dirty. Deliberately does NOT write to storage.
-    //
-    // Application.Storage.setValue() is a synchronous flash write. Most of these
-    // events fire inside BLE callbacks, and doing flash writes in that context is
-    // exactly the class of re-entrancy that has caused every crash here so far --
-    // the instrumentation itself became a suspect. Writes are therefore deferred
-    // to flush(), which the timer tick calls from normal app context.
-    //
-    // Cost: a crash can lose up to one tick (250ms) of events. That is a real
-    // tradeoff, accepted because a diagnostic that changes the failure it is
-    // measuring is worse than one that is slightly coarse.
+    // Commits the current state. Called on every event so a crash cannot
+    // outrun it.
     function persist() {
-        _dirty = true;
-    }
-
-    // Commits pending state. MUST be called from the timer tick, never from a
-    // BLE callback.
-    function flush() {
-        if (!DIAGNOSTICS_ENABLED || !_dirty) {
-            return;
-        }
-
-        _dirty = false;
-
         try {
             Application.Storage.setValue(KEY_LEDGER, ledgerText());
             Application.Storage.setValue(KEY_STEP, _lastStep);
@@ -349,10 +260,6 @@ class BleResourceLog {
     // Step marker for the abrupt-teardown walkthrough. The fault is instant and
     // stackless, so the final step printed identifies where it died.
     function step(label) {
-        if (!DIAGNOSTICS_ENABLED) {
-            return;
-        }
-
         _lastStep = label;
         System.println("SKYSHIELD BLERES  step: " + label);
         persist();
@@ -363,10 +270,6 @@ class BleResourceLog {
     // Prints every counter plus explicit leak figures. An acquire with no
     // matching release shows up as a climbing leak across connect cycles.
     function mark(event) {
-        if (!DIAGNOSTICS_ENABLED) {
-            return;
-        }
-
         _lastEvent = event;
         System.println("SKYSHIELD BLERES  " + event);
         System.println("SKYSHIELD BLERES  LEDGER t=" + System.getTimer() +

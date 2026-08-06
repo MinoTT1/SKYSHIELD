@@ -57,18 +57,11 @@ class SkyShieldView extends WatchUi.View {
     var _lastHapticNonAlertCycleStartMs;
     var _operationalState;
     var _crashReport;
-    var _crashLines;
 
     function initialize(crashReport) {
         View.initialize();
-        BleResourceLog.markPhase(PHASE_VIEW_CTOR, "view ctor");
         _crashReport = crashReport;
-        // Wrapped ONCE here, never per render.
-        _crashLines = (crashReport != null)
-            ? splitForDisplay(safeText(crashReport[:ledger]))
-            : [];
         _engine = new AlertEngine();
-        BleResourceLog.markPhase(PHASE_ENGINE_READY, "engine ready");
         _settings = new SettingsModel();
         _history = new AlertHistory();
         _connectionState = new ConnectionStateService();
@@ -98,7 +91,6 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function onShow() {
-        BleResourceLog.markPhase(PHASE_ON_SHOW, "onShow");
         _alert = _engine.getActiveAlert();
         _latestAlert = _alert;
         _displayAlert = null;
@@ -129,7 +121,6 @@ class SkyShieldView extends WatchUi.View {
         }
 
         _timer.start(method(:onTimerTick), TIMER_INTERVAL_MS, true);
-        BleResourceLog.markPhase(PHASE_TIMER_STARTED, "timer started");
     }
 
     function onHide() {
@@ -142,26 +133,16 @@ class SkyShieldView extends WatchUi.View {
         _connectionState.tick();
 
         if (_showSplash) {
-            if (_splashElapsedMs == 0) {
-                BleResourceLog.markPhase(PHASE_SPLASH_TICK, "splash ticking");
-            }
-
             _splashElapsedMs += TIMER_INTERVAL_MS;
 
             if (_splashElapsedMs >= splashDurationMs()) {
                 _splashElapsedMs = 0;
                 _showSplash = false;
-                BleResourceLog.markPhase(PHASE_STARTBLE_CALLED, "startBle called");
                 _engine.startBle();
-                BleResourceLog.markPhase(PHASE_BLE_START_RETURNED, "startBle returned");
             }
 
             WatchUi.requestUpdate();
             return;
-        }
-
-        if (_alertElapsedMs == 0) {
-            BleResourceLog.markPhase(PHASE_FIRST_LIVE_TICK, "first live tick");
         }
 
         _alertElapsedMs += TIMER_INTERVAL_MS;
@@ -619,21 +600,6 @@ class SkyShieldView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, 96, "SKYSHIELD", Graphics.FONT_SMALL);
         drawCentered(dc, width, 132, "TACTICAL RF DETECTOR", Graphics.FONT_TINY);
-
-        // Build identity. The kill switch is a runtime constant, not dead-code
-        // elimination, so the two diagnostic builds are byte-identical in size.
-        // Without this they are indistinguishable once on the watch, which is
-        // exactly the kind of mix-up that would waste a hardware test.
-        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, 168, buildTag(), Graphics.FONT_XTINY);
-    }
-
-    function buildTag() {
-        if (DIAGNOSTICS_ENABLED) {
-            return "DIAG ON";
-        }
-
-        return "DIAG OFF - KILL SWITCH BUILD";
     }
 
     // Post-crash readout.
@@ -642,44 +608,39 @@ class SkyShieldView extends WatchUi.View {
     // figures come from Application.Storage, written as they changed. This is
     // the capture method: read the numbers off the watch, no USB required.
     function drawCrashReport(dc, width) {
-        var y = 20;
+        var y = 22;
 
         dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, "PREV SESSION CRASHED", Graphics.FONT_XTINY);
-        y += 22;
-
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, "session " + safeText(_crashReport[:session]), Graphics.FONT_XTINY);
         y += 24;
 
-        // THE HEADLINE. How far startup got before it died. Written immediately
-        // as each phase is reached, so unlike the BLE ledger it is never blind
-        // during the splash.
-        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, "REACHED PHASE " + safeText(_crashReport[:phase]), Graphics.FONT_XTINY);
-        y += 22;
-
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, safeText(_crashReport[:phaseText]), Graphics.FONT_XTINY);
+        drawCentered(dc, width, y, "session #" + safeText(_crashReport[:session]), Graphics.FONT_XTINY);
         y += 26;
 
         dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, "LEDGER", Graphics.FONT_XTINY);
-        y += 20;
+        y += 22;
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 
-        // Precomputed once in initialize(). Building this per render allocated
-        // roughly 110 strings a frame at 4Hz, which on a memory-constrained
-        // device is its own hazard -- and the diagnostic has already been the
-        // bug twice.
-        for (var i = 0; i < _crashLines.size(); i += 1) {
-            drawCentered(dc, width, y, _crashLines[i], Graphics.FONT_XTINY);
-            y += 18;
+        // Wrapped by hand: the ledger is wider than the round display.
+        var ledger = safeText(_crashReport[:ledger]);
+        var parts = splitForDisplay(ledger);
+
+        for (var i = 0; i < parts.size(); i += 1) {
+            drawCentered(dc, width, y, parts[i], Graphics.FONT_XTINY);
+            y += 20;
         }
 
-        y += 4;
+        y += 6;
+        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, "DIED AT", Graphics.FONT_XTINY);
+        y += 22;
+
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, y, safeText(_crashReport[:step]), Graphics.FONT_XTINY);
+        y += 20;
         drawCentered(dc, width, y, safeText(_crashReport[:event]), Graphics.FONT_XTINY);
     }
 
