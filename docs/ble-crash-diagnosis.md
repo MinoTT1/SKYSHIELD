@@ -1,6 +1,58 @@
 # Diagnosing the BLE Workarea Crash
 
-**Status: DIAGNOSED AND FIXED, pending hardware re-test.**
+**Status: root cause identified as a general re-entrancy rule. Pending re-test.**
+
+## The pattern across all three crashes
+
+| Readout | Died at | Cause |
+|---|---|---|
+| `c2 d0 s2` | `READ callback #2` | duplicate CONNECTED re-ran discover/subscribe/read |
+| `c1 d0 s1 rd0/0 DUP=0` | `SUBSCRIBE success #1` | see below |
+
+The second readout is a **clean first connection** — one connect, no disconnect,
+no duplicate, the state-recovery read never even issued. It died immediately
+after a *successful* subscribe.
+
+Reading the subscribe-success handler, **there are no BLE calls after
+`subscribeSucceeded()`** — only state assignment and logging. The one heavyweight
+system call in that path was `persist()`, which did three
+`Application.Storage.setValue()` flash writes **from inside the BLE callback**.
+
+That is almost certainly the instrumentation itself. The risk was flagged when
+the ledger was added ("this build writes to flash inside BLE callbacks... if the
+crash becomes intermittent or moves, that is itself a finding"), and the crash
+moving to every ledger event is consistent with it.
+
+### The general rule
+
+Every crash in this area has been the same class: **a system operation issued
+from inside a BLE callback.** Pairing, discovery, CCCD writes, characteristic
+reads and now flash writes.
+
+The fix is structural rather than another point guard:
+
+1. **Storage writes are deferred.** `persist()` only marks state dirty;
+   `flush()` writes, and is called from the timer tick. Cost: a crash can lose up
+   to one tick (250ms) of events. Accepted, because a diagnostic that changes the
+   failure it measures is worse than one that is slightly coarse.
+2. **Post-connect BLE work is deferred.** The connected callback records intent
+   and returns; a queued action serviced from the timer tick performs discovery,
+   the CCCD write and the state read. Each action re-validates the link at the
+   moment of use, since it may have gone away while queued.
+
+### The one deliberate exception
+
+`handleScanResults()` still calls `setScanState(OFF)` and `pairDevice()` directly.
+This is left alone on purpose:
+
+- it demonstrably works — every readout shows `c1`/`s1` reaching a live link
+- a `ScanResult` is not guaranteed to stay valid across ticks, so deferring the
+  pairing risks breaking connection outright
+- no evidence implicates it
+
+Changing it would be a speculative fix with functional risk, which is the pattern
+that already failed twice here. If evidence points there, it is the next thing to
+defer.
 
 The instrumentation worked. The on-screen readout from a reproduced crash:
 

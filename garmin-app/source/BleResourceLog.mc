@@ -53,6 +53,8 @@ class BleResourceLog {
     var _session;
     var _lastEvent;
     var _lastStep;
+    // Storage writes are DEFERRED. See persist()/flush().
+    var _dirty;
 
     // Storage keys. Short on purpose; Connect IQ storage is small.
     static const KEY_SESSION = "ss_seq";
@@ -80,6 +82,7 @@ class BleResourceLog {
         _duplicateConnect = 0;
         _lastEvent = "none";
         _lastStep = "none";
+        _dirty = false;
         _session = 0;
     }
 
@@ -151,9 +154,30 @@ class BleResourceLog {
             " DUP=" + _duplicateConnect;
     }
 
-    // Commits the current state. Called on every event so a crash cannot
-    // outrun it.
+    // Marks state dirty. Deliberately does NOT write to storage.
+    //
+    // Application.Storage.setValue() is a synchronous flash write. Most of these
+    // events fire inside BLE callbacks, and doing flash writes in that context is
+    // exactly the class of re-entrancy that has caused every crash here so far --
+    // the instrumentation itself became a suspect. Writes are therefore deferred
+    // to flush(), which the timer tick calls from normal app context.
+    //
+    // Cost: a crash can lose up to one tick (250ms) of events. That is a real
+    // tradeoff, accepted because a diagnostic that changes the failure it is
+    // measuring is worse than one that is slightly coarse.
     function persist() {
+        _dirty = true;
+    }
+
+    // Commits pending state. MUST be called from the timer tick, never from a
+    // BLE callback.
+    function flush() {
+        if (!_dirty) {
+            return;
+        }
+
+        _dirty = false;
+
         try {
             Application.Storage.setValue(KEY_LEDGER, ledgerText());
             Application.Storage.setValue(KEY_STEP, _lastStep);

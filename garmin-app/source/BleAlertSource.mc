@@ -58,6 +58,20 @@ const BLE_RECONNECT_MAX_MS = 8000;
 // real before anything is asked of it.
 const STATE_READ_SETTLE_MS = 750;
 
+// Deferred post-connect actions.
+//
+// GENERAL RULE, learned the hard way across three crashes: NO BLE operation is
+// issued from inside a BLE callback. Callbacks record intent only; the timer
+// tick performs the work from normal app context. Every crash in this area has
+// been a stack operation re-entered from within the stack's own callback.
+const BLE_ACTION_NONE = 0;
+const BLE_ACTION_DISCOVER = 1;
+const BLE_ACTION_READ = 2;
+
+// Short settle before discovery. Lets the connection finish establishing inside
+// the stack before anything is asked of it.
+const BLE_DISCOVER_SETTLE_MS = 300;
+
 class BleAlertSource extends AlertSource {
     var _latestAlert;
     var _hasUnreadAlert;
@@ -113,6 +127,9 @@ class BleAlertSource extends AlertSource {
     // must be impossible to issue twice for a single link.
     var _stateReadIssued;
     var _stateReadDueAtMs;
+    var _pendingAction;
+    var _pendingActionDueAtMs;
+    var _pendingDevice;
     var _decoder;
     var _latency;
 
@@ -233,6 +250,7 @@ class BleAlertSource extends AlertSource {
         _stateRecoveryPending = false;
         _stateReadIssued = false;
         _stateReadDueAtMs = 0;
+        clearBleAction("reconnect reset");
 
         setLifecycleFlags(false, false, false, false, "reconnect reset");
 
@@ -286,6 +304,64 @@ class BleAlertSource extends AlertSource {
         } catch (ex) {
             _res.step("unpairDevice THREW: " + ex);
             log("unpair failed (already released?): " + ex);
+        }
+    }
+
+    // Records a BLE action to be performed later from the timer tick.
+    function queueBleAction(action, delayMs, reason) {
+        _pendingAction = action;
+        _pendingActionDueAtMs = _uptimeMs + delayMs;
+        _res.step("queued BLE action " + action + ": " + reason);
+        log("queued BLE action " + action + " (" + reason + ")");
+    }
+
+    function clearBleAction(reason) {
+        if (_pendingAction == BLE_ACTION_NONE) {
+            return;
+        }
+
+        _pendingAction = BLE_ACTION_NONE;
+        _pendingActionDueAtMs = 0;
+        _pendingDevice = null;
+        log("cleared pending BLE action: " + reason);
+    }
+
+    // Performs any due BLE action. Called ONLY from tick(), so every stack
+    // operation happens in normal app context rather than inside a callback.
+    function serviceBleActions() {
+        if (_pendingAction == BLE_ACTION_NONE) {
+            return;
+        }
+
+        if (_uptimeMs < _pendingActionDueAtMs) {
+            return;
+        }
+
+        var action = _pendingAction;
+        _pendingAction = BLE_ACTION_NONE;
+        _pendingActionDueAtMs = 0;
+
+        // Re-validate at the moment of use: the link may have gone away while
+        // the action sat in the queue.
+        if (explicitDisconnectSeen || !_enabled) {
+            _res.step("queued action dropped, link gone");
+            log("queued BLE action dropped, link no longer valid");
+            _pendingDevice = null;
+            return;
+        }
+
+        if (action == BLE_ACTION_DISCOVER) {
+            var device = _pendingDevice;
+            _pendingDevice = null;
+
+            _res.step("running deferred discovery");
+            discoverAlertCharacteristic(device);
+            return;
+        }
+
+        if (action == BLE_ACTION_READ) {
+            _res.step("running deferred state read");
+            requestCurrentStateRead();
         }
     }
 
@@ -350,7 +426,12 @@ class BleAlertSource extends AlertSource {
         _diagElapsedMs += elapsedMs;
 
         serviceReconnect();
+        serviceBleActions();
         serviceCurrentStateRead();
+
+        // Storage writes happen HERE, in normal app context, never inside a
+        // BLE callback.
+        _res.flush();
 
         if ((_diagState == BLE_DIAG_SCAN) && (_diagElapsedMs >= BLE_STAGE_TIMEOUT_MS) && !_scanTimeoutLogged) {
             _scanTimeoutLogged = true;
@@ -776,7 +857,13 @@ class BleAlertSource extends AlertSource {
             log("onConnected");
             log("BLE connected");
             logTiming("CONNECT", _connectStartedAtMs, _connectedAtMs);
-            discoverAlertCharacteristic(device);
+
+            // Discovery is NOT run here. Walking services and writing the CCCD
+            // are stack operations, and issuing them from inside the stack's own
+            // connected callback is the re-entrancy that has faulted repeatedly.
+            // Record intent; the tick does the work.
+            _pendingDevice = device;
+            queueBleAction(BLE_ACTION_DISCOVER, BLE_DISCOVER_SETTLE_MS, "discover after connect");
             return;
         }
 
@@ -927,6 +1014,7 @@ class BleAlertSource extends AlertSource {
             log("subscribed waiting for notification callback");
             logTiming("CONNECT_START_TO_SUBSCRIBE", _connectStartedAtMs, _subscribedAtMs);
             logTiming("CONNECTED_TO_SUBSCRIBE", _connectedAtMs, _subscribedAtMs);
+            // Same rule: no stack call from this callback.
             armCurrentStateRead();
             return;
         }
