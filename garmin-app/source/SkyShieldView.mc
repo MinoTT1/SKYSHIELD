@@ -619,6 +619,21 @@ class SkyShieldView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, 96, "SKYSHIELD", Graphics.FONT_SMALL);
         drawCentered(dc, width, 132, "TACTICAL RF DETECTOR", Graphics.FONT_TINY);
+
+        // Build identity. The kill switch is a runtime constant, not dead-code
+        // elimination, so the two diagnostic builds are byte-identical in size.
+        // Without this they are indistinguishable once on the watch, which is
+        // exactly the kind of mix-up that would waste a hardware test.
+        dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_BLACK);
+        drawCentered(dc, width, 168, buildTag(), Graphics.FONT_XTINY);
+    }
+
+    function buildTag() {
+        if (DIAGNOSTICS_ENABLED) {
+            return "DIAG ON";
+        }
+
+        return "DIAG OFF - KILL SWITCH BUILD";
     }
 
     // Post-crash readout.
