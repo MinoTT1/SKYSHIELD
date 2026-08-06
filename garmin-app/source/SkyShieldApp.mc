@@ -8,10 +8,13 @@ class SkyShieldApp extends Application.AppBase {
 
     function initialize() {
         AppBase.initialize();
+        BleResourceLog.markPhase(PHASE_APP_INIT, "app initialize");
         _crashReport = BleResourceLog.readCrashReport();
+        BleResourceLog.markPhase(PHASE_CRASH_READ, "crash report read");
     }
 
     function onStart(state) {
+        BleResourceLog.markPhase(PHASE_ON_START, "onStart");
     }
 
     // Marks a clean exit. A System Error never reaches this, which is exactly

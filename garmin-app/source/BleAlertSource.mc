@@ -190,6 +190,7 @@ class BleAlertSource extends AlertSource {
     }
 
     function start() {
+        BleResourceLog.markPhase(PHASE_BLE_START_ENTERED, "BLE start entered");
         _enabled = true;
         _res.sourceStarted();
         log("init");
@@ -210,6 +211,7 @@ class BleAlertSource extends AlertSource {
             _res.step("setDelegate called");
             Ble.setDelegate(_delegate);
             _res.step("setDelegate returned");
+            BleResourceLog.markPhase(PHASE_DELEGATE_SET, "delegate set");
             log("delegate set");
             registerSkyShieldProfile();
             startScan();
@@ -587,6 +589,7 @@ class BleAlertSource extends AlertSource {
             _res.profileRegisterAttempt();
             Ble.registerProfile(profile);
             _res.step("registerProfile returned");
+            BleResourceLog.markPhase(PHASE_PROFILE_REGISTERED, "profile registered");
             log("profile registration requested");
         } catch (ex) {
             _res.step("registerProfile THREW: " + ex);
@@ -627,6 +630,7 @@ class BleAlertSource extends AlertSource {
             _res.scanStarted();
             Ble.setScanState(Ble.SCAN_STATE_SCANNING);
             _res.step("setScanState(SCANNING) returned");
+            BleResourceLog.markPhase(PHASE_SCAN_STARTED, "scan started");
         } catch (ex) {
             setLifecycleFlags(false, false, false, false, "scan start failed");
             log("scan failed: " + ex);
