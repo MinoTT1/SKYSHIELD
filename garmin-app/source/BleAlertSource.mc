@@ -352,6 +352,11 @@ class BleAlertSource extends AlertSource {
         serviceReconnect();
         serviceCurrentStateRead();
 
+        // Commits diagnostic state from normal app context. This is the other
+        // half of the minimal subscribe-success fix: callbacks mark dirty, the
+        // tick writes.
+        _res.flush();
+
         if ((_diagState == BLE_DIAG_SCAN) && (_diagElapsedMs >= BLE_STAGE_TIMEOUT_MS) && !_scanTimeoutLogged) {
             _scanTimeoutLogged = true;
             log("scan timeout");

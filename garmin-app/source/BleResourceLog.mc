@@ -53,6 +53,7 @@ class BleResourceLog {
     var _session;
     var _lastEvent;
     var _lastStep;
+    var _dirty;
 
     // Storage keys. Short on purpose; Connect IQ storage is small.
     static const KEY_SESSION = "ss_seq";
@@ -80,6 +81,7 @@ class BleResourceLog {
         _duplicateConnect = 0;
         _lastEvent = "none";
         _lastStep = "none";
+        _dirty = false;
         _session = 0;
     }
 
@@ -153,7 +155,33 @@ class BleResourceLog {
 
     // Commits the current state. Called on every event so a crash cannot
     // outrun it.
+    // Marks state dirty. Deliberately does NOT write to storage.
+    //
+    // THE MINIMAL FIX FOR THE SUBSCRIBE-SUCCESS CRASH.
+    //
+    // Application.Storage.setValue() is a synchronous flash write, and mark()
+    // is called from inside BLE callbacks. In the subscribe-success handler
+    // this was the ONLY heavyweight operation -- everything else there is a
+    // field assignment or a println -- which makes it the sole candidate for
+    // that crash.
+    //
+    // Only this one operation is deferred. The wider deferral of BLE
+    // operations attempted previously broke app startup and has been reverted;
+    // nothing about init, the connect callback or discovery is touched here.
     function persist() {
+        _dirty = true;
+    }
+
+    // Commits pending state. MUST be called from the timer tick, never from a
+    // BLE callback. Costs up to one tick (250ms) of events on a crash, which is
+    // the price of not writing flash from callback context.
+    function flush() {
+        if (!_dirty) {
+            return;
+        }
+
+        _dirty = false;
+
         try {
             Application.Storage.setValue(KEY_LEDGER, ledgerText());
             Application.Storage.setValue(KEY_STEP, _lastStep);
