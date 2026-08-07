@@ -56,6 +56,15 @@ const BLE_RECONNECT_MAX_MS = 8000;
 // Heartbeat cadence for the diagnostic ledger while connected and idle.
 const BLE_HEARTBEAT_MS = 3000;
 
+// Settle time between releasing a dead connection and restarting the scan.
+//
+// Hardware localized the crash to the second setScanState(SCANNING): the unpair,
+// the scan stop and the scan start all ran back to back inside a single tick,
+// giving the stack no opportunity to actually finish releasing a connection that
+// died without ever reporting a disconnect. Scanning on top of a half-released
+// connection is what faulted.
+const BLE_RELEASE_SETTLE_MS = 750;
+
 // How long a subscribed link may go with no contact at all before the app
 // concludes the peer is gone on its own.
 //
@@ -363,6 +372,15 @@ class BleAlertSource extends AlertSource {
         _res.step("silent loss: teardown queued");
     }
 
+    // Reconnect runs in TWO PHASES, deliberately split across ticks.
+    //
+    // Previously the unpair, the scan stop and the scan start all happened back
+    // to back inside one tick. After an abrupt loss the old connection was never
+    // reported as disconnected, so the stack was still holding it, and asking it
+    // to scan while it was mid-release is what faulted at the second
+    // setScanState(SCANNING).
+    //
+    // Phase 1 releases and stops, then yields. Phase 2 scans, a settle later.
     function serviceReconnect() {
         if (!_reconnectPending || !_enabled) {
             return;
@@ -372,20 +390,36 @@ class BleAlertSource extends AlertSource {
             return;
         }
 
+        // ---- Phase 1: tear the old connection down, then yield -------------
+        if (_devicePendingUnpair != null) {
+            _res.step("reconnect phase 1: releasing dead connection");
+
+            releasePendingDevice();
+
+            // Stop any scan that may still be running from before the loss.
+            // Doing this now, not next to the scan start, so the stack has the
+            // whole settle window to quiesce.
+            try {
+                _res.scanStopped();
+                Ble.setScanState(Ble.SCAN_STATE_OFF);
+                _res.step("reconnect phase 1: prior scan stopped");
+            } catch (ex) {
+                _res.step("reconnect phase 1: scan stop threw");
+                log("reconnect scan reset warning: " + ex);
+            }
+
+            // Stay pending; phase 2 runs on a later tick.
+            _reconnectAtMs = _uptimeMs + BLE_RELEASE_SETTLE_MS;
+            _res.step("reconnect phase 1 done, settling before scan");
+            return;
+        }
+
+        // ---- Phase 2: nothing left to release, safe to scan ----------------
         _reconnectPending = false;
         _reconnectCount += 1;
 
-        // MUST happen before the rescan can lead to another pairDevice().
-        releasePendingDevice();
-
+        _res.step("reconnect phase 2: starting scan");
         log("reconnect attempt " + _reconnectCount + " starting rescan");
-
-        try {
-            _res.scanStopped();
-            Ble.setScanState(Ble.SCAN_STATE_OFF);
-        } catch (ex) {
-            log("reconnect scan reset warning: " + ex);
-        }
 
         startScan();
     }
@@ -696,12 +730,36 @@ class BleAlertSource extends AlertSource {
 
     function handleScanResults(scanResults) {
         log("SCAN callback entered");
-        var result = scanResults.next();
+        _res.step("scan results callback entered");
+
+        var result = null;
+
+        // Every ScanResult access below reaches into stack-owned state. This
+        // callback runs immediately after the scan restart, which is exactly
+        // where the fault now lands, so the whole walk is guarded rather than
+        // each field individually.
+        try {
+            result = scanResults.next();
+        } catch (ex) {
+            _res.step("scan results next() THREW");
+            log("scan result iteration failed: " + ex);
+            return;
+        }
 
         while (result != null) {
             logScanResult(result);
 
-            if (isSkyShieldPeripheral(result)) {
+            var matched = false;
+
+            try {
+                matched = isSkyShieldPeripheral(result);
+            } catch (ex) {
+                _res.step("scan result inspection THREW");
+                log("scan result inspection failed: " + ex);
+                return;
+            }
+
+            if (matched) {
                 log("BLE matched SKYSHIELD peripheral");
                 hasEverFoundPeripheral = true;
                 log("ever found peripheral");
@@ -712,8 +770,16 @@ class BleAlertSource extends AlertSource {
                 return;
             }
 
-            result = scanResults.next();
+            try {
+                result = scanResults.next();
+            } catch (ex) {
+                _res.step("scan results next() THREW mid-walk");
+                log("scan result iteration failed: " + ex);
+                return;
+            }
         }
+
+        _res.step("scan results callback complete, no match");
     }
 
     function logScanResult(scanResult) {
