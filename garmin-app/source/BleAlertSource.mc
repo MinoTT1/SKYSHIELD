@@ -53,6 +53,19 @@ const BLE_STAGE_TIMEOUT_MS = 20000;
 const BLE_RECONNECT_MIN_MS = 1000;
 const BLE_RECONNECT_MAX_MS = 8000;
 
+// Heartbeat cadence for the diagnostic ledger while connected and idle.
+const BLE_HEARTBEAT_MS = 3000;
+
+// How long a subscribed link may go with no contact at all before the app
+// concludes the peer is gone on its own.
+//
+// An abrupt peer death -- a pulled cable, a flat battery -- produces NO
+// disconnect callback on this hardware (observed c1 d0). Until now the app did
+// nothing whatsoever in that case: the timeout only changed what the view
+// displayed, and the stack was left holding a connection to a device that no
+// longer exists. This is the detector that was missing.
+const BLE_SILENT_LOSS_MS = 12000;
+
 class BleAlertSource extends AlertSource {
     var _latestAlert;
     var _hasUnreadAlert;
@@ -99,6 +112,8 @@ class BleAlertSource extends AlertSource {
     // stack is mid-disconnect.
     var _res;
     var _devicePendingUnpair;
+    var _heartbeatAtMs;
+    var _silentLossDeclared;
     var _reconnectPending;
     var _reconnectAtMs;
     var _reconnectDelayMs;
@@ -154,6 +169,8 @@ class BleAlertSource extends AlertSource {
         _res.beginSession();
         // Lets onStop() close the session without walking the view hierarchy.
         SkyShieldApp.activeLog = _res;
+        _heartbeatAtMs = 0;
+        _silentLossDeclared = false;
         _devicePendingUnpair = null;
         _reconnectPending = false;
         _reconnectAtMs = 0;
@@ -275,6 +292,77 @@ class BleAlertSource extends AlertSource {
         }
     }
 
+    // Records proof-of-life so the ledger is never stale during idle periods.
+    // Touches no BLE object.
+    function serviceHeartbeat() {
+        if (_uptimeMs < _heartbeatAtMs) {
+            return;
+        }
+
+        _heartbeatAtMs = _uptimeMs + BLE_HEARTBEAT_MS;
+
+        var state = "idle";
+
+        if (explicitDisconnectSeen) {
+            state = "lost";
+        } else if (isSubscribed) {
+            state = "subscribed";
+        } else if (isConnected) {
+            state = "connected";
+        } else if (isScanning) {
+            state = "scanning";
+        }
+
+        _res.heartbeat(_uptimeMs / 1000, state);
+    }
+
+    // Concludes the peer is gone when a subscribed link goes completely silent
+    // and no disconnect callback ever arrives.
+    //
+    // ORDER MATTERS. The operator warning is raised FIRST, by flipping the same
+    // flag a real disconnect would set, so the view shows LINK LOST and fires
+    // the haptic on its very next tick. Only after that is any teardown
+    // scheduled -- and scheduleReconnect() itself touches no BLE object, it only
+    // queues the unpair for releasePendingDevice() a second later. So the
+    // warning can never depend on surviving teardown.
+    //
+    // Touches no BLE object.
+    function serviceSilentLossDetection() {
+        if (_silentLossDeclared || explicitDisconnectSeen || !_enabled) {
+            return;
+        }
+
+        if (!isSubscribed) {
+            return;
+        }
+
+        var lastContactMs = (lastRxMs > 0) ? lastRxMs : lastSubscribeMs;
+
+        if (lastContactMs <= 0) {
+            return;
+        }
+
+        if ((_uptimeMs - lastContactMs) < BLE_SILENT_LOSS_MS) {
+            return;
+        }
+
+        _silentLossDeclared = true;
+        _res.silentLoss((_uptimeMs - lastContactMs) / 1000);
+
+        // 1. WARNING FIRST. Same flag a real disconnect sets, so the view
+        //    renders LINK LOST and buzzes on the next 250ms tick.
+        explicitDisconnectSeen = true;
+        setLifecycleFlags(false, false, false, false, "silent loss");
+        setDisconnectError("peer vanished with no disconnect callback");
+        _res.step("silent loss: warning raised");
+
+        // 2. Only then queue teardown. No BLE call happens here; the unpair is
+        //    performed later by releasePendingDevice() from serviceReconnect().
+        _alertCharacteristic = null;
+        scheduleReconnect("silent loss");
+        _res.step("silent loss: teardown queued");
+    }
+
     function serviceReconnect() {
         if (!_reconnectPending || !_enabled) {
             return;
@@ -335,6 +423,8 @@ class BleAlertSource extends AlertSource {
         _uptimeMs += elapsedMs;
         _diagElapsedMs += elapsedMs;
 
+        serviceHeartbeat();
+        serviceSilentLossDetection();
         serviceReconnect();
 
         // Commits diagnostic state from normal app context. This is the other
@@ -705,6 +795,7 @@ class BleAlertSource extends AlertSource {
     }
 
     function connectToScanResult(scanResult) {
+        _silentLossDeclared = false;
         hasEverConnected = true;
         explicitDisconnectSeen = false;
         _connectStartedAtMs = _uptimeMs;

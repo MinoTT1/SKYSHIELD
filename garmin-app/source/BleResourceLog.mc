@@ -250,6 +250,23 @@ class BleResourceLog {
         mark("NOTIFY #" + _notify + " " + stage);
     }
 
+    // Periodic proof-of-life while connected and idle.
+    //
+    // THE STALE-LEDGER FIX. Nothing was recorded between subscribe and the next
+    // notification, so a crash while idle showed whatever happened last -- a
+    // subscribe, or an alert from minutes earlier. That misread the fault four
+    // separate times. The heartbeat means DIED AT always reflects roughly when
+    // the app died, not merely what it last did.
+    function heartbeat(seconds, state) {
+        mark("ALIVE t" + seconds + "s " + state);
+    }
+
+    // The app itself concluded the peer is gone, with no disconnect callback
+    // from the stack.
+    function silentLoss(seconds) {
+        mark("SILENT LOSS after " + seconds + "s of no contact");
+    }
+
     function duplicateConnect() {
         _duplicateConnect += 1;
         mark("DUPLICATE CONNECT blocked #" + _duplicateConnect);
