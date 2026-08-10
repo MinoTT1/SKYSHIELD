@@ -4,14 +4,12 @@ import Toybox.Timer;
 import Toybox.WatchUi;
 
 const UI_PHASE_ALERT = 0;
-const UI_PHASE_BANDS = 1;
 const UI_PHASE_IDLE = 2;
 const TIMER_INTERVAL_MS = 250;
 const SPLASH_DURATION_MS = 1000;
 // Held long enough to read or photograph the post-crash ledger off the screen.
 const SPLASH_CRASH_REPORT_MS = 40000;
 const ALERT_DURATION_MS = 3000;
-const BANDS_DURATION_MS = 2000;
 const MONITOR_TIMEOUT_MS = 5000;
 const UI_CYCLE_MS = 5000;
 const MOCK_ALERT_ROTATION_MS = 4000;
@@ -312,11 +310,10 @@ class SkyShieldView extends WatchUi.View {
 
         elapsed = elapsed % UI_CYCLE_MS;
 
-        if (elapsed < ALERT_DURATION_MS) {
-            return UI_PHASE_ALERT;
-        }
-
-        return UI_PHASE_BANDS;
+        // The alert is ONE screen. The cycle itself is kept because the alert
+        // haptic is gated on _uiCycleStartMs advancing, so collapsing the phase
+        // must not collapse the cycle -- the buzz cadence is unchanged.
+        return UI_PHASE_ALERT;
     }
 
     function addAlertToHistory(alert) {
@@ -466,8 +463,6 @@ class SkyShieldView extends WatchUi.View {
 
             if (_uiPhase == UI_PHASE_ALERT) {
                 drawAlertScreen(dc, width);
-            } else if (_uiPhase == UI_PHASE_BANDS) {
-                drawBandsScreen(dc, width);
             } else {
                 drawMonitorScreen(dc, width);
             }
@@ -840,6 +835,19 @@ class SkyShieldView extends WatchUi.View {
         drawCentered(dc, width + 2, y, label, font);
     }
 
+    // The TITLE is a short label; the long descriptive text stays in the data.
+    //
+    // droneClass carries the detector's own wording, e.g.
+    // "FM Analog(DIY FPV, Aircraft model)". That is useful telemetry but it is
+    // far wider than a 260px round screen, so it rendered as
+    // "...g(DIY FPV, Aircra...". The title now comes from the CLASSIFIED
+    // threatType instead, which is a closed set decided upstream by the parser.
+    //
+    // Deriving it from threatType rather than string-matching droneClass on the
+    // watch matters: the classification decision stays in one place, and the
+    // display cannot disagree with the threat the rest of the app is acting on.
+    //
+    // droneClass is untouched and still flows to the model and the history.
     function getDroneClassLabel(alert) {
         if (alert == null) {
             return "UNKNOWN";
@@ -851,15 +859,45 @@ class SkyShieldView extends WatchUi.View {
             return "CONTACT";
         }
 
-        if ((alert.droneClass == null) || alert.droneClass.equals("")) {
+        return shortThreatLabel(alert.threatType);
+    }
+
+    // Only labels the protocol can actually produce. There is deliberately no
+    // "HOVER" here: the detector reports no hover state, so a HOVER label would
+    // be the display asserting something no sensor measured.
+    function shortThreatLabel(threatType) {
+        if (threatType == null) {
             return "UNKNOWN";
         }
 
-        return alert.droneClass;
+        if (threatType.equals("FPV")) {
+            return "FPV";
+        }
+
+        if (threatType.equals("DJI")) {
+            return "DJI";
+        }
+
+        if (threatType.equals("AUTEL")) {
+            return "AUTEL";
+        }
+
+        return "UNKNOWN";
     }
 
+    // Highlights the band this detection came in on, greys the rest.
+    //
+    // This used to key off alert.activeBands, the per-band strength array. That
+    // array is still decoded, but the TTSKW07 parser never populates it: the
+    // detector reports ONE frequency per detection, not four strengths, so all
+    // four levels arrive as NONE and every row rendered grey. The highlight was
+    // not removed, it was starved of data.
+    //
+    // alert.band is the field the detector actually fills, so the highlight now
+    // comes from that. activeBands is left alone for a future detector that
+    // does report per-band strength.
     function drawAlertBandActivityMeter(dc, alert) {
-        if ((alert == null) || (alert.activeBands == null)) {
+        if (alert == null) {
             return;
         }
 
@@ -873,9 +911,7 @@ class SkyShieldView extends WatchUi.View {
     }
 
     function drawAlertBandActivityRow(dc, labelX, markerX, y, alert, bandLabel) {
-        var level = getActiveBandLevel(alert, bandLabel);
-
-        if (isBandActive(level)) {
+        if (isDetectionBand(alert, bandLabel)) {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
             dc.drawText(labelX, y, Graphics.FONT_XTINY, bandLabel, Graphics.TEXT_JUSTIFY_LEFT);
             dc.drawText(labelX + 1, y, Graphics.FONT_XTINY, bandLabel, Graphics.TEXT_JUSTIFY_LEFT);
@@ -887,40 +923,20 @@ class SkyShieldView extends WatchUi.View {
         dc.drawText(labelX, y, Graphics.FONT_XTINY, bandLabel, Graphics.TEXT_JUSTIFY_LEFT);
     }
 
-    function getActiveBandLevel(alert, bandLabel) {
-        for (var i = 0; i < alert.activeBands.size(); i += 1) {
-            var item = alert.activeBands[i];
-
-            if ((item[:band] != null) && item[:band].equals(bandLabel)) {
-                return item[:level];
-            }
-        }
-
-        return null;
-    }
-
-    function isBandActive(level) {
-        if (level == null) {
+    // True when this row is the band the alert was detected on. alert.band is a
+    // label such as "5.8GHz", so the row label "5.8" is matched as its prefix.
+    function isDetectionBand(alert, bandLabel) {
+        if ((alert == null) || (alert.band == null)) {
             return false;
         }
 
-        if (level.equals("NONE")) {
+        var band = alert.band;
+
+        if (band.length() < bandLabel.length()) {
             return false;
         }
 
-        if (level.equals("-")) {
-            return false;
-        }
-
-        if (level.equals("")) {
-            return false;
-        }
-
-        return level.equals("LOW") ||
-            level.equals("MED") ||
-            level.equals("MEDIUM") ||
-            level.equals("HIGH") ||
-            level.equals("ACTIVE");
+        return band.substring(0, bandLabel.length()).equals(bandLabel);
     }
 
     function drawAlertSeverityMeter(dc, width, severityLabel) {
@@ -1162,40 +1178,6 @@ class SkyShieldView extends WatchUi.View {
         }
 
         return "BLE OK";
-    }
-
-    function drawBandsScreen(dc, width) {
-        var alert = getDisplayAlert();
-
-        if (alert == null) {
-            drawBleStatusFooter(dc, width);
-            return;
-        }
-
-        var y = 70;
-
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, "BANDS", Graphics.FONT_SMALL);
-        y += 34;
-
-        dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-
-        for (var i = 0; i < alert.activeBands.size(); i += 1) {
-            var item = alert.activeBands[i];
-            drawCentered(dc, width, y, item[:band] + "  " + formatBandLevelForBandsScreen(alert, item[:level]), Graphics.FONT_TINY);
-            y += 28;
-        }
-    }
-
-    // When the bridge sent no per-band detail the decoder marks every level
-    // UNKNOWN. Show that rather than synthesizing activity: the watch must not
-    // invent telemetry it was never given.
-    function formatBandLevelForBandsScreen(alert, level) {
-        if ((alert != null) && !alert.hasBandDetail) {
-            return "--";
-        }
-
-        return level;
     }
 
     function drawHistoryScreen(dc, width) {
