@@ -1,6 +1,5 @@
 using Toybox.BluetoothLowEnergy as Ble;
 import Toybox.System;
-import Toybox.Attention;
 
 const BLE_STATE_SCANNING = "SCANNING";
 const BLE_STATE_CONNECTING = "CONNECTING";
@@ -86,7 +85,6 @@ class BleAlertSource extends AlertSource {
     var _subscribedAtMs;
     var _disconnectedAtMs;
     var _lastBridgeActivityMs;
-    var _earlyLinkLostBuzzed;
     var lastSubscribeMs;
     var lastRxMs;
     var explicitDisconnectSeen;
@@ -471,43 +469,6 @@ class BleAlertSource extends AlertSource {
         return explicitDisconnectSeen || _state == BLE_STATE_SIGNAL_LOST;
     }
 
-    // Fires the LINK LOST rhythm straight from the disconnect callback.
-    //
-    // Deliberately does NOT go through VibrationEngine: reaching it would mean
-    // wiring a reference in at construction, and the startup path is staying
-    // exactly as it is on a build that took this long to stabilise. Attention
-    // is a different subsystem from BLE and from the Storage writes that were
-    // previously shown to fault in callback context.
-    //
-    // Wrapped so a vibration failure can never be what kills the app.
-    function buzzLinkLostEarly() {
-        if (_earlyLinkLostBuzzed == true) {
-            return;
-        }
-
-        _earlyLinkLostBuzzed = true;
-
-        try {
-            var profile = HAPTIC_LINK_LOST_PROFILE;
-            var profiles = new [profile.size()];
-
-            for (var i = 0; i < profile.size(); i += 1) {
-                profiles[i] = new Attention.VibeProfile(profile[i][0], profile[i][1]);
-            }
-
-            Attention.vibrate(profiles);
-            log("early LINK LOST buzz fired from disconnect callback");
-        } catch (ex) {
-            log("early LINK LOST buzz unavailable: " + ex);
-        }
-    }
-
-    // Lets the view skip its own LINK LOST buzz when this one already played,
-    // so a clean disconnect still buzzes exactly once.
-    function hasEarlyLinkLostBuzzed() {
-        return _earlyLinkLostBuzzed == true;
-    }
-
     function markBridgeActivity(reason) {
         _lastBridgeActivityMs = _uptimeMs;
         log("bridge activity: " + reason);
@@ -795,7 +756,6 @@ class BleAlertSource extends AlertSource {
 
             hasEverConnected = true;
             explicitDisconnectSeen = false;
-            _earlyLinkLostBuzzed = false;   // re-arm for the next loss
             _connectedAtMs = _uptimeMs;
             markBridgeActivity("connected");
             setLifecycleFlags(false, false, true, false, "connected");
@@ -806,24 +766,6 @@ class BleAlertSource extends AlertSource {
             discoverAlertCharacteristic(device);
             return;
         }
-
-        // WARN BEFORE WE TEAR DOWN.
-        //
-        // Peer loss can take the app down inside the Connect IQ stack, below
-        // anything Monkey C can guard. Every attempt to PREVENT that has failed
-        // or destabilised normal operation, so this stops trying: it accepts
-        // that the app may die and makes sure the operator is told first.
-        //
-        // The buzz used to be driven from the view's 250ms tick, which meant
-        // the ordering was: disconnect -> teardown -> (maybe crash) -> tick ->
-        // buzz. If the fault landed in teardown the operator got NOTHING. Here
-        // the buzz is the first statement in the callback, so the warning wins
-        // the race against our own teardown.
-        //
-        // It cannot win a race that never starts: an abrupt cable pull delivers
-        // no disconnect callback at all (c1 d0 on hardware), so this line never
-        // runs in that case. It helps only where a callback does arrive.
-        buzzLinkLostEarly();
 
         _res.disconnected(state);
         _res.step("teardown 1: disconnect callback entered");
