@@ -33,6 +33,21 @@ import Toybox.Application;
 // did not exit cleanly.
 //
 // This class performs no BLE calls. It counts, prints and persists.
+// SHIPPING BUILD: diagnostics OFF.
+//
+// The ledger did its job -- it localized four separate faults that no log file
+// could capture -- but it is a development tool, not something an operator
+// should ever see. With this false:
+//
+//   * no Application.Storage reads or writes happen at all
+//   * no PREV SESSION CRASHED screen can ever be shown
+//   * the counters still run in RAM, so println output remains available
+//
+// Note this makes startup do strictly LESS than the hardware-confirmed stable
+// build did, since readCrashReport() and beginSession() both return before
+// touching storage. Set true to re-enable for debugging.
+const DIAGNOSTICS_ENABLED = false;
+
 class BleResourceLog {
     var _pair;
     var _unpair;
@@ -50,7 +65,6 @@ class BleResourceLog {
     var _readRequest;
     var _readCallback;
     var _duplicateConnect;
-    var _notify;
     var _session;
     var _lastEvent;
     var _lastStep;
@@ -80,7 +94,6 @@ class BleResourceLog {
         _readRequest = 0;
         _readCallback = 0;
         _duplicateConnect = 0;
-        _notify = 0;
         _lastEvent = "none";
         _lastStep = "none";
         _dirty = false;
@@ -90,6 +103,10 @@ class BleResourceLog {
     // Opens a persisted session. Call once at app start, AFTER reading the
     // previous session's report.
     function beginSession() {
+        if (!DIAGNOSTICS_ENABLED) {
+            return;
+        }
+
         var previous = Application.Storage.getValue(KEY_SESSION);
 
         if (previous == null) {
@@ -115,6 +132,10 @@ class BleResourceLog {
     // watchdog, a power loss -- leaves the session flagged open, which is how
     // the next launch knows it crashed.
     function endSessionCleanly() {
+        if (!DIAGNOSTICS_ENABLED) {
+            return;
+        }
+
         try {
             Application.Storage.setValue(KEY_OPEN, false);
         } catch (ex) {
@@ -125,6 +146,10 @@ class BleResourceLog {
     // Reads the previous session's final state. Returns null when there is
     // nothing recorded or the previous session exited cleanly.
     static function readCrashReport() {
+        if (!DIAGNOSTICS_ENABLED) {
+            return null;   // no crash screen in a shipping build
+        }
+
         var open = Application.Storage.getValue(KEY_OPEN);
 
         if (open == null) {
@@ -152,7 +177,6 @@ class BleResourceLog {
             " c" + _connect + " d" + _disconnect +
             " s" + _subscribeRequest + " sc" + _scanOn + "/" + _scanOff +
             " rd" + _readRequest + "/" + _readCallback +
-            " n" + _notify +
             " DUP=" + _duplicateConnect;
     }
 
@@ -179,7 +203,7 @@ class BleResourceLog {
     // BLE callback. Costs up to one tick (250ms) of events on a crash, which is
     // the price of not writing flash from callback context.
     function flush() {
-        if (!_dirty) {
+        if (!DIAGNOSTICS_ENABLED || !_dirty) {
             return;
         }
 
@@ -241,32 +265,6 @@ class BleResourceLog {
     // A second CONNECTED with no disconnect between. This is the condition that
     // caused the crash; counting it proves the guard is firing rather than
     // leaving us to infer it from the absence of a fault.
-    // Notifications are the ONLY thing that happens on a healthy link after
-    // subscribe. Without this the ledger went silent once connected, so
-    // "DIED AT: SUBSCRIBE success" merely meant "nothing has been recorded
-    // since", not that the subscribe path was at fault.
-    function notification(stage) {
-        _notify += 1;
-        mark("NOTIFY #" + _notify + " " + stage);
-    }
-
-    // Periodic proof-of-life while connected and idle.
-    //
-    // THE STALE-LEDGER FIX. Nothing was recorded between subscribe and the next
-    // notification, so a crash while idle showed whatever happened last -- a
-    // subscribe, or an alert from minutes earlier. That misread the fault four
-    // separate times. The heartbeat means DIED AT always reflects roughly when
-    // the app died, not merely what it last did.
-    function heartbeat(seconds, state) {
-        mark("ALIVE t" + seconds + "s " + state);
-    }
-
-    // The app itself concluded the peer is gone, with no disconnect callback
-    // from the stack.
-    function silentLoss(seconds) {
-        mark("SILENT LOSS after " + seconds + "s of no contact");
-    }
-
     function duplicateConnect() {
         _duplicateConnect += 1;
         mark("DUPLICATE CONNECT blocked #" + _duplicateConnect);

@@ -53,28 +53,6 @@ const BLE_STAGE_TIMEOUT_MS = 20000;
 const BLE_RECONNECT_MIN_MS = 1000;
 const BLE_RECONNECT_MAX_MS = 8000;
 
-// Heartbeat cadence for the diagnostic ledger while connected and idle.
-const BLE_HEARTBEAT_MS = 3000;
-
-// Settle time between releasing a dead connection and restarting the scan.
-//
-// Hardware localized the crash to the second setScanState(SCANNING): the unpair,
-// the scan stop and the scan start all ran back to back inside a single tick,
-// giving the stack no opportunity to actually finish releasing a connection that
-// died without ever reporting a disconnect. Scanning on top of a half-released
-// connection is what faulted.
-const BLE_RELEASE_SETTLE_MS = 750;
-
-// How long a subscribed link may go with no contact at all before the app
-// concludes the peer is gone on its own.
-//
-// An abrupt peer death -- a pulled cable, a flat battery -- produces NO
-// disconnect callback on this hardware (observed c1 d0). Until now the app did
-// nothing whatsoever in that case: the timeout only changed what the view
-// displayed, and the stack was left holding a connection to a device that no
-// longer exists. This is the detector that was missing.
-const BLE_SILENT_LOSS_MS = 12000;
-
 class BleAlertSource extends AlertSource {
     var _latestAlert;
     var _hasUnreadAlert;
@@ -121,8 +99,6 @@ class BleAlertSource extends AlertSource {
     // stack is mid-disconnect.
     var _res;
     var _devicePendingUnpair;
-    var _heartbeatAtMs;
-    var _silentLossDeclared;
     var _reconnectPending;
     var _reconnectAtMs;
     var _reconnectDelayMs;
@@ -178,8 +154,6 @@ class BleAlertSource extends AlertSource {
         _res.beginSession();
         // Lets onStop() close the session without walking the view hierarchy.
         SkyShieldApp.activeLog = _res;
-        _heartbeatAtMs = 0;
-        _silentLossDeclared = false;
         _devicePendingUnpair = null;
         _reconnectPending = false;
         _reconnectAtMs = 0;
@@ -301,86 +275,6 @@ class BleAlertSource extends AlertSource {
         }
     }
 
-    // Records proof-of-life so the ledger is never stale during idle periods.
-    // Touches no BLE object.
-    function serviceHeartbeat() {
-        if (_uptimeMs < _heartbeatAtMs) {
-            return;
-        }
-
-        _heartbeatAtMs = _uptimeMs + BLE_HEARTBEAT_MS;
-
-        var state = "idle";
-
-        if (explicitDisconnectSeen) {
-            state = "lost";
-        } else if (isSubscribed) {
-            state = "subscribed";
-        } else if (isConnected) {
-            state = "connected";
-        } else if (isScanning) {
-            state = "scanning";
-        }
-
-        _res.heartbeat(_uptimeMs / 1000, state);
-    }
-
-    // Concludes the peer is gone when a subscribed link goes completely silent
-    // and no disconnect callback ever arrives.
-    //
-    // ORDER MATTERS. The operator warning is raised FIRST, by flipping the same
-    // flag a real disconnect would set, so the view shows LINK LOST and fires
-    // the haptic on its very next tick. Only after that is any teardown
-    // scheduled -- and scheduleReconnect() itself touches no BLE object, it only
-    // queues the unpair for releasePendingDevice() a second later. So the
-    // warning can never depend on surviving teardown.
-    //
-    // Touches no BLE object.
-    function serviceSilentLossDetection() {
-        if (_silentLossDeclared || explicitDisconnectSeen || !_enabled) {
-            return;
-        }
-
-        if (!isSubscribed) {
-            return;
-        }
-
-        var lastContactMs = (lastRxMs > 0) ? lastRxMs : lastSubscribeMs;
-
-        if (lastContactMs <= 0) {
-            return;
-        }
-
-        if ((_uptimeMs - lastContactMs) < BLE_SILENT_LOSS_MS) {
-            return;
-        }
-
-        _silentLossDeclared = true;
-        _res.silentLoss((_uptimeMs - lastContactMs) / 1000);
-
-        // 1. WARNING FIRST. Same flag a real disconnect sets, so the view
-        //    renders LINK LOST and buzzes on the next 250ms tick.
-        explicitDisconnectSeen = true;
-        setLifecycleFlags(false, false, false, false, "silent loss");
-        setDisconnectError("peer vanished with no disconnect callback");
-        _res.step("silent loss: warning raised");
-
-        // 2. Only then queue teardown. No BLE call happens here; the unpair is
-        //    performed later by releasePendingDevice() from serviceReconnect().
-        _alertCharacteristic = null;
-        scheduleReconnect("silent loss");
-        _res.step("silent loss: teardown queued");
-    }
-
-    // Reconnect runs in TWO PHASES, deliberately split across ticks.
-    //
-    // Previously the unpair, the scan stop and the scan start all happened back
-    // to back inside one tick. After an abrupt loss the old connection was never
-    // reported as disconnected, so the stack was still holding it, and asking it
-    // to scan while it was mid-release is what faulted at the second
-    // setScanState(SCANNING).
-    //
-    // Phase 1 releases and stops, then yields. Phase 2 scans, a settle later.
     function serviceReconnect() {
         if (!_reconnectPending || !_enabled) {
             return;
@@ -390,36 +284,20 @@ class BleAlertSource extends AlertSource {
             return;
         }
 
-        // ---- Phase 1: tear the old connection down, then yield -------------
-        if (_devicePendingUnpair != null) {
-            _res.step("reconnect phase 1: releasing dead connection");
-
-            releasePendingDevice();
-
-            // Stop any scan that may still be running from before the loss.
-            // Doing this now, not next to the scan start, so the stack has the
-            // whole settle window to quiesce.
-            try {
-                _res.scanStopped();
-                Ble.setScanState(Ble.SCAN_STATE_OFF);
-                _res.step("reconnect phase 1: prior scan stopped");
-            } catch (ex) {
-                _res.step("reconnect phase 1: scan stop threw");
-                log("reconnect scan reset warning: " + ex);
-            }
-
-            // Stay pending; phase 2 runs on a later tick.
-            _reconnectAtMs = _uptimeMs + BLE_RELEASE_SETTLE_MS;
-            _res.step("reconnect phase 1 done, settling before scan");
-            return;
-        }
-
-        // ---- Phase 2: nothing left to release, safe to scan ----------------
         _reconnectPending = false;
         _reconnectCount += 1;
 
-        _res.step("reconnect phase 2: starting scan");
+        // MUST happen before the rescan can lead to another pairDevice().
+        releasePendingDevice();
+
         log("reconnect attempt " + _reconnectCount + " starting rescan");
+
+        try {
+            _res.scanStopped();
+            Ble.setScanState(Ble.SCAN_STATE_OFF);
+        } catch (ex) {
+            log("reconnect scan reset warning: " + ex);
+        }
 
         startScan();
     }
@@ -457,8 +335,6 @@ class BleAlertSource extends AlertSource {
         _uptimeMs += elapsedMs;
         _diagElapsedMs += elapsedMs;
 
-        serviceHeartbeat();
-        serviceSilentLossDetection();
         serviceReconnect();
 
         // Commits diagnostic state from normal app context. This is the other
@@ -730,36 +606,12 @@ class BleAlertSource extends AlertSource {
 
     function handleScanResults(scanResults) {
         log("SCAN callback entered");
-        _res.step("scan results callback entered");
-
-        var result = null;
-
-        // Every ScanResult access below reaches into stack-owned state. This
-        // callback runs immediately after the scan restart, which is exactly
-        // where the fault now lands, so the whole walk is guarded rather than
-        // each field individually.
-        try {
-            result = scanResults.next();
-        } catch (ex) {
-            _res.step("scan results next() THREW");
-            log("scan result iteration failed: " + ex);
-            return;
-        }
+        var result = scanResults.next();
 
         while (result != null) {
             logScanResult(result);
 
-            var matched = false;
-
-            try {
-                matched = isSkyShieldPeripheral(result);
-            } catch (ex) {
-                _res.step("scan result inspection THREW");
-                log("scan result inspection failed: " + ex);
-                return;
-            }
-
-            if (matched) {
+            if (isSkyShieldPeripheral(result)) {
                 log("BLE matched SKYSHIELD peripheral");
                 hasEverFoundPeripheral = true;
                 log("ever found peripheral");
@@ -770,16 +622,8 @@ class BleAlertSource extends AlertSource {
                 return;
             }
 
-            try {
-                result = scanResults.next();
-            } catch (ex) {
-                _res.step("scan results next() THREW mid-walk");
-                log("scan result iteration failed: " + ex);
-                return;
-            }
+            result = scanResults.next();
         }
-
-        _res.step("scan results callback complete, no match");
     }
 
     function logScanResult(scanResult) {
@@ -861,7 +705,6 @@ class BleAlertSource extends AlertSource {
     }
 
     function connectToScanResult(scanResult) {
-        _silentLossDeclared = false;
         hasEverConnected = true;
         explicitDisconnectSeen = false;
         _connectStartedAtMs = _uptimeMs;
@@ -1109,19 +952,7 @@ class BleAlertSource extends AlertSource {
         log("onNotificationReceived");
         log("BLE notification packet");
         logTiming("SUBSCRIBE_TO_NOTIFICATION", _subscribedAtMs, _uptimeMs);
-
-        _res.notification("entered");
-
-        // `value` is a stack-owned buffer. If the peer vanished mid-notification
-        // -- a cable pull is exactly that -- it can be partially valid, and
-        // reading it was the last unguarded BLE access left on this path.
-        try {
-            onNotificationBytes(value);
-            _res.notification("decoded");
-        } catch (ex) {
-            _res.notification("THREW");
-            log("notification processing failed, ignoring: " + ex);
-        }
+        onNotificationBytes(value);
     }
 
     // Decodes one BLE notification through CborAlertDecoder -- the single
