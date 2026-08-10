@@ -19,24 +19,31 @@ limitation is a documented decision rather than a surprise.
 | Sustained alert flow | ✅ ~10 consecutive alerts, no crash |
 | Threat haptic on alert | ✅ verified |
 | Stable in steady state (MONITOR / LIVE) | ✅ verified |
-| LINK LOST shown on a clean disconnect | ✅ verified |
-| LINK LOST haptic on a clean disconnect | ✅ present — fires on a real disconnect callback |
+| LINK LOST shown on a clean disconnect | ⚠️ was verified, needs re-test |
+| LINK LOST haptic on a clean disconnect | ⚠️ present, but see limitation 1 |
 | AUTEL as a first-class threat | ✅ T:11/T:12 → `AUTEL`, never `DJI` |
 | Confidence reported as null, never 0 | ✅ enforced by contract test |
 
 ## What it does NOT do — known limitations
 
-### 1. Abrupt peer disappearance crashes the app — KNOWN LIMITATION
+### 1. Peer loss crashes the app — KNOWN LIMITATION, FIELD-RELEVANT
 
-If the ESP32 vanishes **instantly mid-connection** — USB cable pulled, power cut
-— the watch app crashes with a Connect IQ System Error instead of degrading to
-LINK LOST.
+Losing the peer crashes the app with a Connect IQ System Error instead of
+degrading to LINK LOST. This happens on **both** loss modes:
+
+- **cable pull / power cut** — no disconnect callback is delivered at all
+- **walking out of range** — the ordinary field scenario
+
+Out-of-range was previously assumed safe and was even written into the demo
+script below. That was wrong.
 
 **Why it is accepted for now:**
 
-- The ESP32 is **not on USB in deployment**. It runs from its own power, so an
-  instant mid-connection death is a bench artifact rather than a field scenario.
-- On this hardware an abrupt loss produces **no disconnect callback at all**
+- ~~The ESP32 is not on USB in deployment, so this is a bench artifact.~~
+  **THIS REASONING IS WITHDRAWN.** Peer loss by *walking out of range* was
+  subsequently found to crash the app too. That is the ordinary field case, not
+  a bench artifact, and it is the scenario the product exists for.
+- On a cable pull this hardware produces **no disconnect callback at all**
   (observed `c1 d0`). The watch is never told the peer is gone.
 - The idle path was verified to touch **zero BLE objects**, so at the moment of
   the pull there is no code of ours running that could fault. The evidence
@@ -75,8 +82,10 @@ re-enable the ledger for debugging.
 2. Launch the watch app; wait for MONITOR.
 3. Inject alerts (serial console, or a live TTSKW07).
 4. Show alerts rendering with threat haptics.
-5. To show LINK LOST: **power the ESP32 down cleanly** or walk out of range.
-   **Do not pull the USB cable while connected.**
+5. **Do not demonstrate link loss at all.** Neither a cable pull nor walking out
+   of range is safe: both crash the app. Only a clean, commanded ESP32 shutdown
+   has ever been observed to degrade properly, and it has not been re-verified
+   since out-of-range was found to crash. End the demo with the link still up.
 
 ## What is verified by automated test
 

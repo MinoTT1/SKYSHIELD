@@ -562,7 +562,11 @@ class SkyShieldView extends WatchUi.View {
             // Any pending recovery is void: the link did not hold.
             _vibrationEngine.cancelLinkRestored("dropped again before stabilising");
 
-            if (_engine.hasBleExplicitDisconnect()) {
+            if (_engine.hasBleEarlyLinkLostBuzzed()) {
+                // The disconnect callback already buzzed, ahead of teardown.
+                // Buzzing again here would double up on every clean drop.
+                System.println("HAPTIC SYSTEM skipped: already buzzed early in the disconnect callback");
+            } else if (_engine.hasBleExplicitDisconnect()) {
                 // Immediate and unconditional. This is the safety-critical half
                 // and is never delayed or rate-limited.
                 _vibrationEngine.triggerLinkLost();

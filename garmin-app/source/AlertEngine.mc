@@ -135,6 +135,10 @@ class AlertEngine {
         return _bleSource.hasExplicitDisconnect();
     }
 
+    function hasBleEarlyLinkLostBuzzed() {
+        return _bleSource.hasEarlyLinkLostBuzzed();
+    }
+
     function getCurrentSource() {
         return _currentSource;
     }
