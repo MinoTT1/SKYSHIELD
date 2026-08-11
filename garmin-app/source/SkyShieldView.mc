@@ -801,7 +801,16 @@ class SkyShieldView extends WatchUi.View {
         var displaySeverity = _formatter.resolveSeverityForTrack(alert, trackState);
         var severityLabel = _formatter.formatSeverity(displaySeverity);
         var titleFont = getAlertTitleFont();
-        var layout = computeAlertRowLayout(dc, titleFont, Graphics.FONT_TINY);
+        // Three rows: threat, band, strength.
+        //
+        // The confidence row was removed from the DISPLAY only. The TTSKW07
+        // reports no confidence, so the row rendered a permanent "CONF --" and
+        // spent a quarter of the centre block saying nothing. The field is
+        // still carried end to end -- protocol, decoder, AlertModel and the
+        // logs -- and DisplayFormatter.formatConfidence() is deliberately kept,
+        // so restoring the row for a sensor that does report confidence is a
+        // one-line change here and needs no protocol work.
+        var layout = computeAlertRowLayout(dc, titleFont, Graphics.FONT_TINY, 2);
         var y = layout[:top];
 
         drawAlertTopSeparator(dc, width);
@@ -810,13 +819,6 @@ class SkyShieldView extends WatchUi.View {
         dc.setColor(getRiskColor(displaySeverity), Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _formatter.formatThreat(alert.threatType), titleFont);
         y += layout[:titleStep];
-
-        // Confidence sits directly under the classification so the operator
-        // reads "what" and "how sure" together. "--" when the detector gave
-        // no confidence value; never a fabricated 0%.
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, _formatter.formatConfidence(alert), Graphics.FONT_TINY);
-        y += layout[:rowStep];
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _formatter.formatBand(alert.band), Graphics.FONT_TINY);
@@ -841,25 +843,29 @@ class SkyShieldView extends WatchUi.View {
     // via getFontHeight(), the bounds come from where the separators are
     // actually drawn, and the spacing is whatever is left over divided evenly.
     // That keeps it correct if a font, a device or a separator ever changes.
-    function computeAlertRowLayout(dc, titleFont, rowFont) {
+    // rowCount is the number of rowFont rows BELOW the title, so the block is
+    // one title plus rowCount rows, with rowCount gaps between them. Taking it
+    // as a parameter rather than baking in a number is what let the confidence
+    // row be dropped without re-deriving any of this by hand.
+    function computeAlertRowLayout(dc, titleFont, rowFont, rowCount) {
         var titleH = dc.getFontHeight(titleFont);
         var rowH = dc.getFontHeight(rowFont);
-        var textH = titleH + (rowH * 3);
+        var textH = titleH + (rowH * rowCount);
 
         // Usable band: inside both lines, minus the clearance on each side.
         var top = ALERT_TOP_SEPARATOR_Y + 1 + ALERT_ROW_CLEARANCE;
         var bottom = ALERT_BOTTOM_SEPARATOR_Y - ALERT_ROW_CLEARANCE;
         var space = bottom - top;
 
-        // Three gaps between four rows. Floor at zero so a hypothetical font
+        // One gap per row below the title. Floor at zero so a hypothetical font
         // set too tall for the space cannot produce negative leading.
-        var gap = (space - textH) / 3;
+        var gap = (space - textH) / rowCount;
 
         if (gap < 0) {
             gap = 0;
         }
 
-        var blockH = textH + (gap * 3);
+        var blockH = textH + (gap * rowCount);
 
         // Centring the block is what makes the guarantee symmetric. There is
         // deliberately no "if (y < top) { y = top; }" here: that clamp would
@@ -868,8 +874,8 @@ class SkyShieldView extends WatchUi.View {
         // Centring splits any shortfall evenly instead.
         //
         // Both clearances hold at ALERT_ROW_CLEARANCE or better as long as
-        //     titleH + 3 * rowH <= 113
-        // which on this device is 26 + 3*22 = 92, a 21px margin.
+        //     titleH + rowCount * rowH <= 113
+        // which for the three-row block is 26 + 2*22 = 70, a 43px margin.
         var y = top + ((space - blockH) / 2);
 
         return {
