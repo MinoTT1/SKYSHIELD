@@ -5,6 +5,7 @@
 #include "IDetectorAdapter.h"
 #include "MockAlertProvider.h"
 #include "SerialInjectAdapter.h"
+#include "DW01Adapter.h"
 #include "SkyShieldCodec.h"
 #include "TTSKW07Adapter.h"
 
@@ -17,6 +18,11 @@ namespace {
 enum DetectorSelection : uint8_t {
     // Live Tatusky TTSKW07 on a hardware UART.
     DETECTOR_TTSKW07 = 0,
+    // Tatusky DW01, the TTSKW07's replacement. Parser and adapter are built and
+    // contract-tested but have NEVER seen the physical device. The UART pins
+    // below are placeholders, and if the DW01 turns out to connect over BLE the
+    // adapter is re-pointed while DW01Parser.h stays as it is.
+    DETECTOR_DW01 = 3,
     // Operator types alerts into the USB console. Bench only, not a detector.
     DETECTOR_SERIAL_INJECT = 1,
     // Rotating simulated alerts on a timer. Bench only.
@@ -183,6 +189,8 @@ void logLine(const char* format, ...) {
 // ---------------------------------------------------------------------------
 
 TTSKW07Adapter ttskw07Adapter(Serial1, TTSKW07_RX_PIN, TTSKW07_TX_PIN);
+// Shares the UART with the TTSKW07: only one detector is ever selected.
+DW01Adapter dw01Adapter(Serial1, TTSKW07_RX_PIN, TTSKW07_TX_PIN);
 SerialInjectAdapter serialInjectAdapter;
 MockAlertProvider mockAlerts;
 
@@ -727,6 +735,10 @@ void pollMockProvider(uint32_t now) {
 
 void selectDetector() {
     switch (ACTIVE_DETECTOR) {
+        case DETECTOR_DW01:
+            detector = &dw01Adapter;
+            break;
+
         case DETECTOR_TTSKW07:
             detector = &ttskw07Adapter;
             break;

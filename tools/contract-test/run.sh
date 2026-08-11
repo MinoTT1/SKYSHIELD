@@ -23,6 +23,7 @@ SAMPLES="${REPO_ROOT}/esp32-bridge/test_samples/ttskw07_raw_samples.txt"
 FIXTURE="${REPO_ROOT}/esp32-bridge/test_samples/expected_alerts.txt"
 EDGE_SAMPLES="${REPO_ROOT}/esp32-bridge/test_samples/ttskw07_edge_cases.txt"
 EDGE_FIXTURE="${REPO_ROOT}/esp32-bridge/test_samples/expected_edge_cases.txt"
+DW01_SAMPLES="${REPO_ROOT}/esp32-bridge/test_samples/dw01_raw_samples.txt"
 
 CXX="${CXX:-g++}"
 CXXFLAGS="-std=c++11 -Wall -Wextra -Werror -I${INCLUDE_DIR}"
@@ -42,6 +43,13 @@ echo "==> building contract test"
 
 echo "==> running contract test"
 "${BUILD_DIR}/contract_test" "${SAMPLES}" "${FIXTURE}" "${EDGE_SAMPLES}" "${EDGE_FIXTURE}"
+
+echo
+echo "==> building DW01 contract test"
+"${CXX}" ${CXXFLAGS} -o "${BUILD_DIR}/dw01_contract_test" "${SCRIPT_DIR}/dw01_contract_test.cpp"
+
+echo "==> running DW01 contract test"
+"${BUILD_DIR}/dw01_contract_test" "${DW01_SAMPLES}"
 
 echo
 echo "==> independent CBOR cross-check (python, RFC 8949)"
