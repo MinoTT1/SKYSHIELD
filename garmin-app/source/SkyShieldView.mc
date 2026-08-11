@@ -10,6 +10,21 @@ const SPLASH_DURATION_MS = 1000;
 // Held long enough to read or photograph the post-crash ledger off the screen.
 const SPLASH_CRASH_REPORT_MS = 40000;
 const ALERT_DURATION_MS = 3000;
+
+// Alert screen vertical anchors, in device pixels on a 280x280 fenix7x /
+// Enduro 2. These are not free parameters: they are the coordinates the
+// separator lines are actually drawn at, named so the row layout can be
+// derived from them instead of being tuned by eye.
+//
+//   drawAlertTopSeparator()  draws at y = 76
+//   drawActionState()        is called with y = 214 and draws its line at y - 12
+//
+// If either line moves, change it here and the rows re-centre themselves.
+const ALERT_TOP_SEPARATOR_Y = 76;
+const ALERT_ACTION_STATE_Y = 214;
+const ALERT_BOTTOM_SEPARATOR_Y = 202;
+// Minimum gap between any glyph box and either separator line.
+const ALERT_ROW_CLEARANCE = 6;
 const MONITOR_TIMEOUT_MS = 5000;
 const UI_CYCLE_MS = 5000;
 const MOCK_ALERT_ROTATION_MS = 4000;
@@ -785,39 +800,90 @@ class SkyShieldView extends WatchUi.View {
         var trackState = getSystemHealthState();
         var displaySeverity = _formatter.resolveSeverityForTrack(alert, trackState);
         var severityLabel = _formatter.formatSeverity(displaySeverity);
-        var y = 94;
+        var titleFont = getAlertTitleFont();
+        var layout = computeAlertRowLayout(dc, titleFont, Graphics.FONT_TINY);
+        var y = layout[:top];
 
         drawAlertTopSeparator(dc, width);
         drawDroneClassHeader(dc, width, alert);
 
         dc.setColor(getRiskColor(displaySeverity), Graphics.COLOR_BLACK);
-        drawCentered(dc, width, y, _formatter.formatThreat(alert.threatType), getAlertTitleFont());
-        y += 33;
+        drawCentered(dc, width, y, _formatter.formatThreat(alert.threatType), titleFont);
+        y += layout[:titleStep];
 
         // Confidence sits directly under the classification so the operator
         // reads "what" and "how sure" together. "--" when the detector gave
         // no confidence value; never a fabricated 0%.
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _formatter.formatConfidence(alert), Graphics.FONT_TINY);
-        y += 26;
+        y += layout[:rowStep];
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y, _formatter.formatBand(alert.band), Graphics.FONT_TINY);
-        y += 28;
+        y += layout[:rowStep];
 
         drawCentered(dc, width, y, _formatter.formatStrength(alert.distanceLabel), Graphics.FONT_TINY);
 
-        drawActionState(dc, width, 214, alert);
+        drawActionState(dc, width, ALERT_ACTION_STATE_Y, alert);
         drawBleStatusFooter(dc, width);
         drawAlertBandActivityMeter(dc, alert);
         drawAlertSeverityMeter(dc, width, severityLabel);
+    }
+
+    // Centres the four alert rows between the two separator lines.
+    //
+    // The row positions used to be four literals (94, +33, +26, +28) chosen by
+    // eye. They put the last row's TOP at 181, and a FONT_TINY glyph box is
+    // over 20px tall, so its bottom landed past the lower separator at 202 --
+    // the line ran straight through "MODERATE" and read as a strikethrough.
+    //
+    // Nothing here is a tuned constant. The row heights come from the device
+    // via getFontHeight(), the bounds come from where the separators are
+    // actually drawn, and the spacing is whatever is left over divided evenly.
+    // That keeps it correct if a font, a device or a separator ever changes.
+    function computeAlertRowLayout(dc, titleFont, rowFont) {
+        var titleH = dc.getFontHeight(titleFont);
+        var rowH = dc.getFontHeight(rowFont);
+        var textH = titleH + (rowH * 3);
+
+        // Usable band: inside both lines, minus the clearance on each side.
+        var top = ALERT_TOP_SEPARATOR_Y + 1 + ALERT_ROW_CLEARANCE;
+        var bottom = ALERT_BOTTOM_SEPARATOR_Y - ALERT_ROW_CLEARANCE;
+        var space = bottom - top;
+
+        // Three gaps between four rows. Floor at zero so a hypothetical font
+        // set too tall for the space cannot produce negative leading.
+        var gap = (space - textH) / 3;
+
+        if (gap < 0) {
+            gap = 0;
+        }
+
+        var blockH = textH + (gap * 3);
+
+        // Centring the block is what makes the guarantee symmetric. There is
+        // deliberately no "if (y < top) { y = top; }" here: that clamp would
+        // only ever fire when the rows do not fit, and it would push the whole
+        // shortfall onto the bottom edge -- the exact edge this is fixing.
+        // Centring splits any shortfall evenly instead.
+        //
+        // Both clearances hold at ALERT_ROW_CLEARANCE or better as long as
+        //     titleH + 3 * rowH <= 113
+        // which on this device is 26 + 3*22 = 92, a 21px margin.
+        var y = top + ((space - blockH) / 2);
+
+        return {
+            :top => y,
+            :titleStep => titleH + gap,
+            :rowStep => rowH + gap
+        };
     }
 
     function drawAlertTopSeparator(dc, width) {
         var margin = 48;
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-        dc.drawLine(margin, 76, width - margin, 76);
+        dc.drawLine(margin, ALERT_TOP_SEPARATOR_Y, width - margin, ALERT_TOP_SEPARATOR_Y);
     }
 
     function drawDroneClassHeader(dc, width, alert) {
@@ -1271,8 +1337,10 @@ class SkyShieldView extends WatchUi.View {
     function drawActionState(dc, width, y, alert) {
         var margin = 46;
 
+        // Drawn from the shared anchor rather than y - 12, so the line the rows
+        // are centred against and the line actually rendered cannot drift apart.
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_BLACK);
-        dc.drawLine(margin, y - 12, width - margin, y - 12);
+        dc.drawLine(margin, ALERT_BOTTOM_SEPARATOR_Y, width - margin, ALERT_BOTTOM_SEPARATOR_Y);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         drawCentered(dc, width, y + 2, "LIVE", Graphics.FONT_TINY);
