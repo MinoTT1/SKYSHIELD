@@ -1,0 +1,15 @@
+# Unit-test build ONLY.
+#
+# monkey.jungle is the shipping build and is deliberately left untouched: its
+# sourcePath is `source` alone, so no test code can reach the .prg that goes on
+# the watch. Relying on (:test) annotations to strip test symbols was measured
+# and found to leave 80 bytes behind, so the separation is by source path
+# instead, which is absolute.
+#
+#   monkeyc -f monkey-test.jungle --unit-test -d fenix7x -o build/test.prg
+#   monkeydo build/test.prg fenix7x -t
+
+project.manifest = manifest.xml
+
+base.sourcePath = source;test
+base.resourcePath = resources
